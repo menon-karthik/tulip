@@ -3,44 +3,49 @@
 using namespace std;
 
 // Constructor
-cmLPNModel::cmLPNModel(){
+cmLPNModel::cmLPNModel(odeIntegrator* integrator){
   this->integrator = integrator;
 }
 
 // Distuctor
-cmModel::~cmModel(){
+cmLPNModel::~cmLPNModel(){
 
 }
 
-int getParameterTotal(){
-  this->integrator->model->getParameterTotal();
+int cmLPNModel::getParameterTotal(){
+  this->integrator->ode->getParameterTotal();
 }
 
-int getStateTotal(){
-  this->integrator->model->getStateTotal();
+int cmLPNModel::getStateTotal(){
+  this->integrator->ode->getStateTotal();
 }
 
-int getResultTotal(){
-  this->integrator->model->getResultTotal();
+int cmLPNModel::getResultTotal(){
+  this->integrator->ode->getResultTotal();
 }
 
-void getParameterLimits(stdVec& limits){
-  this->integrator->model->getParameterLimits(limits);
+void cmLPNModel::getParameterLimits(stdVec& limits){
+  this->integrator->ode->getParameterLimits(limits);
 }
 
-void getDefaultParams(stdVec& params){
-  this->integrator->model->getDefaultParams(params);
+void cmLPNModel::getDefaultParams(stdVec& params){
+  this->integrator->ode->getDefaultParams(params);
 }
 
-string getParamName(int parID){
-  this->integrator->model->getParamName(parID);
+string cmLPNModel::getParamName(int parID){
+  this->integrator->ode->getParamName(parID);
 }
 
-string getResultName(int resID){
-  this->integrator->model->getResultName(resID);
+string cmLPNModel::getResultName(int resID){
+  this->integrator->ode->getResultName(resID);
 }
 
-double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
-  integrator->run(inputs,outputs);
-  int totalSteps,double timeStep,stdVec iniVals,stdVec params,stdMat& outVals,stdMat& auxOutVals
+double cmLPNModel::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+
+  // Run the integrator
+  integrator->run(int totalSteps,double timeStep,stdVec iniVals,stdVec params,stdMat& outVals,stdMat& auxOutVals);
+
+  // Post-process and write outputs
+  integrator->postProcess();
+
 }

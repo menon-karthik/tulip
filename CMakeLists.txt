@@ -21,7 +21,7 @@ OPTION(buildDocumentation "Build Documentation" OFF)
 # ===================
 # INCLUDES TEST CASES
 # ===================
-OPTION(buildTests "Build tulip Test Suite" OFF)
+OPTION(buildTests "Build tulip Test Suite" ON)
 
 # ===============================
 # SET FOLDERS FOR CMAKE UTILITIES
@@ -115,6 +115,8 @@ ADD_DEFINITIONS("-g -m64 -O3 -std=c++0x -fPIC -fmax-errors=5")
 INCLUDE_DIRECTORIES(
   "${CMAKE_SOURCE_DIR}/src/"
   "${CMAKE_SOURCE_DIR}/src/actions/"
+  "${CMAKE_SOURCE_DIR}/src/models/odeModels/"
+  "${CMAKE_SOURCE_DIR}/src/models/odeIntegrators/"
   "${CMAKE_SOURCE_DIR}/src/models/"
   "${CMAKE_SOURCE_DIR}/src/data/"
   "${CMAKE_SOURCE_DIR}/src/tools/"

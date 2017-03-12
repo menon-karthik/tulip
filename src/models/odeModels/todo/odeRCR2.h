@@ -6,7 +6,7 @@
 
 # include "cmModel.h"
 # include "cmException.h"
-# include "lpnUtils.h"
+# include "cmUtils.h"
 
 # include "uqTypes.h"
 # include "math.h"

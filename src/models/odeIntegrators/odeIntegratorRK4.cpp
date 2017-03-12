@@ -2,6 +2,10 @@
 
 using namespace std;
 
+// Constructor
+odeIntegratorRK4::odeIntegratorRK4(odeModel* odeModel):odeIntegrator(odeModel){
+}
+
 int odeIntegratorRK4::run(int totalSteps,double timeStep,stdVec iniVals,stdVec params,stdMat& outVals,stdMat& auxOutVals){
 
   // Intialize Current Time
@@ -11,8 +15,8 @@ int odeIntegratorRK4::run(int totalSteps,double timeStep,stdVec iniVals,stdVec p
   bool isValidDouble = true;
 
   // Get Total number of States
-  int totalStates = getStateTotal();
-  int totAuxStates = getAuxStateTotal();
+  int totalStates = ode->getStateTotal();
+  int totAuxStates = ode->getAuxStateTotal();
 
   // Allocate Temporary Variables
   stdVec k1;
@@ -68,7 +72,7 @@ int odeIntegratorRK4::run(int totalSteps,double timeStep,stdVec iniVals,stdVec p
   }
 
   // Set Initial Conditions
-  for(int loopA=0;loopA<getStateTotal();loopA++){
+  for(int loopA=0;loopA<ode->getStateTotal();loopA++){
     Xn[loopA] = iniVals[loopA];
   }
 
@@ -81,25 +85,25 @@ int odeIntegratorRK4::run(int totalSteps,double timeStep,stdVec iniVals,stdVec p
     stepId++;
 
     // Eval K1
-    model->eval(currTime,Xn,params,k1,k1AuxOut,Ind);
+    ode->eval(currTime,Xn,params,k1,k1AuxOut,Ind);
 
     // Eval K2
     for(int loopB=0;loopB<totalStates;loopB++){
       Xk2[loopB] = Xn[loopB] + ((1.0/3.0)*timeStep) * k1[loopB];
     }
-    model->eval(currTime + (1.0/3.0) * timeStep,Xk2,params,k2,k2AuxOut,Ind);
+    ode->eval(currTime + (1.0/3.0) * timeStep,Xk2,params,k2,k2AuxOut,Ind);
     
     // Eval K3
     for(int loopB=0;loopB<totalStates;loopB++){
       Xk3[loopB] = Xn[loopB] - (1.0/3.0)*timeStep * k1[loopB] + (1.0*timeStep) * k2[loopB];
     }
-    model->eval(currTime + (2.0/3.0) * timeStep,Xk3,params,k3,k3AuxOut,Ind);
+    ode->eval(currTime + (2.0/3.0) * timeStep,Xk3,params,k3,k3AuxOut,Ind);
     
     // Eval K4
     for(int loopB=0;loopB<totalStates;loopB++){
       Xk4[loopB] = Xn[loopB] + timeStep*k1[loopB] - timeStep*k2[loopB] + timeStep * k3[loopB];
     }
-    model->eval(currTime + timeStep,Xk4,params,k4,k4AuxOut,Ind);
+    ode->eval(currTime + timeStep,Xk4,params,k4,k4AuxOut,Ind);
 
     // Eval Xn1
     for(int loopB=0;loopB<totalStates;loopB++){

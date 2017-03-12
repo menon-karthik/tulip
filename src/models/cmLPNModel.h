@@ -10,12 +10,10 @@ using namespace std;
 
 // GENERIC CLASS FOR MODELS
 class cmLPNModel: public cmModel{
-  private:
+  public:
 
     // ODE Integrator that contains the model
     odeIntegrator* integrator;
-  
-  public:
 
     //! Default constructor
     cmLPNModel(odeIntegrator* integrator);

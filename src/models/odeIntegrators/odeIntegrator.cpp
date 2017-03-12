@@ -1,7 +1,7 @@
 # include "odeIntegrator.h"
 
 // Constructor
-odeIntegrator::odeIntegrator(odeModel* model){
-  this->model = model;
+odeIntegrator::odeIntegrator(odeModel* odeModel){
+  this->ode = odeModel;
 }
 

@@ -2,13 +2,14 @@
 #define ODEINTEGRATORRK4_H
 
 # include "odeIntegrator.h"
+# include "odeModel.h"
 
 // GENERIC CLASS FOR SAMPLES
 class odeIntegratorRK4: public odeIntegrator{
   public:
 
     // Constructor
-    odeIntegratorRK4(odeModel* model);
+    odeIntegratorRK4(odeModel* odeModel);
 
     // Destructor
     virtual ~odeIntegratorRK4();

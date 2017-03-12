@@ -5,14 +5,13 @@
 
 // Generic class for ODE integrator
 class odeIntegrator{
-  private:
-    // ODE model to integrate
-    odeModel* model;
-
   public:
 
+    // ODE model to integrate
+    odeModel* ode;    
+
     // Constructor
-    odeIntegrator(odeModel* model);
+    odeIntegrator(odeModel* odeModel);
 
     // Destructor
     virtual ~odeIntegrator();

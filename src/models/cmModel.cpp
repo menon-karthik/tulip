@@ -1,7 +1,4 @@
-# include <string>
-
 # include "cmModel.h"
-# include "cmException.h"
 
 using namespace std;
 
