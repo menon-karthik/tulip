@@ -10,13 +10,13 @@
 # define ARMA_DONT_USE_CXX11
 # include <armadillo>
 
-# include "uqTypes.h"
-# include "uqPartitionBinaryTree.h"
 # include "pdflib.h"
 # include "rnglib.h"
-# include "uqException.h"
 # include "uqTypes.h"
 # include "uqConstants.h"
+# include "uqPartitionBinaryTree.h"
+# include "uqException.h"
+# include "cmUtils.h"
 # include "sparse_grid_cc.h"
 # include "uq1DQuadratureRule.h"
 # include "uq1DQuadratureRule_CC.h"

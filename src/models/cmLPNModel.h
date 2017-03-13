@@ -4,6 +4,7 @@
 # include <string>
 
 # include "cmModel.h"
+# include "cmException.h"
 # include "odeIntegrator.h"
 
 using namespace std;

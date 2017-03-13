@@ -5,6 +5,9 @@ using namespace std;
 odeNormalAdult::odeNormalAdult(){
 }
 
+odeNormalAdult::~odeNormalAdult(){
+}
+
 int odeNormalAdult::getParameterTotal(){
   return 89;
 }
@@ -19,6 +22,10 @@ int odeNormalAdult::getAuxStateTotal(){
 
 int odeNormalAdult::getResultTotal(){
   return 5;  
+}
+
+string odeNormalAdult::getResultName(int resID){
+  throw cmException("ERROR: odeNormalAdult::getResultName Not Implemented.");
 }
 
 string odeNormalAdult::getParamName(int index){
@@ -278,7 +285,7 @@ double evalElastance(double tr){
   return eMin + eMax* (( num1 / den1 ) * factor2);
 }
 
-void odeNormalAdult::eval(double t,const stdVec& Xk,const stdVec& params,const stdVec& fn, stdVec& DXk, stdVec& auxOut){
+void odeNormalAdult::eval(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut){
 
   // Assign the Parameters
   double HR         = params[0]; // Heart Rate

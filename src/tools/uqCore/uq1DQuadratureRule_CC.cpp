@@ -40,7 +40,7 @@ void uq1DQuadratureRule_CC::generatePointsAndWeights(){
   double GY[loopEnd+1];
   // Evaluate the Location of the Quadrature Points
   for(int loopA=0;loopA<totalPoints;loopA++){
-    points[loopA] = -cos(((loopA)*kPI)/(totalPoints-1));
+    points[loopA] = -cos(((loopA)*M_PI)/(totalPoints-1));
   }
   // Form Vector V
   for(int loopA=0;loopA<(loopEnd+1);loopA++){
