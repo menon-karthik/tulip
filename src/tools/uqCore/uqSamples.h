@@ -46,8 +46,6 @@ const int kDoubleCC = 2;
 const int kBoundingBox = 0;
 const int kFourSTD = 1;
 
-const int array[] = { 1, 2, 3 };
-
 // QUASI RANDOM SAMPLES
 enum quasiRandomTypes{rsHalton};
 enum randomAdaptiveSamplingTypes{asRandom,asHalton};

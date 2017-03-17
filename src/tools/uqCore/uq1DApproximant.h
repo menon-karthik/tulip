@@ -16,8 +16,8 @@ class uq1DApproximant{
 
     // Member Functions
     // Evaluate Approximant
-    virtual double eval(double XValue) = 0;
-    void eval(stdVec XValue,stdVec& results);
+    virtual double evaluate(double XValue) = 0;
+    void evaluate(stdVec XValue,stdVec& results);
 
     // Export Multi-element Approximant to File
     virtual void exportToTextFile(string fileName, bool append = false) = 0;

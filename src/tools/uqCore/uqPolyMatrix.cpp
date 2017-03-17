@@ -43,7 +43,7 @@ uqPolyMatrix::uqPolyMatrix(uqSamples xValues, int maxOrder, int polyType, int co
         // Eval Order from multi-index
         currPolyOrder = mi(loopB,loopC);
         // Eval function Value
-        currBaseValue = myInterp->eval(xValue,currPolyOrder);
+        currBaseValue = myInterp->evaluate(xValue,currPolyOrder);
         // Fill Constraint Mat
         values[loopA][loopB] *= currBaseValue;
       }

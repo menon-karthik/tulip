@@ -25,7 +25,7 @@ uq1DQuadratureRule_CCDouble::uq1DQuadratureRule_CCDouble(const int quadOrder, co
 void uq1DQuadratureRule_CC::generatePointsAndWeights(){
   // Zero Points
   if(totalPoints < 1){
-    throw uqQuadratureException("Error: Not Enough Points for Quadrature.");
+    throw uqException("Error: Not Enough Points for Quadrature.");
   } 
   // Only One Point
   if(totalPoints == 1){

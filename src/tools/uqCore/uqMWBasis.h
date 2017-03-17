@@ -32,7 +32,6 @@ class uqMWBasis: public uqBasis{
     virtual ~uqMWBasis();
     // Allocation and Deallocation
     void AllocateMWCoefficients();
-    void DeallocateMWCoefficients();
     void formUniformMeasure(int quadOrder);
     
     // Member Functions
@@ -49,7 +48,7 @@ class uqMWBasis: public uqBasis{
 
     // Virtual evaluation function
     virtual int getPolynomialType();
-    virtual double eval(double XValue, int order);
+    virtual double evaluate(double XValue, int order);
 };
 
 #endif // UQMWBASIS_H

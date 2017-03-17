@@ -266,10 +266,11 @@ int cmTableInterpolator::getCloserPointId(stdVec inputs){
 // ================
 // EVAL MODEL ERROR
 // ================
-double cmTableInterpolator::evalModelError(stdVec inputs,stdVec& outputs,int& errorCode){
+double cmTableInterpolator::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
 
   // Init Error
-  errorCode = 0;
+  errorCode.clear();
+  errorCode.push_back(0);
 
   if(interpMethod != kNearestNighbor){
     // Convert Input to Samples
@@ -340,11 +341,4 @@ double cmTableInterpolator::evalModelError(stdVec inputs,stdVec& outputs,int& er
   }
   // Return log-likelihood
   return sqrt(modelError);
-}
-
-// =========================
-// MULTIPLE MODEL EVALUATION
-// =========================
-stdVec cmTableInterpolator::evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode){
-  throw new cmException("ERROR: Not Implemented.\n");
 }

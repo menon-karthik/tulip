@@ -58,8 +58,7 @@ class cmTableInterpolator: public cmModel{
   	virtual void   getPriorMapping(int priorModelType,int* prPtr);
     
     // EVAL MODEL
-    virtual double evalModelError(stdVec inputs,stdVec& outputs,int& errorCode);
-    virtual stdVec evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode);
+    virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
 };
 
 #endif //CMTABLEINTERPOLATOR_H

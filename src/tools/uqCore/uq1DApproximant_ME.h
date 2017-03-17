@@ -1,25 +1,25 @@
-#ifndef UQ1DMEAPPROXIMANT_H
-#define UQ1DMEAPPROXIMANT_H
+#ifndef UQ1DAPPROXIMANT_ME_H
+#define UQ1DAPPROXIMANT_ME_H
 
 # include "uq1DApproximant.h"
-# include "uq1DSEApproximant.h"
+# include "uq1DApproximant_SE.h"
 # include "uqMWBasis.h"
 
 // CLass for Multi-element Approximants
-class uq1DMEApproximant: public uq1DApproximant{
+class uq1DApproximant_ME: public uq1DApproximant{
   public:
     // Data Members
     // One basis for each Element
-    vector<uq1DSEApproximant*> approx;
+    vector<uq1DApproximant_SE*> approx;
     
     // Constructor and Destructor        
-    uq1DMEApproximant();
-    uq1DMEApproximant(vector<uq1DSEApproximant*> locApprox);
-    virtual ~uq1DMEApproximant();
+    uq1DApproximant_ME();
+    uq1DApproximant_ME(vector<uq1DApproximant_SE*> locApprox);
+    virtual ~uq1DApproximant_ME();
     
     // Member Functions
     // Evaluate Intepolator
-    virtual double eval(double XValue);
+    virtual double evaluate(double XValue);
 
     // Evaluate the element ID whose the value belongs to
     int getElementID(double value);

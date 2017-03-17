@@ -19,9 +19,11 @@ class uq1DQuadratureRule{
     int getTotalPoints(){return totalPoints;};
     stdVec getPoints();
     stdVec getWeights();
+    // Printing Facilities
+    void printToFile(std::string fileName);
+    void printToScreen();
+    // Points and weights generation
     virtual void generatePointsAndWeights() = 0;
-    virtual void printToFile(std::string fileName);
-    virtual void print();
 };
 
 #endif // UQQUADRATURERULE_H

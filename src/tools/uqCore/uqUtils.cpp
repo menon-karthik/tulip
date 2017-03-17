@@ -141,7 +141,7 @@ void solveDenseLinearSystem(int totRows, int totCols, stdMat coeffMat, stdVec cu
   // Solve System
   bool solvedOK = solve(xVec,A,b);
   if(!solvedOK){
-    throw uqSolverException("ERROR: Armadillo solve...\n");
+    throw uqException("ERROR: Armadillo solve...\n");
   }
 
   // Copy Result Back

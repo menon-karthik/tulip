@@ -70,7 +70,7 @@ double evalLegendre(int order, double XValue){
 }
 
 // Eval Generic Polynomials at requested order
-double uqPolyBasis::eval(double XValue, int order){
+double uqPolyBasis::evaluate(double XValue, int order){
   if(order > basisOrder-1){
     throw uqException("ERROR: Order exceeds basis order.\n");
   }

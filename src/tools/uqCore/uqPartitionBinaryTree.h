@@ -153,7 +153,7 @@ class uqPartitionBinaryTree: public uqPartition{
   	stdIntVec getLeafIndex();
 
     // Refine partition
-    void print();
+    void printToScreen();
     void printLeavesToFile(string outFileName);
 
 };

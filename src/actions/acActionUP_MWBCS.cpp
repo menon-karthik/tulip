@@ -1,4 +1,3 @@
-
 # include "acActionUP_MWBCS.h"
 
 void performMWOrthogonalityTest(uqSamples* grid, uqMatrix* mwMat, stdMat measure){
@@ -1302,7 +1301,7 @@ int acActionUP_MWBCS::go(){
                 //printf("Value: %f, Result: %f\n",measureLocations[loopC],measure[loopB][loopC]);
               }else if(opts.measureInputMode == miFromBetaMarginals){
                 //printf("Called with Value: %f\n",measureLocations[loopC]);
-                measure[loopB][loopC] = marginalMeasures[loopB]->eval(measureLocations[loopC]);
+                measure[loopB][loopC] = marginalMeasures[loopB]->evaluate(measureLocations[loopC]);
                 //printf("Value: %f, Result: %f\n",measureLocations[loopC],measure[loopB][loopC]);
                 // getchar();
               }else{
@@ -2111,7 +2110,7 @@ void acActionUP_MWBCS::evalMarginals(uqSamples* inputs,stdMat& marginals){
 }
 
 // NORMALIZE THE INTEGRAL OF THE APPROXIMANT TO 1.0
-void normalizeApproximant(uq1DMEApproximant* meApprox){
+void normalizeApproximant(uq1DApproximant_ME* meApprox){
   // Get an integration grid
 
   // Set Quadrature Order and type of support
@@ -2137,7 +2136,7 @@ void normalizeApproximant(uq1DMEApproximant* meApprox){
     for(int loopB=0;loopB<rule->getTotalPoints();loopB++){
       // Scale Current Point
       currPoint = minEl + quadPoints[loopB] * (maxEl - minEl);
-      currVal = meApprox->approx[loopA]->eval(currPoint);
+      currVal = meApprox->approx[loopA]->evaluate(currPoint);
       currIntegral += currVal * quadWeights[loopB] * elSize;
     }
   }
@@ -2148,7 +2147,7 @@ void normalizeApproximant(uq1DMEApproximant* meApprox){
 }
 
 // If the inputs are one-dimensional, generate a multi-element approximant
-uq1DMEApproximant* acActionUP_MWBCS::generate1DMEApproximant(bool normalize){
+uq1DApproximant_ME* acActionUP_MWBCS::generate1DMEApproximant(bool normalize){
 
   // Return error if input has more than one dimension
   if(inputs->getTotDims() != 1){
@@ -2164,7 +2163,7 @@ uq1DMEApproximant* acActionUP_MWBCS::generate1DMEApproximant(bool normalize){
 
   // Loop on Partitions
   uqPartitionNode* currPartition;
-  vector<uq1DSEApproximant*> seApprox;
+  vector<uq1DApproximant_SE*> seApprox;
   int currLeafIndex = 0;
   for(int loopA=0;loopA<totPartitions;loopA++){
 
@@ -2196,14 +2195,14 @@ uq1DMEApproximant* acActionUP_MWBCS::generate1DMEApproximant(bool normalize){
     }
 
     // Construct each single-element approximant
-    uq1DSEApproximant* currApprox = new uq1DSEApproximant(atMW,locBasisOrder,locQuadOrder,
-                                                          locMeasure[0],locCoeffs,locLimits);
+    uq1DApproximant_SE* currApprox = new uq1DApproximant_SE(atMW,locBasisOrder,locQuadOrder,
+                                                            locMeasure[0],locCoeffs,locLimits);
     // Add to the array of SE approximants
     seApprox.push_back(currApprox);
   }
 
   // Create Multiwavelet approximant from array for SE
-  uq1DMEApproximant* result = new uq1DMEApproximant(seApprox);
+  uq1DApproximant_ME* result = new uq1DApproximant_ME(seApprox);
 
   // Normalize to have a unit integral
   if(normalize){

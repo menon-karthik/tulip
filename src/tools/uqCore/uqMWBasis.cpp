@@ -1,8 +1,7 @@
 # include "uqMWBasis.h"
 
 // Constructor
-uqMWBasis::uqMWBasis(int order)
-{
+uqMWBasis::uqMWBasis(int order){
   // Set Order
   basisOrder = order; 
   // set Default Quadrature Points
@@ -19,8 +18,7 @@ uqMWBasis::uqMWBasis(int order)
 }
 
 // Constructor 2
-uqMWBasis::uqMWBasis(int order,int quadOrder)
-{
+uqMWBasis::uqMWBasis(int order,int quadOrder){
   // Set Order
   basisOrder = order; 
   // set Quadrature Points
@@ -37,8 +35,7 @@ uqMWBasis::uqMWBasis(int order,int quadOrder)
 }
 
 // Constructor 3
-uqMWBasis::uqMWBasis(int order,int quadOrder, stdVec probMeasure)
-{
+uqMWBasis::uqMWBasis(int order,int quadOrder, stdVec probMeasure){
   // Set Order
   basisOrder = order; 
   // set Quadrature Points
@@ -696,7 +693,7 @@ double uqMWBasis::EvalMS(double XValue, int scaleIndex, int shiftIndex, int poly
     return 0.0;
   }else{
     double newCoord = pow(2.0,scaleIndex)*XValue-shiftIndex;    
-    return pow(2.0,0.5*scaleIndex)*orthoPoly->eval(newCoord,polyOrderIndex);
+    return pow(2.0,0.5*scaleIndex)*orthoPoly->evaluate(newCoord,polyOrderIndex);
   }
 }
 
@@ -774,7 +771,7 @@ double uqMWBasis::EvalExactMotherMW(double XValue, int polyOrder, int basisOrder
 
   // Check Max Order
   if (basisOrder>4){ 
-    throw uqInterpolationException("Internal: MW Order Cannot be Bigger than 4 for Exact Evaluation.\n");
+    throw uqException("Internal: MW Order Cannot be Bigger than 4 for Exact Evaluation.\n");
   }
   // Eval MW
   double currentXValue = XValue;
@@ -804,7 +801,7 @@ double uqMWBasis::EvalSingleExactMW(double XValue, int scaleIndex, int shiftInde
 }
 
 // Virtual Evaluation Function
-double uqMWBasis::eval(double XValue, int order){
+double uqMWBasis::evaluate(double XValue, int order){
   throw uqException("ERROR: Eval Not implemented for uqMWBasis.\n");
 }
 

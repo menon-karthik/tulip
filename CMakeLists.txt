@@ -11,7 +11,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 # =================
 # SET PYTHON OPTION
 # =================
-OPTION(buildPythonInterface "Build Python Interface" OFF)
+OPTION(buildPythonInterface "Build Python Interface" ON)
 
 # ===================
 # BUILD DOCUMENTATION
@@ -21,7 +21,7 @@ OPTION(buildDocumentation "Build Documentation" OFF)
 # ===================
 # INCLUDES TEST CASES
 # ===================
-OPTION(buildTests "Build tulip Test Suite" ON)
+OPTION(buildTests "Build tulip Test Suite" OFF)
 
 # ===============================
 # SET FOLDERS FOR CMAKE UTILITIES
@@ -60,13 +60,13 @@ FILE(GLOB UQ_SRC_H "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/*.h"
 
 # SWIG INTERFACE FILES
 # UQ functionalities - Uncertainty Quantification
-FILE(GLOB UQ_SRC_I_UQ "${CMAKE_CURRENT_SOURCE_DIR}/src/tools/uqCore/tulipUQ.i")
+FILE(GLOB PY_I_UQ "${CMAKE_CURRENT_SOURCE_DIR}/src/tools/uqCore/tulipUQ.i")
 # CM functionalities - Computational Models for Hemodynamics
-FILE(GLOB UQ_SRC_I_CM "${CMAKE_CURRENT_SOURCE_DIR}/src/models/tulipCM.i")
+FILE(GLOB PY_I_CM "${CMAKE_CURRENT_SOURCE_DIR}/src/models/tulipCM.i")
 # AC functionalities - High level algorithms for uncertainty analysis
-FILE(GLOB UQ_SRC_I_AC "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipAC.i")
+# FILE(GLOB UQ_SRC_I_AC "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipAC.i")
 # DA functionalities - Data structures
-FILE(GLOB UQ_SRC_I_DA "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipDA.i")
+# FILE(GLOB UQ_SRC_I_DA "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipDA.i")
 
 # DEFINE FOLDERS VARIABLES
 SET(LPN_SRCS_DIR "./src")
@@ -133,7 +133,7 @@ ADD_SUBDIRECTORY(${LPN_SRCS_DIR})
 # ================================
 IF(buildDocumentation)
   
-  OPTION(USE_SYSTEM_DOXYGEN "Use the pre-compiled version of Doxygen configured for your system" OFF )
+  OPTION(USE_SYSTEM_DOXYGEN "Use the pre-compiled version of Doxygen configured for your system" ON)
 
   # INSTALL DOXYGEN IF REQUIRED
   IF( NOT USE_SYSTEM_DOXYGEN )
@@ -150,7 +150,7 @@ ENDIF()
 # ======================
 IF(buildPythonInterface)
 
-  OPTION(USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 2.0 previously configured for your system" OFF )
+  OPTION(USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 2.0 previously configured for your system" ON)
 
   # INSTALL SWIG IF REQUIRED
   IF( NOT USE_SYSTEM_SWIG )

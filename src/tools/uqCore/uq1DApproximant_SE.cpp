@@ -1,12 +1,11 @@
-
-# include "uq1DSEApproximant.h"
+# include "uq1DApproximant_SE.h"
 
 // Default Constructor
-uq1DSEApproximant::uq1DSEApproximant(){
+uq1DApproximant_SE::uq1DApproximant_SE(){
   basis = NULL;
 }
 
-uq1DSEApproximant::uq1DSEApproximant(approxTypes approxType,int order,int quadOrder,stdVec probMeasure,stdVec locCoeffs,stdVec limits){
+uq1DApproximant_SE::uq1DApproximant_SE(approxTypes approxType,int order,int quadOrder,stdVec probMeasure,stdVec locCoeffs,stdVec limits){
 
   // Define Approx and Polynomial Type
   this->approxType = approxType;
@@ -38,7 +37,7 @@ uq1DSEApproximant::uq1DSEApproximant(approxTypes approxType,int order,int quadOr
   }
 }
 
-uq1DSEApproximant::uq1DSEApproximant(int polyType,int order,stdVec locCoeffs,stdVec limits){
+uq1DApproximant_SE::uq1DApproximant_SE(int polyType,int order,stdVec locCoeffs,stdVec limits){
 
   // Define Approx and Polynomial Type
   this->approxType = atPoly;
@@ -62,14 +61,14 @@ uq1DSEApproximant::uq1DSEApproximant(int polyType,int order,stdVec locCoeffs,std
 }
 
 // Destructor
-uq1DSEApproximant::~uq1DSEApproximant(){
+uq1DApproximant_SE::~uq1DApproximant_SE(){
   coeff.clear();
   limits.clear();
   delete basis;
 }
 
 // EVALUATION FUNCTION
-double uq1DSEApproximant::eval(double XValue){
+double uq1DApproximant_SE::evaluate(double XValue){
 
   //Scale and shift to [0,1]
   double currVal = (XValue - limits[0])/(limits[1] - limits[0]);
@@ -97,7 +96,7 @@ double uq1DSEApproximant::eval(double XValue){
 }
 
 // Export Single-element Approximant to File
-void uq1DSEApproximant::exportToTextFile(string fileName,bool append){
+void uq1DApproximant_SE::exportToTextFile(string fileName,bool append){
   FILE* outFile;
   if(append){
     outFile = fopen(fileName.c_str(),"a");
@@ -139,7 +138,7 @@ void uq1DSEApproximant::exportToTextFile(string fileName,bool append){
 }
 
 // Import Multi-element Approximant from file
-int uq1DSEApproximant::importFromTextFile(string fileName,bool startFromTop,int startLine){
+int uq1DApproximant_SE::importFromTextFile(string fileName,bool startFromTop,int startLine){
   // Open File
   ifstream myReadFile;
   string buffer;
@@ -231,14 +230,14 @@ int uq1DSEApproximant::importFromTextFile(string fileName,bool startFromTop,int 
 }
 
 // Normalize by dividing the coefficients for a common constant
-void uq1DSEApproximant::normalizeByConstant(double normValue){
+void uq1DApproximant_SE::normalizeByConstant(double normValue){
   for(int loopA=0;loopA<coeff.size();loopA++){
     coeff[loopA] /= normValue;
   }
 }
 
 // Get Extremes of the approximant
-void uq1DSEApproximant::getExtremes(stdVec& result){
+void uq1DApproximant_SE::getExtremes(stdVec& result){
   result.clear();
   result.push_back(limits[0]);
   result.push_back(limits[1]);

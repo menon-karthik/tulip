@@ -1,59 +1,25 @@
-// One-dimensional approximant
-# include "uq1DApproximant.h"
-// Global approximant on a single element
-# include "uq1DSEApproximant.h"
-// One-dimensional multi-element approximant
-# include "uq1DMEApproximant.h"
+# include "cmModel.h"
 
-// Numerical quadrature
-# include "uq1DQuadratureRule.h"
-// Tensor grid trapeziodal quadrature
-# include "uq1DQuadratureRule_Regular.h"
-// Clenshaw Curtis quadrature
-# include "uq1DQuadratureRule_CC.h"
+# include "cmConstants.h"
+# include "cmException.h"
+# include "cmUtils.h"
 
-// Algoritmhs
-# include "uqAlgorithm.h"
-// Relevance vector machine regression
-# include "uqAlgorithmBCS.h"
+# include "cmTutorial.h"
 
-// Basis functions
-# include "uqBasis.h"
-// Polynomials
-# include "uqPolyBasis.h"
-// Orthogonal polynomials
-# include "uqOrthoPolyBasis.h"
-// Generalized Alpert Multiwavelets
-# include "uqMWBasis.h"
+# include "cmAnalyticalExpressionModel.h"
 
-// Mult-index for multi-variate polynomials
-# include "uqMultiIndex.h"
+# include "cmLPNModel.h"
 
-// Measurement matrices
-# include "uqMatrix.h"
-// Polynomial matrices
-# include "uqPolyMatrix.h"
-// Generalized Multiwavelet matrices
-# include "uqMWMatrix.h"
+# include "cmTableInterpolator.h"
 
-// Parameter space partitioning
-# include "uqPartition.h"
-// Binary tree partitioning
-# include "uqPartitionBinaryTree.h"
+# include "cmSimpleNonLin.h"
 
-// Close-form PDFs
-# include "uqPDF.h"
+# include "cmResistanceModel.h"
 
-// Class for samples
-# include "uqSamples.h"
+# include "cmPDF_KnownPDF.h"
 
-// Exceptions
-# include "uqException.h"
+# include "cmKraichnanOrszagModel.h"
 
-// Constants and types
-# include "uqConstants.h"
-# include "uqTypes.h"
+# include "cmArmVenousOcclusion.h"
 
-// Utils
-# include "uqUtils.h"
-
+# include "cm3DPQSurrogateModel.h"

@@ -26,11 +26,7 @@ class uqMatrix{
     // SET
     void setRowCount(int rc){rowCount = rc;}
     void setColCount(int cc){colCount = cc;}
-    
-    // MEMBER FUNCTIONS
-    double* getColumnNorms();
-    void convertToUnitaryColums();
-    
+        
     // EASY ACCESS TO VALUES
     double operator()(const int nRow, const int nCol);
     

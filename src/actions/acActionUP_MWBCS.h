@@ -5,15 +5,17 @@
 # include <chrono>
 
 # include "acActionUP.h"
-# include "uqMWMatrix.h"
 # include "acException.h"
+# include "uqMWMatrix.h"
 # include "uqConstants.h"
 # include "uqAlgorithmBCS.h"
 # include "uqMWMatrix.h"
 # include "uqPartitionBinaryTree.h"
-# include "cmUtils.h"
 # include "uqUtils.h"
-# include "uq1DMEApproximant.h"
+# include "uq1DApproximant.h"
+# include "uq1DApproximant_SE.h"
+# include "uq1DApproximant_ME.h"
+# include "cmUtils.h"
 
 // Execution Modes
 enum inputModeTypes{imRandom,imGrid,imTable,imCVSimVTK,imFromMCMC};
@@ -223,7 +225,7 @@ class acActionUP_MWBCS: public acActionUP{
     No Reference
     \endverbatim
     */
-    uq1DMEApproximant* generate1DMEApproximant(bool normalize = true);
+    uq1DApproximant_ME* generate1DMEApproximant(bool normalize = true);
 };
 
 #endif //ACACTIONUP_MWBCS_H

@@ -18,7 +18,7 @@ class uqPolyBasis: public uqBasis{
   
     // Eval Interpolator
     virtual int getPolynomialType();
-    virtual double eval(double XValue, int order);
+    virtual double evaluate(double XValue, int order);
 };
 
 #endif // UQPOLYBASIS_H

@@ -308,7 +308,7 @@ int uqPartitionNode::countSamplesOnPartition(uqSamples* samples){
 }
 
 // PRINT PARTITION
-void uqPartitionBinaryTree::print(){
+void uqPartitionBinaryTree::printToScreen(){
   stdVec limits;
   double minSize = 0.0;
   for(int loopA=0;loopA<allNodes.size();loopA++){

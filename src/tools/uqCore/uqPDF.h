@@ -12,12 +12,11 @@ class uqPDF{
     uqPDF();
     virtual ~uqPDF(){}
     // Member Functions
-    virtual double eval(double XValue){return 0.0;}
+    virtual double evaluate(double XValue){return 0.0;}
 };
 
 // Gaussian PDF
-class uqGaussianPDF: public uqPDF 
-{
+class uqGaussianPDF: public uqPDF{
   public:
     // Parameters: TEMP
     double mean;
@@ -26,13 +25,11 @@ class uqGaussianPDF: public uqPDF
     uqGaussianPDF(double mean, double stdev);
     virtual ~uqGaussianPDF(){}
     // Member Functions
-    virtual double eval(double XValue);
-    void printToFile(string fileName);
+    virtual double evaluate(double XValue);
 };
 
 // Truncated Gaussian PDF
-class uqTruncatedGaussianPDF: public uqGaussianPDF
-{
+class uqTruncatedGaussianPDF: public uqGaussianPDF{
   public:
     // Parameters: TEMP
     double truncSigma;
@@ -40,12 +37,11 @@ class uqTruncatedGaussianPDF: public uqGaussianPDF
     uqTruncatedGaussianPDF(double mean, double stdev, double trunc);
     virtual ~uqTruncatedGaussianPDF(){}
     // Member Functions
-    virtual double eval(double XValue);
+    virtual double evaluate(double XValue);
 };
 
 // Rescaled Truncated Gaussian PDF
-class uqRescaledTruncatedGaussianPDF: public uqTruncatedGaussianPDF
-{
+class uqRescaledTruncatedGaussianPDF: public uqTruncatedGaussianPDF{
 public:
     // Data Members: TEMP
     double truncFactor;
@@ -53,7 +49,7 @@ public:
     uqRescaledTruncatedGaussianPDF(double truncFactor);
     virtual ~uqRescaledTruncatedGaussianPDF(){}
     // Member Functions
-    virtual double eval(double XValue);
+    virtual double evaluate(double XValue);
 };
 
 #endif // UQPDF_H

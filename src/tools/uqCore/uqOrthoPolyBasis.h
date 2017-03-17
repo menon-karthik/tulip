@@ -18,7 +18,7 @@ class uqOrthoPolyBasis: public uqBasis{
     // Eval Basis
     void buildRecursiveCoefficients();
     virtual int getPolynomialType();
-    virtual double eval(double XValue, int order);
+    virtual double evaluate(double XValue, int order);
 };
 
 

@@ -20,7 +20,7 @@ class uqBasis{
     // Member Functions
     // Evaluate Intepolator
     virtual int getPolynomialType() = 0;
-    virtual double eval(double XValue, int order) = 0;
+    virtual double evaluate(double XValue, int order) = 0;
 };
 
 #endif // UQBASIS_H

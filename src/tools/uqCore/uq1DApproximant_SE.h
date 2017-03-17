@@ -1,11 +1,11 @@
-#ifndef UQ1DSEAPPROXIMANT_H
-#define UQ1DSEAPPROXIMANT_H
+#ifndef UQ1DAPPROXIMANT_SE_H
+#define UQ1DAPPROXIMANT_SE_H
 
 # include "uq1DApproximant.h"
 # include "uqMWBasis.h"
 
 // APPROXIMANT ON A SINGLE ELEMENT
-class uq1DSEApproximant: public uq1DApproximant{
+class uq1DApproximant_SE: public uq1DApproximant{
   public:
     // Data Members
     // Type of Approximant
@@ -20,16 +20,16 @@ class uq1DSEApproximant: public uq1DApproximant{
     stdVec limits;
 
     // CONSTRUCTOR AND DESTRUCTOR
-    uq1DSEApproximant();
+    uq1DApproximant_SE();
     // Construct Polynomial Approximant
-    uq1DSEApproximant(int polyType,int order,stdVec locCoeffs,stdVec limits);
+    uq1DApproximant_SE(int polyType,int order,stdVec locCoeffs,stdVec limits);
     // Construct Ortho Poly or MW Approximant
-    uq1DSEApproximant(approxTypes approxType,int order,int quadOrder,stdVec probMeasure,stdVec locCoeffs,stdVec limits);    
-    virtual ~uq1DSEApproximant();
+    uq1DApproximant_SE(approxTypes approxType,int order,int quadOrder,stdVec probMeasure,stdVec locCoeffs,stdVec limits);    
+    virtual ~uq1DApproximant_SE();
     
     // Member Functions
     // Evaluate Approximant
-    virtual double eval(double XValue);
+    virtual double evaluate(double XValue);
 
     // Export Multi-element Approximant to File
     virtual void exportToTextFile(string fileName, bool append = false);
@@ -38,4 +38,4 @@ class uq1DSEApproximant: public uq1DApproximant{
     virtual void getExtremes(stdVec& result);
 };
 
-#endif // UQ1DSEAPPROXIMANT_H
+#endif // UQ1DPPROXIMANT_SE_H

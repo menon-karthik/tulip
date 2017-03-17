@@ -45,7 +45,7 @@ void uq1DQuadratureRule::printToFile(std::string fileName){
 }
 
 // Print quadrature Points and weights to File
-void uq1DQuadratureRule::print(){
+void uq1DQuadratureRule::printToScreen(){
   // Write Header
   printf("\n");
   printf("QUADRATURE POINTS PRINTOUT\n");

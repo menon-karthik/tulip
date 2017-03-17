@@ -2,11 +2,8 @@
 
 #include "uqPDF.h"
 
-uqPDF::uqPDF()
-{
+uqPDF::uqPDF(){
 }
-
-void printToFile(std::string fileName);
 
 // Constructor for Gaussian PDF
 uqGaussianPDF::uqGaussianPDF(double meanValue, double stdevValue){
@@ -15,7 +12,7 @@ uqGaussianPDF::uqGaussianPDF(double meanValue, double stdevValue){
 }
     
 // Eval Gaussian PDF
-double uqGaussianPDF::eval(double XValue){
+double uqGaussianPDF::evaluate(double XValue){
   return (1.0/(stdev*sqrt(2.0*M_PI)))*exp(-(XValue-mean)*(XValue-mean)/(2.0*stdev*stdev));
 }
 
@@ -26,7 +23,7 @@ uqTruncatedGaussianPDF::uqTruncatedGaussianPDF(double mean, double stdev, double
 }
 
 // Eval Gaussian PDF
-double uqTruncatedGaussianPDF::eval(double XValue){
+double uqTruncatedGaussianPDF::evaluate(double XValue){
   // Check Result
   if(XValue<(mean-truncSigma)){
     return 0.0;
@@ -43,13 +40,7 @@ uqRescaledTruncatedGaussianPDF::uqRescaledTruncatedGaussianPDF(double trunc):uqT
 }
 
 // Eval Rescaled Truncated Gaussian PDF
-double uqRescaledTruncatedGaussianPDF::eval(double XValue){
+double uqRescaledTruncatedGaussianPDF::evaluate(double XValue){
   double newValue = -truncFactor + (2.0*truncFactor)*XValue;
   return (1.0/(stdev*sqrt(2.0*M_PI)))*exp(-(newValue-mean)*(newValue-mean)/(2.0*stdev*stdev));
 }
-
-
-
-
-
-

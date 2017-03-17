@@ -340,7 +340,7 @@ void evalMultiDPoly(int polyType,int current_basis,int totalNodes,double* nodes,
       // Eval Order from multi-index
       currPolyOrder = multiIndex[current_basis][loopB];
       // Eval function Value
-      currBaseValue = myInterp->eval(xValue,currPolyOrder);
+      currBaseValue = myInterp->evaluate(xValue,currPolyOrder);
       // Fill Constraint Mat
       nodeResult = nodeResult*currBaseValue;
     }

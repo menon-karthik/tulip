@@ -80,7 +80,7 @@ void uqOrthoPolyBasis::buildRecursiveCoefficients(){
 }
 
 // Eval Orthogonal Polynomials
-double uqOrthoPolyBasis::eval(double XValue, int order){
+double uqOrthoPolyBasis::evaluate(double XValue, int order){
   if(order > basisOrder-1){
     throw uqException("ERROR: Order exceeds basis order.\n");
   }
