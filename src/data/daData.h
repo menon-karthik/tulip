@@ -156,7 +156,7 @@ class daData{
     \endverbatim
     \param[in] patientIndex the index of the patient column for files supporting multiple patients
     */
-    void print(int patientIndex);
+    void printToScreen(int patientIndex);
 
 
     // ========================

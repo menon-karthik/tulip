@@ -32,9 +32,6 @@ class cmKraichnanOrszagModel: public cmModel{
 
     // EVAL MODEL 
     virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
-
-    // EVAL MULTIPLE MODELS
-    stdVec evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode);
 };
 
 #endif //CMKRAICHNANORSZAGMODEL_H

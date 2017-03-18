@@ -98,7 +98,6 @@ struct mwbcsOptions{
   bool printDBGMessages;
 };
 
-
 // GENERIC CLASS FOR SAMPLES
 class acActionUP_MWBCS: public acActionUP{
   private:      
@@ -128,9 +127,8 @@ class acActionUP_MWBCS: public acActionUP{
     // Constructor for arbitrarily and dependent samples
     acActionUP_MWBCS(uqSamples* locInputs,uqSamples* locOutputs,stdVec betaCoeffs,vector<uq1DApproximant*> marginals);
 
-    // Option input/output
-    void getOptions(mwbcsOptions& mwbcsOpts);
-    void setOptions(mwbcsOptions mwbcsOpts);
+    //Destructor
+    ~acActionUP_MWBCS();
 
   	// Perform Action
   	virtual int go();

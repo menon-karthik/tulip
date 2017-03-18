@@ -77,7 +77,7 @@ cmTableInterpolator::cmTableInterpolator(string tableFile, string weightFile,
   }
 
   // Form Samples
-  double* limits = new double[2*totInputs];
+  stdVec limits;
   getParameterLimits(limits);
   // Print Limits for Debug
   //for(int loopA=0;loopA<totInputs;loopA++){
@@ -184,20 +184,30 @@ cmTableInterpolator::cmTableInterpolator(string tableFile, string weightFile,
 int cmTableInterpolator::getParameterTotal(){
   return totInputs;
 }
+
 // GET PARAMETER NAME
 string cmTableInterpolator::getParamName(int parID){
   return string("Parameter " + to_string(parID) + "\n");
 }
+
 // GET TOTAL STATES
 int cmTableInterpolator::getStateTotal(){
   return 0;
 }
+
 // GET TOTAL RESULTS
 int cmTableInterpolator::getResultTotal(){
   return totOutputs;
 }
+
+// GET RESULTS NAME
+string cmTableInterpolator::getResultName(int resID){
+  throw cmException("ERROR: cmTableInterpolator::getResultName not implemented.\n");
+}
+
 // GET PARAMETER LIMITS FROM TABLE
-void cmTableInterpolator::getParameterLimits(double* limits){
+void cmTableInterpolator::getParameterLimits(stdVec& limits){
+  limits.resize(2 * getParameterTotal());
   // Return maximum and minimum values from table
   double currValue = 0.0;
   for(int loopA=0;loopA<totInputs;loopA++){
@@ -216,9 +226,10 @@ void cmTableInterpolator::getParameterLimits(double* limits){
   }
 }
 // Get Default Parameters: Centre of the admissible space
-void cmTableInterpolator::getDefaultParams(double* params){
+void cmTableInterpolator::getDefaultParams(stdVec& params){
+  params.resize(getParameterTotal());
   // Return 
-  double limits[2*totInputs];
+  stdVec limits;
   getParameterLimits(limits);
   for(int loopA=0;loopA<totInputs;loopA++){
     params[loopA] = 0.5 * (limits[loopA*2 + 0] + limits[loopA*2 + 1]);
@@ -277,7 +288,7 @@ double cmTableInterpolator::evalModelError(stdVec inputs,stdVec& outputs, stdInt
     uqSamples sample(totInputs);
 
     // Form Samples
-    double limits[2*totInputs];
+    stdVec limits;
     getParameterLimits(limits);
     double currValue = 0.0;
     stdVec currSample;

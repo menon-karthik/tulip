@@ -64,9 +64,9 @@ FILE(GLOB PY_I_UQ "${CMAKE_CURRENT_SOURCE_DIR}/src/tools/uqCore/tulipUQ.i")
 # CM functionalities - Computational Models for Hemodynamics
 FILE(GLOB PY_I_CM "${CMAKE_CURRENT_SOURCE_DIR}/src/models/tulipCM.i")
 # AC functionalities - High level algorithms for uncertainty analysis
-# FILE(GLOB UQ_SRC_I_AC "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipAC.i")
+FILE(GLOB PY_I_AC "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipAC.i")
 # DA functionalities - Data structures
-# FILE(GLOB UQ_SRC_I_DA "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipDA.i")
+FILE(GLOB PY_I_DA "${CMAKE_CURRENT_SOURCE_DIR}/src/data/tulipDA.i")
 
 # DEFINE FOLDERS VARIABLES
 SET(LPN_SRCS_DIR "./src")

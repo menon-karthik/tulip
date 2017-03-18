@@ -53,12 +53,11 @@ class cmTableInterpolator: public cmModel{
     virtual string getParamName(int parID);
     virtual int    getStateTotal();
     virtual int    getResultTotal();
-  	virtual void   getParameterLimits(double* limits);
-  	virtual void   getDefaultParams(double* params);
+    virtual string getResultName(int resID);
+  	virtual void   getParameterLimits(stdVec& limits);
+  	virtual void   getDefaultParams(stdVec& params);
   	virtual void   getPriorMapping(int priorModelType,int* prPtr);
-    
-    // EVAL MODEL
     virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
 };
 
-#endif //CMTABLEINTERPOLATOR_H
+#endif // CMTABLEINTERPOLATOR_H

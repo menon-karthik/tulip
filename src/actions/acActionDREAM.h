@@ -25,9 +25,8 @@
 # include "acAction.h"
 # include "pdflib.h"
 # include "rnglib.h"
+# include "auxlib.h"
 # include "cmUtils.h"
-
-
 
 using namespace std;
 

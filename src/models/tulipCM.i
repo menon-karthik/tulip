@@ -1,4 +1,4 @@
-%module LPN_Coronary
+%module tulipCM
 %{
 /* Includes the header in the wrapper code */
 #include "cmModel.h"

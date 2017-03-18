@@ -386,88 +386,7 @@ int r8_round_i4 ( double x )
 
   return value;
 }
-//****************************************************************************80
 
-int i4_max ( int i1, int i2 )
-
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    I4_MAX returns the maximum of two I4's.
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    13 October 1998
-//
-//  Author:
-//
-//    John Burkardt
-//
-//  Parameters:
-//
-//    Input, int I1, I2, are two integers to be compared.
-//
-//    Output, int I4_MAX, the larger of I1 and I2.
-//
-{
-  int value;
-
-  if ( i2 < i1 )
-  {
-    value = i1;
-  }
-  else
-  {
-    value = i2;
-  }
-  return value;
-}
-//****************************************************************************80
-
-int i4_min ( int i1, int i2 )
-
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    I4_MIN returns the minimum of two I4's.
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    13 October 1998
-//
-//  Author:
-//
-//    John Burkardt
-//
-//  Parameters:
-//
-//    Input, int I1, I2, two integers to be compared.
-//
-//    Output, int I4_MIN, the smaller of I1 and I2.
-//
-{
-  int value;
-
-  if ( i1 < i2 )
-  {
-    value = i1;
-  }
-  else
-  {
-    value = i2;
-  }
-  return value;
-}
 //****************************************************************************80
 
 double *r8vec_copy_new ( int n, double a1[] )
@@ -721,51 +640,6 @@ void r8vec_sort_heap_a ( int n, double a[] )
   }
 
   return;
-}
-//****************************************************************************80
-
-double r8vec_sum ( int n, double a[] )
-
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    R8VEC_SUM returns the sum of an R8VEC.
-//
-//  Discussion:
-//
-//    An R8VEC is a vector of R8's.
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    15 October 2004
-//
-//  Author:
-//
-//    John Burkardt
-//
-//  Parameters:
-//
-//    Input, int N, the number of entries in the vector.
-//
-//    Input, double A[N], the vector.
-//
-//    Output, double R8VEC_SUM, the sum of the vector.
-//
-{
-  int i;
-  double value;
-
-  value = 0.0;
-  for ( i = 0; i < n; i++ )
-  {
-    value = value + a[i];
-  }
-  return value;
 }
 //****************************************************************************80
 

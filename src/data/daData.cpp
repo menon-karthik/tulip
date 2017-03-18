@@ -48,7 +48,7 @@ void daData::removeKeyValue(string key){
 }
 
 // Print Dictionary to stdout
-void daData::print(int patientIndex){
+void daData::printToScreen(int patientIndex){
   printf("---\n");
   printf("%30s %30s\n","key","value");
   for(dataMap::iterator it = dict.begin(); it!=dict.end();it++){

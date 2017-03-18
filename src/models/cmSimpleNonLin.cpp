@@ -6,7 +6,6 @@ using namespace std;
 
 // CONSTRUCTOR
 cmSimpleNonLin::cmSimpleNonLin(){
-
 }
 
 int cmSimpleNonLin::getParameterTotal(){
@@ -29,20 +28,24 @@ int cmSimpleNonLin::getResultTotal(){
   return 1;
 }
 
-void cmSimpleNonLin::getParameterLimits(double* limits){
+string cmSimpleNonLin::getResultName(int resID){
+  return string("noName");
+}
+
+void cmSimpleNonLin::getParameterLimits(stdVec& limits){
   limits[0] = 0.0;
   limits[1] = 2.0;
 }
 
-void cmSimpleNonLin::getDefaultParams(double* params){
+void cmSimpleNonLin::getDefaultParams(stdVec& params){
   params[0] = 1.0;
 }
 
 void cmSimpleNonLin::getPriorMapping(int priorModelType,int* prPtr){
-  throw cmException("ERROR: Not Implemented.");
+  throw cmException("ERROR: Not Implemented.\n");
 }
 
-double cmSimpleNonLin::evalModelError(stdVec inputs,stdVec& outputs, int& errorCode){
+double cmSimpleNonLin::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
   double theta = inputs[0];
   double average = 1.0;
   double sigma = 0.1;
@@ -52,11 +55,7 @@ double cmSimpleNonLin::evalModelError(stdVec inputs,stdVec& outputs, int& errorC
   outputs.push_back(out);
 
   double ll = (out-average)*(out-average)/(sigma*sigma);
-  errorCode = 0;
+  errorCode.clear();
+  errorCode.push_back(0);
   return ll;
 }
-
-stdVec cmSimpleNonLin::evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode){
-  throw cmException("ERROR: Not Implemented.");	
-}
-

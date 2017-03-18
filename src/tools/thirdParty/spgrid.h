@@ -1,4 +1,15 @@
+#ifndef SPGRID_H
+#define SPGRID_H
+
 # include <string>
+# include <cstdlib>
+# include <iostream>
+# include <iomanip>
+# include <cmath>
+# include <ctime>
+# include <cstring>
+
+# include "auxlib.h"
 
 using namespace std;
 
@@ -24,8 +35,7 @@ int i4_min ( int i1, int i2 );
 int i4_mop ( int i );
 int i4_power ( int i, int j );
 void i4mat_print ( int m, int n, int a[], string title );
-void i4mat_print_some ( int m, int n, int a[], int ilo, int jlo, int ihi,
-  int jhi, string title );
+void i4mat_print_some ( int m, int n, int a[], int ilo, int jlo, int ihi, int jhi, string title);
 int *i4vec_cum0_new ( int n, int a[] );
 void i4vec_print ( int n, int a[], string title );
 int i4vec_product ( int n, int a[] );
@@ -36,9 +46,8 @@ int kpn_order ( int l );
 void kpu ( int n, double x[], double w[] );
 int kpu_order ( int l );
 int num_seq ( int n, int k );
-void nwspgr ( void rule ( int n, double x[], double w[] ), 
-  int rule_order ( int l ), int dim, int k, int r_size, int &s_size, 
-  double nodes[], double weights[] );
+void nwspgr ( void rule ( int n, double x[], double w[] ),
+int rule_order ( int l ), int dim, int k, int r_size, int &s_size, double nodes[], double weights[] );
 int nwspgr_size ( int rule_order ( int l ), int dim, int k );
 void quad_rule_print ( int m, int n, double x[], double w[], string title );
 double r8_abs ( double x );
@@ -60,7 +69,6 @@ void r8vec_direct_product2 ( int factor_index, int factor_order,
 double r8vec_dot_product ( int n, double a1[], double a2[] );
 double *r8vec_normal_01_new ( int n, int &seed );
 void r8vec_print ( int n, double a[], string title );
-double r8vec_sum ( int n, double a[] );
 void r8vec_transpose_print ( int n, double a[], string title );
 double *r8vec_uniform_01_new ( int n, int &seed );
 void rule_adjust ( double a, double b, double c, double d, int n, double x[], 
@@ -73,3 +81,4 @@ void tensor_product ( int d, int order1d[], int n1d, double x1d[],
 void tensor_product_cell ( int nc, double xc[], double wc[], int dim, int nr[], 
   int roff[], int np, double xp[], double wp[] );
 
+#endif // SPGRID_H

@@ -1,5 +1,8 @@
 # include "acActionUP_MWBCS.h"
 
+acActionUP_MWBCS::~acActionUP_MWBCS(){
+}
+
 void performMWOrthogonalityTest(uqSamples* grid, uqMatrix* mwMat, stdMat measure){
 
   // Get Maximum Weight Order

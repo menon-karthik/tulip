@@ -1,3 +1,6 @@
+#ifndef TULIPCM_H
+#define TULIPCM_H
+
 # include "cmModel.h"
 
 # include "cmConstants.h"
@@ -23,3 +26,5 @@
 # include "cmArmVenousOcclusion.h"
 
 # include "cm3DPQSurrogateModel.h"
+
+#endif // TULIPCM_H

@@ -1,3 +1,6 @@
+#ifndef TULIPUQ_H
+#define TULIPUQ_H
+
 // One-dimensional approximant
 # include "uq1DApproximant.h"
 // Global approximant on a single element
@@ -56,4 +59,6 @@
 
 // Utils
 # include "uqUtils.h"
+
+#endif // TULIPUQ_H
 

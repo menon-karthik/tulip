@@ -16,16 +16,14 @@ class cmSimpleNonLin: public cmModel{
 
     // FUNCTIONS THAT MUST BE IMPLEMENTED BY THE SUB CLASSES
     virtual int getParameterTotal();
-    virtual string getParamName(int parID);
     virtual int getStateTotal();
     virtual int getResultTotal();
-  	virtual void getParameterLimits(double* limits);
-  	virtual void getDefaultParams(double* params);
-  	virtual void getPriorMapping(int priorModelType,int* prPtr);
-
-    // EVAL MODEL 
-    virtual double evalModelError(stdVec inputs,stdVec& outputs, int& errorCode);
-    virtual stdVec evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode);
+    virtual void getParameterLimits(stdVec& limits);
+    virtual void getDefaultParams(stdVec& params);
+    virtual void getPriorMapping(int priorModelType,int* prPtr);
+    virtual string getParamName(int parID);
+    virtual string getResultName(int resID);
+    virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
 };
 
 #endif //CMSIMPLENONLIN_H
