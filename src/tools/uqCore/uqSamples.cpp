@@ -369,7 +369,7 @@ stdMat uqSamples::normalizeColumns(bool symmetric){
 // =======================
 // ADD VARIABLE DEFINITION
 // =======================
-void uqSamples::AddVariable(string varName,int varType,double par1,double par2){
+void uqSamples::addVariable(string varName,int varType,double par1,double par2){
   // Increase the Dimensionality
   totDims += 1;
   // Perform Checks
@@ -685,7 +685,7 @@ double uqSamples::denormalizeRV(double value, int dimId){
 // ====================================================
 // ADJUST WEIGHTS FOR THE VARIOUS PROBABILITY DENSITIES
 // ====================================================
-void uqSamples::AdjustWeights(int maxOrder){
+void uqSamples::adjustWeights(int maxOrder){
   // Initialize
   double currCCVal = 0.0;
   double mappedValue = 0.0;
@@ -907,6 +907,7 @@ void uqSamples::generateSparseGrid(int gridOrder){
   // Copy Nodes and weight to a local Matrix and Vector
   stdVec temp;
   stdVec tempWeight;
+  stdMat newValues;
   weights.clear();
   values.clear();
   int currentCount = 0;
@@ -921,7 +922,7 @@ void uqSamples::generateSparseGrid(int gridOrder){
         currentCount++;
       }
     }
-    values.push_back(temp);
+    newValues.push_back(temp);
     tempWeight.clear();
     for(int loopB=0;loopB<gridOrder+1;loopB++){
       tempWeight.push_back(currWeights[loopA][loopB]);
@@ -938,7 +939,7 @@ void uqSamples::generateSparseGrid(int gridOrder){
   for(int loopA=0;loopA<totalNodes;loopA++){
     temp.clear();
     for(int loopB=0;loopB<rvs.size();loopB++){
-      denorm = denormalizeRV(values[loopA][loopB],loopB);
+      denorm = denormalizeRV(newValues[loopA][loopB],loopB);
       temp.push_back(denorm);
     }
     values.push_back(temp);
@@ -949,7 +950,7 @@ void uqSamples::generateSparseGrid(int gridOrder){
 
 
   // Adjust Weights To account for the probabilities
-  AdjustWeights(gridOrder);
+  adjustWeights(gridOrder);
 
   // Free Memory
   delete[] currNodes;
@@ -1324,7 +1325,7 @@ void uqSamples::extractSampleColumnWithIndex(stdIntVec Indexes,int outCol,stdVec
 // ===========================================
 // ADAPTIVE SAMPLING FOR BINARY PARTITION TREE
 // ===========================================
-void uqSamples::AddSamplesAdaptive(uqSamples* inputs,uqPartitionBinaryTree* tree,double metricThreshold,int samplesInPartition,randomAdaptiveSamplingTypes type){
+void uqSamples::addSamplesAdaptive(uqSamples* inputs,uqPartitionBinaryTree* tree,double metricThreshold,int samplesInPartition,randomAdaptiveSamplingTypes type){
   
   int startSampleIdx = 0;
   // Loop on the partitions
@@ -1367,14 +1368,14 @@ void uqSamples::AddSamplesAdaptive(uqSamples* inputs,uqPartitionBinaryTree* tree
       // Add the samples
       if(samplesToAdd > 0){
         if(type == asRandom){
-          AddUniformSamplesFromPartition(samplesToAdd,currLimits);    
+          addUniformSamplesFromPartition(samplesToAdd,currLimits);    
         }else if(type == asHalton){
           // Get Maximum Sample index for current partition
           startSampleIdx = currPartition->getQuasiRandomSampleId();
           //printf("Current Sample Index: %d\n",startSampleIdx);
           // Add Samples
           //printf("startSampleIdx PRIMA: %d\n",startSampleIdx);          
-          AddQuasiRandomSamplesFromPartition(samplesToAdd,rsHalton,onPartition,currLimits,rootLimits,startSampleIdx);
+          addQuasiRandomSamplesFromPartition(samplesToAdd,rsHalton,onPartition,currLimits,rootLimits,startSampleIdx);
           //getchar();
           // Store the maximum ID
           currPartition->setQuasiRandomSampleId(startSampleIdx);
@@ -1387,7 +1388,7 @@ void uqSamples::AddSamplesAdaptive(uqSamples* inputs,uqPartitionBinaryTree* tree
 // ===========================================
 // ADD UNIFORM RANDOM SAMPLES FROM PARTITION
 // ===========================================
-void uqSamples::AddUniformSamplesFromPartition(int samplesToAdd, stdVec limits){  
+void uqSamples::addUniformSamplesFromPartition(int samplesToAdd, stdVec limits){  
   stdVec storeVec;
   double currValue = 0.0;
   // Loop through the new samples
@@ -1407,7 +1408,7 @@ void uqSamples::AddUniformSamplesFromPartition(int samplesToAdd, stdVec limits){
 // =========================================
 // ADD UNIFORM RANDOM SAMPLES FROM PARTITION
 // =========================================
-void uqSamples::AddQuasiRandomSamplesFromPartition(int samplesToAdd, quasiRandomTypes type,bool onPartition, stdVec limits, stdVec rootLimits, int& startSampleIdx){
+void uqSamples::addQuasiRandomSamplesFromPartition(int samplesToAdd, quasiRandomTypes type,bool onPartition, stdVec limits, stdVec rootLimits, int& startSampleIdx){
 
   // Clear available samples
   stdVec storeVec;
@@ -1554,7 +1555,7 @@ bool uqSamples::areAllUniformVariables(){
 // =====================
 // ADD COVARIANCE MATRIX
 // =====================
-void uqSamples::AddCovariance(stdMat covariance){
+void uqSamples::addCovariance(stdMat covariance){
   if(rvs.size() != covariance.size()){
     throw uqException("Incompatible Covariance size in AddCovariance.\n");
   }
@@ -1602,7 +1603,7 @@ void uqSamples::AddCovariance(stdMat covariance){
 // ===============================================
 // CREATE CORRELATED SAMPLES FROM STANDARD SAMPLES
 // ===============================================
-void uqSamples::CorrelateVariables(){
+void uqSamples::correlateVariables(){
   // Allocate Correlated Variables
   corrValues.resize(values.size());
   for(int loopA=0;loopA<values.size();loopA++){
@@ -1637,7 +1638,7 @@ void uqSamples::CorrelateVariables(){
 // ==================================================================
 // CREATE STANDARD SAMPLES FROM CORRELATED AND NON-NORMALIZED SAMPLES
 // ==================================================================
-void uqSamples::DecorrelateVariables(){
+void uqSamples::decorrelateVariables(){
   // Allocate Correlated Variables
   values.resize(corrValues.size());
   for(int loopA=0;loopA<corrValues.size();loopA++){
@@ -1695,7 +1696,7 @@ void uqSamples::readAndTransform(uqSamples* samples){
     corrValues.push_back(temp);
   }
   // Create Normalized and Decorrelated Samples
-  DecorrelateVariables();
+  decorrelateVariables();
 }
 
 // =================================================

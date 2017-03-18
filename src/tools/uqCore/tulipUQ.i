@@ -30,9 +30,13 @@
  
 /* Parse the header file to generate wrappers */
 
+%include <cstring.i>
 %include <std_string.i>
 %include <std_vector.i>
 %include <std_map.i>
+
+%apply const int & { int & }; 
+%apply const double & { double & }; 
 
 %include "uq1DApproximant.h"
 %include "uq1DApproximant_SE.h"
@@ -68,4 +72,7 @@ namespace std {
   %template(stdStringMat) vector<vector<string> >;
 }  
 
- 
+%apply const stdVec & { stdVec & }; 
+%apply const stdMat & { stdMat & }; 
+
+

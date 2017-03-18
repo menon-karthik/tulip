@@ -6,10 +6,19 @@
 #include "uq1DQuadratureRule_CC.h"
 
 // Constructor
-uqOrthoPolyBasis::uqOrthoPolyBasis(int order, int level, stdVec measureAtQuadPoints){
+uqOrthoPolyBasis::uqOrthoPolyBasis(int order, int level,const stdVec& measureAtQuadPoints){
   basisOrder = order;
   quadratureOrder = level;
-  probabilityMeasure = measureAtQuadPoints;
+
+  // Check Measures Size
+  if(measureAtQuadPoints.size() != 2*level){
+    throw uqException("ERROR: Not enough points in the measure, using double rule for othogonal polynomials.\n");
+  }
+
+  probabilityMeasure.clear();
+  for(int loopA=0;loopA<measureAtQuadPoints.size();loopA++){
+    probabilityMeasure.push_back(measureAtQuadPoints[loopA]);
+  }
   alphaCoeff.resize(basisOrder);
   betaCoeff.resize(basisOrder);
   normCoeff.resize(basisOrder);
@@ -25,7 +34,7 @@ uqOrthoPolyBasis::~uqOrthoPolyBasis(){
 void uqOrthoPolyBasis::buildRecursiveCoefficients(){
   
   // Get Integration Points
-  uq1DQuadratureRule_CCDouble* quadRule = new uq1DQuadratureRule_CCDouble(quadratureOrder,kHaarRange);
+  uq1DQuadratureRule* quadRule = new uq1DQuadratureRule_CCDouble(quadratureOrder,kHaarRange);
   quadRule->generatePointsAndWeights();
   int totalPoints = quadRule->getTotalPoints();
   stdVec intPoints = quadRule->getPoints();

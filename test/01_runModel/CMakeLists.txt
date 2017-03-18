@@ -1,2 +1,0 @@
-  ADD_EXECUTABLE(runLPN ${CMAKE_SOURCE_DIR}/test/01_runModel/test_RunLPNModel.cpp)
-  TARGET_LINK_LIBRARIES(runLPN gCodeLib)

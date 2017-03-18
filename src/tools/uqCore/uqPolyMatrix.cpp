@@ -28,7 +28,7 @@ uqPolyMatrix::uqPolyMatrix(uqSamples xValues, int maxOrder, int polyType, int co
   }
 
   // Create polynomial interpolator
-  uqPolyBasis* myInterp = new uqPolyBasis(polyType);
+  uqPolyBasis* myInterp = new uqPolyBasis(polyType,maxOrder+1);
 
   // Fill Values Entries
   double xValue = 0.0;

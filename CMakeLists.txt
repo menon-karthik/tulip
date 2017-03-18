@@ -68,6 +68,9 @@ FILE(GLOB PY_I_AC "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipAC.i")
 # DA functionalities - Data structures
 FILE(GLOB PY_I_DA "${CMAKE_CURRENT_SOURCE_DIR}/src/data/tulipDA.i")
 
+# COPY TEST FOLDER
+file(COPY "${CMAKE_SOURCE_DIR}/test/." DESTINATION "${CMAKE_BINARY_DIR}/test/.")
+
 # DEFINE FOLDERS VARIABLES
 SET(LPN_SRCS_DIR "./src")
 

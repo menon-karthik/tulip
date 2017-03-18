@@ -755,7 +755,7 @@ int acActionUP_MWBCS::go(){
         //inputs->printToFile(string("test_Inputs_Gauss.txt"),false);
         //getchar();
       }else if(opts.samplingType == stHalton){
-        inputs->AddQuasiRandomSamplesFromPartition(opts.numIniSamples,rsHalton,false,tempVec,tempVec,rootQuasiRandomID);  
+        inputs->addQuasiRandomSamplesFromPartition(opts.numIniSamples,rsHalton,false,tempVec,tempVec,rootQuasiRandomID);  
       }
     }
 
@@ -917,7 +917,7 @@ int acActionUP_MWBCS::go(){
   int totMWIntPoints = 0;
   // Create a 1D integration grid in [0,1]
   measure1DGridPoints = new uqSamples();
-  measure1DGridPoints->AddVariable("grid1D",kSAMPLEUniform,0.0,1.0);
+  measure1DGridPoints->addVariable("grid1D",kSAMPLEUniform,0.0,1.0);
   measure1DGridPoints->generateCartesianGrid(opts.mwQuadOrder,kDoubleCC,kHaarRange);
   // Allocate 1D locations for arbitrary measure
   measureLocations.resize(measure1DGridPoints->getTotSamples());
@@ -1708,7 +1708,7 @@ int acActionUP_MWBCS::go(){
       if((opts.inputMode == imRandom)&&(opts.doRefineSamples)){
         // Eval Additional Samples
         AddedSamples = new uqSamples(inputs->getTotDims());
-        AddedSamples->AddSamplesAdaptive(inputs,partitionTree,opts.maxMWVarianceRatio,opts.minSamplesInPartition,asHalton);
+        AddedSamples->addSamplesAdaptive(inputs,partitionTree,opts.maxMWVarianceRatio,opts.minSamplesInPartition,asHalton);
         //AddedSamples->AddSamplesAdaptive(inputs,partitionTree,opts.maxMWVarianceRatio,opts.minSamplesInPartition);
         totAddedSamples = AddedSamples->getTotSamples();
 

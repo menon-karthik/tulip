@@ -12,7 +12,7 @@ class uqOrthoPolyBasis: public uqBasis{
     stdVec normCoeff;
     
     // Constructor and Destructor
-    uqOrthoPolyBasis(int order, int level, stdVec measureAtQuadPoints);
+    uqOrthoPolyBasis(int order, int level, const stdVec& measureAtQuadPoints);
     virtual ~uqOrthoPolyBasis();
   
     // Eval Basis

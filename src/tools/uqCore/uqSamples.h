@@ -113,7 +113,7 @@ class uqSamples{
     double getWeightAt(int nodeId, int order);
     int    getMaxWeightOrder();
 
-    void AdjustWeights(int maxOrder);
+    void adjustWeights(int maxOrder);
 
     int getTotRVS(){return int(rvs.size());}
     variableRecord getRVS(int index){return rvs[index];}
@@ -167,7 +167,7 @@ class uqSamples{
     \param[in] samplesToAdd number of samples to be added.
     \param[in] limits 2*totDims vector storing the current partition limits.
     */
-    void   AddUniformSamplesFromPartition(int samplesToAdd, stdVec limits);
+    void   addUniformSamplesFromPartition(int samplesToAdd, stdVec limits);
 
     /*! 
     \verbatim embed:rst
@@ -191,7 +191,7 @@ class uqSamples{
     \param[in][out] startSampleIdx in input it is the starting sample number in the Halton sequence while in output is the
                     sample with the highest index generated.
     */
-    void   AddQuasiRandomSamplesFromPartition(int samplesToAdd, quasiRandomTypes type, bool onPartition, stdVec limits, stdVec rootLimits, int& startSampleIdx);
+    void   addQuasiRandomSamplesFromPartition(int samplesToAdd, quasiRandomTypes type, bool onPartition, stdVec limits, stdVec rootLimits, int& startSampleIdx);
     stdMat normalizeColumns(bool symmetric);
     void   addPointsOnBoundary(int boundPointOrder);
 
@@ -201,15 +201,15 @@ class uqSamples{
     void   rescaleFromHypercubeToPartition(stdVec currLimits);
 
     // ADD VARIABLE DEFINITION
-    void AddVariable(string varName,int varType,double par1,double par2);
+    void addVariable(string varName,int varType,double par1,double par2);
     // Add Covariance Matrix
-    void AddCovariance(stdMat covariance);
+    void addCovariance(stdMat covariance);
     // Check if all variables are uniform
     bool areAllUniformVariables();
     // Correlate Variables
-    void CorrelateVariables();
+    void correlateVariables();
     // Decorrelate Variables
-    void DecorrelateVariables();
+    void decorrelateVariables();
 
     // GENERATE SAMPLES ACCORDING TO VARIABLE INFORMATION
     // Generate Random Samples
@@ -346,7 +346,7 @@ class uqSamples{
     // REMOVE VARIABLES
     uqSamples removeVariable(int idx);
     // Add Adaptive Samples based on a binary tree partition
-    void AddSamplesAdaptive(uqSamples* inputs,uqPartitionBinaryTree* tree,double metricThreshold,int samplesInPartition,randomAdaptiveSamplingTypes type=asRandom);
+    void addSamplesAdaptive(uqSamples* inputs,uqPartitionBinaryTree* tree,double metricThreshold,int samplesInPartition,randomAdaptiveSamplingTypes type=asRandom);
 
     /*! 
     \verbatim embed:rst

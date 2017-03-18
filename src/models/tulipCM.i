@@ -46,5 +46,3 @@ namespace std {
   %template(stdStringVec) vector<string>;
   %template(stdStringMat) vector<vector<string> >;
 } 
-
-
