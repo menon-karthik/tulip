@@ -27,156 +27,160 @@ int odeRCRCR::getResultTotal(){
 // GET NAME OF RESULT QUANTITY
 // ===========================
 string odeRCRCR::getResultName(int resID){
+  string result;
   switch(resID){
     case 0:
     {      
-      return string("minP0 [mmHg]");
+      result = "minP0 [mmHg]";
       break;
     }
     case 1:
     {      
-      return string("mP0 [mmHg]");
+      result = "mP0 [mmHg]";
       break;
     }
     case 2:
     {      
-      return string("maxP0 [mmHg]");
+      result = "maxP0 [mmHg]";
       break;
     }
     case 3:
     {      
-      return string("minP1 [mmHg]");
+      result = "minP1 [mmHg]";
       break;
     }
     case 4:
     {      
-      return string("mP1 [mmHg]");
+      result = "mP1 [mmHg]";
       break;
     }
     case 5:
     {      
-      return string("maxP1 [mmHg]");
+      result = "maxP1 [mmHg]";
       break;
     }    
     case 6:
     {      
-      return string("minP2 [mmHg]");
+      result = "minP2 [mmHg]";
       break;
     }
     case 7:
     {      
-      return string("mP2 [mmHg]");
+      result = "mP2 [mmHg]";
       break;
     }        
     case 8:
     {      
-      return string("maxP2 [mmHg]");
+      result = "maxP2 [mmHg]";
       break;
     }        
     case 9:
     {      
-      return string("minP3 [mmHg]");
+      result = "minP3 [mmHg]";
       break;
     }        
     case 10:
     {      
-      return string("mP3 [mmHg]");
+      result = "mP3 [mmHg]";
       break;
     }        
     case 11:
     {      
-      return string("maxP3 [mmHg]");
+      result = "maxP3 [mmHg]";
       break;
     }        
     case 12:
     {      
-      return string("minQ1 [mmHg]");
+      result = "minQ1 [mmHg]";
       break;
     }        
     case 13:
     {      
-      return string("mQ1 [mmHg]");
+      result = "mQ1 [mmHg]";
       break;
     }        
     case 14:
     {      
-      return string("maxQ1 [mmHg]");
+      result = "maxQ1 [mmHg]";
       break;
     }        
     case 15:
     {      
-      return string("minQ2 [mmHg]");
+      result = "minQ2 [mmHg]";
       break;
     }        
     case 16:
     {      
-      return string("mQ2 [mmHg]");
+      result = "mQ2 [mmHg]";
       break;
     }        
     case 17:
     {      
-      return string("maxQ2 [mmHg]");
+      result = "maxQ2 [mmHg]";
       break;
     }        
     case 18:
     {      
-      return string("minQ3 [mmHg]");
+      result = "minQ3 [mmHg]";
       break;
     }        
     case 19:
     {      
-      return string("mQ3 [mmHg]");
+      result = "mQ3 [mmHg]";
       break;
     }        
     case 20:
     {      
-      return string("maxQ3 [mmHg]");
+      result = "maxQ3 [mmHg]";
       break;
     }        
   }
+  return result;
 }
 
 // ==================
 // GET PARAMETER NAME
 // ==================
 string odeRCRCR::getParamName(int parID){
+  string result;
   switch(parID){
     case 0:
     {
-      return string("Rtot");
+      result = "Rtot";
       break;
     }
     case 1:
     {
-      return string("Ctot");
+      result = "Ctot";
       break;
     }
     case 2:
     {      
-      return string("C1C2ratio");
+      result = "C1C2ratio";
       break;
     }
     case 3:
     {      
-      return string("R1R2ratio");
+      result = "R1R2ratio";
       break;
     }
     case 4:
     {      
-      return string("R3R2ratio");
+      result = "R3R2ratio";
       break;
     }
     case 5:
     {      
-      return string("Initial-P1");
+      result = "Initial-P1";
       break;
     }
     case 6:
     {      
-      return string("Initial-P2");
+      result = "Initial-P2";
       break;
     }    
   }
+  return result;
 }
 
 // GET MODEL PARAMETERS

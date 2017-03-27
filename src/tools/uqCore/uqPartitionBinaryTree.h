@@ -106,7 +106,7 @@ class uqPartitionNode{
 
     // Get and set the maximum integer number for Quasi Random Sampling
     int getQuasiRandomSampleId(){return maxSampleIdx;};
-    int setQuasiRandomSampleId(int maxId){maxSampleIdx = maxId;};
+    void setQuasiRandomSampleId(int maxId){maxSampleIdx = maxId;};
 
     // Get Limits
   	stdVec getLimits();
@@ -121,7 +121,7 @@ class uqPartitionNode{
     
     // Get volume
     double getVolume();
-    double setVolume(double vol);
+    void setVolume(double vol);
 
     // Get Left and Right Node
   	uqPartitionNode* getLeft(){return left;}

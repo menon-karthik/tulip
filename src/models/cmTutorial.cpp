@@ -121,4 +121,5 @@ double cmTutorial::evalModelError(stdVec inputs,stdVec& outputs,stdIntVec& error
 }
 
 string cmTutorial::getResultName(int resID){
+  return string("");
 }

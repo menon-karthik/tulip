@@ -265,7 +265,7 @@ double uqPartitionNode::getVolume(){
 }
 
 // SET THE VOLUME OF THE PARTITION
-double uqPartitionNode::setVolume(double vol){
+void uqPartitionNode::setVolume(double vol){
   this->volume = vol;
 }
 

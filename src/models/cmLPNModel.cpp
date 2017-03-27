@@ -13,15 +13,15 @@ cmLPNModel::~cmLPNModel(){
 }
 
 int cmLPNModel::getParameterTotal(){
-  this->integrator->ode->getParameterTotal();
+  return this->integrator->ode->getParameterTotal();
 }
 
 int cmLPNModel::getStateTotal(){
-  this->integrator->ode->getStateTotal();
+  return this->integrator->ode->getStateTotal();
 }
 
 int cmLPNModel::getResultTotal(){
-  this->integrator->ode->getResultTotal();
+  return this->integrator->ode->getResultTotal();
 }
 
 void cmLPNModel::getParameterLimits(stdVec& limits){
@@ -33,11 +33,11 @@ void cmLPNModel::getDefaultParams(stdVec& params){
 }
 
 string cmLPNModel::getParamName(int parID){
-  this->integrator->ode->getParamName(parID);
+  return this->integrator->ode->getParamName(parID);
 }
 
 string cmLPNModel::getResultName(int resID){
-  this->integrator->ode->getResultName(resID);
+  return this->integrator->ode->getResultName(resID);
 }
 
 void cmLPNModel::getPriorMapping(int priorModelType,int* prPtr){
@@ -75,4 +75,7 @@ double cmLPNModel::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& erro
   // Post-process and write outputs
   int totalStepsOnSingleCycle = int(integrator->totalSteps/(double)integrator->totalCycles);
   integrator->ode->postProcess(integrator->timeStep,totalStepsOnSingleCycle,integrator->totalSteps,outVals,auxOutVals,outputs);
+
+  // Need to evaluate log-likelihood/posterior and return
+  return 0;
 }

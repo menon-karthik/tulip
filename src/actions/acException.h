@@ -8,10 +8,10 @@ using namespace std;
 class acException: public exception{
   public:
     // Constructor and Destructor
-    acException(const char* m):msg(m){};
-    virtual ~acException() throw(){};
+    acException(const char* m);
+    virtual ~acException() throw();
     // Member Functions
-		virtual const char* what() const throw() {return msg.c_str();}
+		virtual const char* what() const throw();
   protected:
     std::string msg;
 };

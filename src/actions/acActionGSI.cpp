@@ -247,6 +247,7 @@ bool hasOnlyIndex(int index,int row,int par_num,vector<vector<int> > table){
 
   // CHECK LAST CONDITION THAT INDEX SHOULD BE NOT ZERO
   result = (result && (table[row][index] != 0));
+  return result;
 }
 
 // ================================================================
@@ -583,4 +584,5 @@ int acActionGSI::go(){
 
   // Completed
   printf("Completed.\n");
+  return 0;
 }

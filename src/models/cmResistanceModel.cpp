@@ -69,6 +69,8 @@ double cmResistanceModel::evalModelError(stdVec inputs,stdVec& outputs,stdIntVec
   // Write outputs
   outputs.clear();
   outputs.push_back(currPressure);
+  // Need to evaluate the resulting likelihood/posterior and return !!!
+  return 0;
 }
 
 // EVAL MODEL: MULTIPLE INPUTS, TO IMPLEMENT

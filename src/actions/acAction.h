@@ -18,7 +18,7 @@ class acAction{
   	//! Default Constructor
   	acAction();
     //! Virtual Destructor
-    ~acAction();
+    virtual ~acAction();
 
   	/*! 
     \verbatim embed:rst

@@ -200,4 +200,7 @@ int acActionLSI_FD::go(){
 
   // PRINT SENSITIVITY TABLE
   WriteSentitivityTableToFile("LSI_Derivatives.txt",par_num,res_num,sensTable);
+
+  // Return No Error
+  return 0;
 }

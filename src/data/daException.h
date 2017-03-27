@@ -8,10 +8,10 @@ using namespace std;
 class daException: public exception{
   public:
     // Constructor and Destructor
-    daException(const char* m):msg(m){};
-    virtual ~daException() throw(){};
+    daException(const char* m);
+    virtual ~daException() throw();
     // Member Functions
-	virtual const char* what() const throw() {return msg.c_str();}
+	virtual const char* what() const throw();
   protected:
     std::string msg;
 };

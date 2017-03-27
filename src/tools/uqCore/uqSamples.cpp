@@ -453,6 +453,8 @@ void uqSamples::generateRandomSamples(int numSamples, int seed){
 // Prime Number Generator from table
 int getPrimeInteger(int n){
 
+  int result = 0;
+
   const int PRIME_MAX = 1600;
 
   int npvec[PRIME_MAX] = {
@@ -618,10 +620,11 @@ int getPrimeInteger(int n){
     13417,13421,13441,13451,13457,13463,13469,13477,13487,13499};
 
   if((n >= 0)&&(n <= PRIME_MAX)){
-    return npvec[n];
+    result = npvec[n];
   }else{
     uqException("Error: Required prime number exceeds storage...\n");
   }
+  return result;
 }
 
 // Generate Halton Sequence: Be Careful in High (14+) dimensions

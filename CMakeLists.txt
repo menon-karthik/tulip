@@ -112,7 +112,7 @@ ELSE()
 ENDIF()
 
 # COMPILER FLAGS
-ADD_DEFINITIONS("-g -m64 -O3 -std=c++0x -fPIC -fmax-errors=5")
+ADD_DEFINITIONS("-g -m64 -O3 -std=c++0x -fPIC -Werror")
 
 # INCLUDE FOLDERS
 INCLUDE_DIRECTORIES(

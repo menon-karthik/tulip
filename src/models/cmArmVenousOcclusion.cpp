@@ -361,6 +361,9 @@ double cmArmVenousOcclusion::evalModelError(stdVec inputs, stdVec& outputs, stdI
   outputs.push_back(0.0);
   errorCodes.clear();
   errorCodes.push_back(0);
+
+  // Return likelihood or posterior
+  return 0.0;
 }
 
 // ===========================
