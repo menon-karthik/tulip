@@ -12,7 +12,23 @@
 
 namespace uqUtils{
 
-  // Build a Binary Array From an Integer
+  /*! 
+  \verbatim embed:rst
+  **Purpose**
+  Apply Fourier low-pass filering to signals
+
+  **Discussion**
+  None
+
+  **Modified**
+  Aug 2016 - DES
+    
+  **Reference**
+  No Reference
+  \endverbatim
+  \param[in] numFreq Number of frequencies to be retained.
+  \param[in/out] margY signal to be filtered.
+  */
   void convertTo01Array(int intValue, int numberOfDimension, int* resultVector);
 
   // Perform Inverse FFT - ARMADILLO LIBRARY
@@ -38,7 +54,6 @@ namespace uqUtils{
   \param[in] numFreq Number of frequencies to be retained.
   \param[in/out] margY signal to be filtered.
   */
-
   void applyFourierSmoothing(int numFreq,stdVec& margY);
 
   /*! 

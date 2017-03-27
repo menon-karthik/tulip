@@ -14,21 +14,19 @@ class uq1DApproximant_ME: public uq1DApproximant{
     
     // Constructor and Destructor        
     uq1DApproximant_ME();
-    uq1DApproximant_ME(vector<uq1DApproximant_SE*> locApprox);
     virtual ~uq1DApproximant_ME();
+
+    uq1DApproximant_ME(vector<uq1DApproximant_SE*> locApprox);
     
-    // Member Functions
-    // Evaluate Intepolator
     virtual double evaluate(double XValue);
-
-    // Evaluate the element ID whose the value belongs to
-    int getElementID(double value);
-
-    // Export Multi-element Approximant to File
     virtual void exportToTextFile(string fileName, bool append = false);
     virtual int  importFromTextFile(string fileName, bool startFromTop = true,int startLine = 0);
     virtual void normalizeByConstant(double normValue);
     virtual void getExtremes(stdVec& result);
+
+    // Evaluate the element ID whose the value belongs to
+    int getElementID(double value);
+
 };
 
 #endif // UQ1DMWAPPROXIMANT_H
