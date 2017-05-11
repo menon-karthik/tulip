@@ -15,9 +15,10 @@ Contents:
    content/installationAndRun
    content/lpnModel_NA
    content/lpnModel_NA_SIMPLE
+   content/code_UQCore
    content/code_Models
    content/code_Actions
    content/code_Data
-   content/code_Tools
+   
    content/zbibliography
 

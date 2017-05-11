@@ -324,7 +324,7 @@ No Reference
 
 \param[in] shift Number of components for circular shift.
 \param[in] size Number of components in array
-\param[in/out] Qvp Array to be shifted 
+\param[in,out] Qvp Array to be shifted 
 */
 void applyCircShift(int shift,int size,double* Qvp);
 
@@ -662,15 +662,19 @@ No Reference
 \param[in] data Array with curve for peak detection
 \param[out] S_time Location in time of the S peak
 \param[out] S_peak Value of the S peak
+\param[out] S_found True is the peak has been found
 \param[out] M_time Location in time of the M peak
 \param[out] M_peak Value of the M peak
+\param[out] M_found True is the peak has been found
 \param[out] D_time Location in time of the D peak
 \param[out] D_peak Value of the D peak
+\param[out] D_found True is the peak has been found
 \param[out] A_time Location in time of the A peak
 \param[out] A_peak Value of the A peak
-\param[out] Total Number of Found Maxima (1 or 2)
-\param[out] Total Number of Found Minima (1 or 2)
-\param[return] Error Code
+\param[out] A_found True is the peak has been found
+\param[out] min_Found_Peaks Number of Found Minima (1 or 2)
+\param[out] max_Found_Peaks Number of Found Maxima (1 or 2)
+\return Error Code
 */
 int detect_peak(int data_count, double* t, double* data,
                 double &S_time, double &S_peak, bool &S_found,
@@ -844,9 +848,9 @@ int getFrozenParametersFromCSVFile(string fileName,stdIntVec& frozParIDX,stdVec&
 /*! 
 \verbatim embed:rst
 **Purpose**
-Get acceleration time between two
-prescribed lower and upped index bounds
-[start, stop]
+Get acceleration time between two prescribed lower and upped index bounds [start, stop].
+This is implemented using peak-finding. The acceleration time is the time need to reach the 
+maximum of the curve.
 
 **Discussion**
 None
@@ -860,8 +864,10 @@ No Reference
 
 \param[in] start Starting array index.
 \param[in] stop Index to the last array component to consider.
-\param[in] vector The vector whose maximum value needs to be found.
-return Acceleration time in ms.
+\param[in] timeStep The underlying time step, assuming that vector has beeen sampled uniformly in time.
+\param[in] vector The vector with the time signal.
+\param[out] at The acceleration time computed by the function.
+return True if a maximum has been found otherwise false.
 */
 bool getAccelerationTime(int start, int stop, double timeStep, double* vector, double& at);
 
@@ -884,8 +890,10 @@ No Reference
 
 \param[in] start Starting array index.
 \param[in] stop Index to the last array component to consider.
-\param[in] vector The vector whose maximum value needs to be found.
-return Deceleration time in ms.
+\param[in] timeStep The underlying time step, assuming that vector has beeen sampled uniformly in time.
+\param[in] vector The vector containing the time signal.
+\param[out] dt The deceleration time computed by the function.
+return true if a maximum followed by a minimum has been found otherwise false.
 */
 bool getDecelerationTime(int start, int stop, double timeStep, double* vector, double& dt);
 
@@ -908,8 +916,9 @@ No Reference
 
 \param[in] start Starting array index.
 \param[in] stop Index to the last array component to consider.
-\param[in] vector The vector whose maximum value needs to be found.
-return Deceleration time in ms.
+\param[in] vector The vector containing the time signal to be analyzed.
+\param[out] EARatio The ratio between two successive peaks in the time signal curve.
+return true if both E and A peaks have been detected, false otherwise.
 */
 bool getEARatio(int start, int stop, double* vector,double& EARatio);
 

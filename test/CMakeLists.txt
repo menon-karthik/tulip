@@ -1,15 +1,3 @@
-#INCLUDE_DIRECTORIES(
-#  "${CMAKE_SOURCE_DIR}/src/"
-#  "${CMAKE_SOURCE_DIR}/src/actions/"
-#  "${CMAKE_SOURCE_DIR}/src/models/"
-#  "${CMAKE_SOURCE_DIR}/src/data/"
-#  "${CMAKE_SOURCE_DIR}/src/tools/"
-#  "${CMAKE_SOURCE_DIR}/src/tools/grSch"
-#  "${CMAKE_SOURCE_DIR}/src/tools/poly"
-#  "${CMAKE_SOURCE_DIR}/src/tools/simLaunch"
-#  "${CMAKE_SOURCE_DIR}/src/tools/spgrid"
-#  "${CMAKE_SOURCE_DIR}/src/tools/uq")
-
 # =======================
 # SELECT TESTS TO INCLUDE
 # =======================

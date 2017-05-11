@@ -5,7 +5,7 @@
 # include "uq1DApproximant_SE.h"
 # include "uqMWBasis.h"
 
-// CLass for Multi-element Approximants
+// Class for Multi-Element Approximants
 class uq1DApproximant_ME: public uq1DApproximant{
   public:
     // Data Members
@@ -23,8 +23,24 @@ class uq1DApproximant_ME: public uq1DApproximant{
     virtual int  importFromTextFile(string fileName, bool startFromTop = true,int startLine = 0);
     virtual void normalizeByConstant(double normValue);
     virtual void getExtremes(stdVec& result);
-
-    // Evaluate the element ID whose the value belongs to
+    
+    /*! 
+    \verbatim embed:rst
+    **Purpose**
+    Evaluate the element ID whose the value belongs to
+    
+    **Discussion**
+    None
+    
+    **Modified**
+    2017 - DES
+    
+    **Reference**
+    No Reference
+    \endverbatim
+    \param[in] value an abscissa that corresponds to the element whose ID you would like to retrieve
+    \return Element number at the specified abscissa
+    */
     int getElementID(double value);
 
 };

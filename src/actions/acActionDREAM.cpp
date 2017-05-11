@@ -48,7 +48,7 @@ acActionDREAM::acActionDREAM(int locTotChains,
 
 }
 
-/*! 
+/*
 #### Purpose
 Build the network topology using 
 local process and Group number

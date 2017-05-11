@@ -331,7 +331,7 @@ void applyCircShift(int shift,int size,double* Qvp){
   }
 }
 
-/*! 
+/*
 ### Function sortPeaks
 
 #### Purpose
@@ -376,7 +376,7 @@ void sortPeaks(int data_size, double* data, int peak_size, int* peaks, int sortT
   }
 }
 
-/*! 
+/*
 ### Function storeFirstNonZeroPeaks
 
 #### Purpose
