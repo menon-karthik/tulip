@@ -325,37 +325,38 @@ stdMat uqSamples::normalizeColumns(bool symmetric){
   for(int loopA=0;loopA<totSamples;loopA++){
     result[loopA].resize(totDims);
   }
-  printf("totDims: %d, totSamples: %d\n",totDims,totSamples);
+  // printf("totDims: %d, totSamples: %d\n",totDims,totSamples);
   // Get and Store Maximum and Minimum Value for each Columns
   for(int loopA=0;loopA<totDims;loopA++){
-    result[loopA][0] = values[0][loopA];
-    result[loopA][1] = values[0][loopA];
+    result[0][loopA] = values[0][loopA];
+    result[1][loopA] = values[0][loopA];
     for(int loopB=1;loopB<totSamples;loopB++){
-      if(values[loopB][loopA] > result[loopA][1]){
-        result[loopA][1] = values[loopB][loopA];
+      if(values[loopB][loopA] > result[1][loopA]){
+        result[1][loopA] = values[loopB][loopA];
       }
-      if(values[loopB][loopA] < result[loopA][0]){
-        result[loopA][0] = values[loopB][loopA];
+      if(values[loopB][loopA] < result[0][loopA]){
+        result[0][loopA] = values[loopB][loopA];
       }
     }
-  }  
+  }
+  // printf("Max values for each column found!\n");
 
   // Rescale Values
   for(int loopA=0;loopA<totDims;loopA++){
     // Scale Symmetrically
     if(symmetric){
-      if(fabs(result[loopA][1])>fabs(result[loopA][0])){
-        minVal = -fabs(result[loopA][1]);
-        maxVal = fabs(result[loopA][1]);
-        result[loopA][0] = -fabs(result[loopA][1]);
+      if(fabs(result[1][loopA])>fabs(result[0][loopA])){
+        minVal = -fabs(result[1][loopA]);
+        maxVal = fabs(result[1][loopA]);
+        result[0][loopA] = -fabs(result[1][loopA]);
       }else{
-        minVal = -fabs(result[loopA][0]);
-        maxVal = fabs(result[loopA][0]);
-        result[loopA][1] = fabs(result[loopA][0]);
+        minVal = -fabs(result[0][loopA]);
+        maxVal = fabs(result[0][loopA]);
+        result[1][loopA] = fabs(result[0][loopA]);
       }
     }else{
-      minVal = result[loopA][0];
-      maxVal = result[loopA][1];      
+      minVal = result[0][loopA];
+      maxVal = result[1][loopA];     
     }
     // SCALE VALUE
     for(int loopB=0;loopB<totSamples;loopB++){            
