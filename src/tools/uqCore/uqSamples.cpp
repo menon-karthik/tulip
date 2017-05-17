@@ -321,8 +321,8 @@ stdMat uqSamples::normalizeColumns(bool symmetric){
   stdMat result;
   double minVal = 0.0;
   double maxVal = 0.0;
-  result.resize(totSamples);
-  for(int loopA=0;loopA<totSamples;loopA++){
+  result.resize(2);
+  for(int loopA=0;loopA<2;loopA++){
     result[loopA].resize(totDims);
   }
   // printf("totDims: %d, totSamples: %d\n",totDims,totSamples);
