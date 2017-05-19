@@ -1,5 +1,5 @@
-#ifndef DADATA_SCALAR_MULTIPLEPATIENTS_H
-#define DADATA_SCALAR_MULTIPLEPATIENTS_H
+#ifndef DADATA_MULTIPLE_TABLE_H
+#define DADATA_MULTIPLE_TABLE_H
 
 # include <string>
 # include <map>
@@ -22,10 +22,11 @@ The other column contain the patient data (one patient for each column).
 Missing data are identified using the "none" string and discarded.
 */
 
-class daData_Scalar_MultiplePatients: public daData{
+class daData_multiple_Table: public daData{
   public:
   	//! Default constructor
-  	daData_Scalar_MultiplePatients();
+  	daData_multiple_Table();
+  	virtual ~daData_multiple_Table();
   	
     virtual void readFromFile(string fileName);
     virtual double evalOBJ(int dataIndex,stdStringVec keys,stdVec values,stdVec weights);
@@ -34,4 +35,4 @@ class daData_Scalar_MultiplePatients: public daData{
     virtual int getPatientValue(int patientID,string key,double &result);
 };
 
-#endif // DADATA_SCALAR_MULTIPLEPATIENTS_H
+#endif // DADATA_MULTIPLE_TABLE_H

@@ -27,4 +27,9 @@
 
 # include "cm3DPQSurrogateModel.h"
 
+// Stress-Stretch Models
+# include "cmStressStretch_SHRA.h"
+# include "cmStressStretch_GOH.h"
+# include "cmStressStretch_FR.h"
+
 #endif // TULIPCM_H

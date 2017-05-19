@@ -3,6 +3,7 @@
 using namespace std;
 
 cmModel::cmModel(){
+  data = NULL;
 }
 
 cmModel::~cmModel(){

@@ -1,4 +1,5 @@
 %module tulipCM
+
 %{
 /* Includes the header in the wrapper code */
 #include "cmModel.h"
@@ -15,13 +16,21 @@
 #include "cmKraichnanOrszagModel.h"
 #include "cmArmVenousOcclusion.h"
 #include "cm3DPQSurrogateModel.h"
+#include "cmStressStretch_SHRA.h"
+#include "cmStressStretch_GOH.h"
+#include "cmStressStretch_FR.h"
+#include "uqTypes.h"
 %}
 
 /* Parse the header file to generate wrappers */
 
+%include <typemaps.i>
 %include <std_string.i>
 %include <std_vector.i>
 %include <std_map.i>
+
+%apply const int & { int & }; 
+%apply const double & { double & }; 
 
 %include "cmModel.h"
 %include "cmConstants.h"
@@ -37,6 +46,10 @@
 %include "cmKraichnanOrszagModel.h"
 %include "cmArmVenousOcclusion.h"
 %include "cm3DPQSurrogateModel.h"
+%include "cmStressStretch_SHRA.h"
+%include "cmStressStretch_GOH.h"
+%include "cmStressStretch_FR.h"
+%include "uqTypes.h"
 
 namespace std {
   typedef std::string String;
@@ -46,3 +59,7 @@ namespace std {
   %template(stdStringVec) vector<string>;
   %template(stdStringMat) vector<vector<string> >;
 } 
+
+%apply const stdVec & { stdVec & }; 
+%apply const stdMat & { stdMat & }; 
+

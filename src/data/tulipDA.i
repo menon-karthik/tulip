@@ -1,22 +1,29 @@
 %module tulipDA
+
 %{
 /* Includes the header in the wrapper code */
 #include "daData.h"
 #include "daException.h"
-#include "daData_Scalar_MultiplePatients.h"
-#include "daData_Variable_SinglePatient.h"
+#include "daData_single_GPatient.h"
+#include "daData_multiple_Table.h"
+#include "uqTypes.h"
 %}
 
 /* Parse the header file to generate wrappers */
 
+%include <typemaps.i>
 %include <std_string.i>
 %include <std_vector.i>
 %include <std_map.i>
 
+%apply const int & { int & }; 
+%apply const double & { double & }; 
+
 %include "daData.h"
 %include "daException.h"
-%include "daData_Scalar_MultiplePatients.h"
-%include "daData_Variable_SinglePatient.h"
+%include "daData_single_GPatient.h"
+%include "daData_multiple_Table.h"
+%include "uqTypes.h"
 
 namespace std {
   typedef std::string String;
@@ -26,3 +33,6 @@ namespace std {
   %template(stdStringVec) vector<string>;
   %template(stdStringMat) vector<vector<string> >;
 } 
+
+%apply const stdVec & { stdVec & }; 
+%apply const stdMat & { stdMat & }; 

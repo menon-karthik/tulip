@@ -5,7 +5,7 @@
 
 # include "daException.h"
 
-# include "daData_Scalar_MultiplePatients.h"
-# include "daData_Variable_SinglePatient.h"
+# include "daData_single_GPatient.h"
+# include "daData_multiple_Table.h"
 
 #endif // TULIPDA_H

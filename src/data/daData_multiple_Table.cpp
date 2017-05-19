@@ -1,14 +1,16 @@
-
-# include "daData_Variable_SinglePatient.h"
+# include "daData_multiple_Table.h"
 
 using namespace std;
 
-daData_Variable_SinglePatient::daData_Variable_SinglePatient(int keyColumn,int timeStampColumn){
-  this->keyColumn = keyColumn;
-  this->timeStampColumn = timeStampColumn;
+daData_multiple_Table::daData_multiple_Table(){
+
 }
 
-void daData_Variable_SinglePatient::readFromFile(string fileName){
+daData_multiple_Table::~daData_multiple_Table(){
+
+}
+
+void daData_multiple_Table::readFromFile(string fileName){
   stdStringMat stringTable;
   stdStringVec temp;
   int error = readCSStringTableFromFile(fileName,stringTable);
@@ -16,30 +18,29 @@ void daData_Variable_SinglePatient::readFromFile(string fileName){
     throw daException("Error: in Data.readFromFile, invalid file.\n");
   }
   for(int loopA=0;loopA<stringTable.size();loopA++){
-    if(stringTable[loopA][0].compare("REDCap") == 0){
-      temp.clear();
-      // 0-th column is the RedCap string: avoid starting from 1
-      for(int loopB=1;loopB<stringTable[loopA].size();loopB++){
-        if((loopB != keyColumn)&&(loopB != timeStampColumn)){
-          temp.push_back(stringTable[loopA][loopB]);  
-        }     
-      }
-      if(temp.size() > 1){
-        throw daException("ERROR: REDCap data is not a scalar.\n");
-      }
-      dict[stringTable[loopA][keyColumn]] = temp;
-    }
+  	temp.clear();
+  	for(int loopB=1;loopB<stringTable[0].size();loopB++){
+      // Float Values
+      // printf("Current String: %s\n",stringTable[loopA][loopB].c_str());
+  	  temp.push_back(stringTable[loopA][loopB]);
+  	}
+    // printf("String: %s\n",stringTable[loopA][0].c_str());
+  	dict[stringTable[loopA][0]] = temp;
   }
+  
 }
 
-double daData_Variable_SinglePatient::evalOBJ(int dataIndex,stdStringVec keys,stdVec values,stdVec weights){
+double daData_multiple_Table::evalOBJ(int dataIndex,stdStringVec keys,stdVec values,stdVec weights){
   
   // Check The Size of keys and values
   if((keys.size() != values.size())||(keys.size() != weights.size())){
     throw daException("Error in evalOBJ size of keys and values are not consistent.\n");
   }
+  if(dict.begin()->second.size() < dataIndex){
+    throw daException("Error in evalOBJ invalid data index.\n");
+  }
   
-  // Simple Cost Objective: Sum of Squared Percent Change
+  // Simple Cost Objective: Sum of Percent Change
   double result = 0.0;
   double perc = 0.0;
   int count = 0;
@@ -50,7 +51,7 @@ double daData_Variable_SinglePatient::evalOBJ(int dataIndex,stdStringVec keys,st
     if(dict.find(keys[loopA]) != dict.end()){
       // Found Key
       computed = values[loopA];      
-      measuredString = dict[keys[loopA]][0];
+      measuredString = dict[keys[loopA]][dataIndex];
       if(measuredString.compare("none") != 0){
         try{
           measured = atof(measuredString.c_str());
@@ -66,11 +67,14 @@ double daData_Variable_SinglePatient::evalOBJ(int dataIndex,stdStringVec keys,st
   return result;
 }
 
-double daData_Variable_SinglePatient::evalLogLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+double daData_multiple_Table::evalLogLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
   
   // Check The Size of keys and values
   if((keys.size() != avValues.size())||(keys.size() != stdFactors.size())||(keys.size() != weights.size())){
     throw daException("Error in evalPosterior size of keys and values are not consistent.\n");
+  }
+  if(dict.begin()->second.size() < dataIndex){
+    throw daException("Error in evalPosterior invalid data index.\n");
   }
   
   // Eval log-likelihood
@@ -82,18 +86,17 @@ double daData_Variable_SinglePatient::evalLogLikelihood(int dataIndex,stdStringV
   double measured = 0.0;
   double stdDev = 0.0;
   double weightVal = 0.0;
-  double stdFactor = 0.0;  
+  double stdFactor = 0.0;
   for(int loopA=0;loopA<keys.size();loopA++){
     if(dict.find(keys[loopA]) != dict.end()){
       // Found Key
       computed = avValues[loopA];  
       stdFactor = stdFactors[loopA];
       weightVal = weights[loopA];
-      measuredString = dict[keys[loopA]][0];
+      measuredString = dict[keys[loopA]][dataIndex - 1];
       if(measuredString.compare("none") != 0){
         try{
           measured = atof(measuredString.c_str());
-          // Use Absolute STDs
           stdDev = fabs(stdFactor);
           perc = 0.5*(computed - measured)*(computed - measured)/((stdDev * stdDev) * weightVal);
           result += perc;
@@ -103,12 +106,11 @@ double daData_Variable_SinglePatient::evalLogLikelihood(int dataIndex,stdStringV
       }
     }
   }
-  //printf("Total checked targets: %d\n",count);
   // Return Value
   return result;
 }
 
-void daData_Variable_SinglePatient::printAndCompare(int datasetColumn,stdStringVec keys,stdVec values,stdVec weigths){
+void daData_multiple_Table::printAndCompare(int datasetColumn,stdStringVec keys,stdVec values,stdVec weigths){
   
   // Check The Size of keys and values
   if((keys.size() != values.size())||(keys.size() != weigths.size())){
@@ -116,15 +118,15 @@ void daData_Variable_SinglePatient::printAndCompare(int datasetColumn,stdStringV
   }
 
   // PRINT MAP
-  //typedef map<string,stdVec>::iterator it_type;
+  //typedef map<string,stdStringVec>::iterator it_type;
   //for(it_type iterator = dict.begin(); iterator != dict.end(); iterator++) {
-  //  printf("Key %s, Value %f\n",iterator->first.c_str(),iterator->second[1]);
+  //  printf("Key %s, Value %s\n",iterator->first.c_str(),iterator->second[1].c_str());
   //}
 
-  if(dict.begin()->second.size() < datasetColumn){
+  if(dict.begin()->second.size() < (datasetColumn + 1)){
     throw daException("Error in evalOBJ invalid data index.\n");
   }
-  
+
   // Simple Cost Objective: Sum of Percent Change
   FILE* fp;
   fp = fopen("outputTargets.out","w");
@@ -132,17 +134,17 @@ void daData_Variable_SinglePatient::printAndCompare(int datasetColumn,stdStringV
   string measuredString;
   double measured = 0.0;
   double weight = 0.0;
-  fprintf(fp,"%30s %15s %15s %15s\n","Key", "Measured", "Computed", "Weight");
+  fprintf(fp,"%15s %15s %15s %15s\n","Key", "Measured", "Computed", "Weight");
   for(int loopA=0;loopA<keys.size();loopA++){
     if(dict.find(keys[loopA]) != dict.end()){
       // Found Key
       computed = values[loopA];      
-      measuredString = dict[keys[loopA]][0];
-      if(measuredString.compare("none") != 0){
+      measuredString = dict[keys[loopA]][datasetColumn];      
+      if(measuredString.compare("none") != 0){        
         try{
           measured = atof(measuredString.c_str());
           weight = weigths[loopA];
-          fprintf(fp,"%30s %15.3f %15.3f %15.3f\n",keys[loopA].c_str(),measured,computed,weight);
+          fprintf(fp,"%15s %15.3f %15.3f %15.3f\n",keys[loopA].c_str(),measured,computed,weight);
         }catch(...){
         }
       }
@@ -152,11 +154,11 @@ void daData_Variable_SinglePatient::printAndCompare(int datasetColumn,stdStringV
   fclose(fp);
 }
 
-int daData_Variable_SinglePatient::getPatientValue(int patientID,string key,double &result){
+int daData_multiple_Table::getPatientValue(int patientID,string key,double &result){
   int retVal = 0;
   if(dict.find(key) != dict.end()){
     try{
-      result = atof(dict[key][0].c_str());
+      result = atof(dict[key][patientID - 1].c_str());
     }catch(...){
       result = 0.0;
       retVal = 1;
@@ -168,20 +170,4 @@ int daData_Variable_SinglePatient::getPatientValue(int patientID,string key,doub
     retVal = 1;
   }
   return retVal;
-}
-
-// Show Available Keys for a given timeStamp
-void daData_Variable_SinglePatient::getAvailableKeys(stdStringVec& foundKeys){
-  foundKeys.clear();
-  typedef map<string,stdStringVec>::iterator it_type;
-  string currKey;
-  string currTimeStamp;
-  int count = 0;
-  for(it_type iterator = dict.begin(); iterator != dict.end(); iterator++) {
-    count++;
-    // Get Key
-    currKey = iterator->first;
-    // Add Key if you have the same time stamp
-    foundKeys.push_back(currKey);
-  }
 }

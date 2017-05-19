@@ -699,6 +699,7 @@ void acActionOPT_NM::LPN_opt (){
   stdIntVec errorCodes;
   try{
     ynewlo = model->evalModelError(inputs,outputs,errorCodes);
+    printf("Errore: %d\n",errorCodes[0]);
     if(errorCodes[0] == 0){
       if(doPrintMessages){
         printf("   LL =  %f\n",ynewlo);
