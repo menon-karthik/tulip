@@ -39,7 +39,7 @@ void acActionLSI_FD::WriteSentitivityTableToFile(string fileName,int par_num,int
     parName = model->getParamName(loopA);
     fprintf(stateFile,"%15s ",parName.c_str());
     for(int loopB=0;loopB<res_num;loopB++){
-      fprintf(stateFile,"%15e ",sensTable[loopA][loopB]);
+      fprintf(stateFile,"%15.3f ",sensTable[loopA][loopB]);
     }
     fprintf(stateFile,"\n");
   }
@@ -199,7 +199,7 @@ int acActionLSI_FD::go(){
   }
 
   // PRINT SENSITIVITY TABLE
-  WriteSentitivityTableToFile("LSI_Derivatives.txt",par_num,res_num,sensTable);
+  WriteSentitivityTableToFile("LSI_Table.txt",par_num,res_num,sensTable);
 
   // Return No Error
   return 0;

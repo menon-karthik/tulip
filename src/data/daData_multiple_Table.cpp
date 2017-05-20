@@ -73,7 +73,7 @@ double daData_multiple_Table::evalLogLikelihood(int dataIndex,stdStringVec keys,
   if((keys.size() != avValues.size())||(keys.size() != stdFactors.size())||(keys.size() != weights.size())){
     throw daException("Error in evalPosterior size of keys and values are not consistent.\n");
   }
-  if(dict.begin()->second.size() < dataIndex){
+  if(dict.begin()->second.size() < dataIndex + 1){
     throw daException("Error in evalPosterior invalid data index.\n");
   }
   
@@ -87,18 +87,20 @@ double daData_multiple_Table::evalLogLikelihood(int dataIndex,stdStringVec keys,
   double stdDev = 0.0;
   double weightVal = 0.0;
   double stdFactor = 0.0;
+  // printf("Test\n");
   for(int loopA=0;loopA<keys.size();loopA++){
     if(dict.find(keys[loopA]) != dict.end()){
       // Found Key
       computed = avValues[loopA];  
       stdFactor = stdFactors[loopA];
       weightVal = weights[loopA];
-      measuredString = dict[keys[loopA]][dataIndex - 1];
+      measuredString = dict[keys[loopA]][dataIndex];
       if(measuredString.compare("none") != 0){
         try{
           measured = atof(measuredString.c_str());
-          stdDev = fabs(stdFactor);
+          stdDev = fabs(stdFactor);          
           perc = 0.5*(computed - measured)*(computed - measured)/((stdDev * stdDev) * weightVal);
+          // printf("%f\n",perc);
           result += perc;
           count++;
         }catch(...){
@@ -106,6 +108,7 @@ double daData_multiple_Table::evalLogLikelihood(int dataIndex,stdStringVec keys,
       }
     }
   }
+  // printf("Result: %f\n",result);
   // Return Value
   return result;
 }

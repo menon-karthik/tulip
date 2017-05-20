@@ -78,17 +78,17 @@ void cmStressStretch_SHRA::setModelResults(stdVec outputs,stdStringVec& keys,std
   
   // STANDARD DEVIATIONS
   stdFactors.clear();
-  stdFactors.push_back(1.0); // str01
-  stdFactors.push_back(1.0); // str02
-  stdFactors.push_back(1.0); // str03
-  stdFactors.push_back(1.0); // str04
-  stdFactors.push_back(1.0); // str05
-  stdFactors.push_back(1.0); // str06
-  stdFactors.push_back(1.0); // str07
-  stdFactors.push_back(1.0); // str08
-  stdFactors.push_back(1.0); // str09
-  stdFactors.push_back(1.0); // str10
-  stdFactors.push_back(1.0); // str11
+  stdFactors.push_back(5.981552e+03); // str01
+  stdFactors.push_back(6.796677e+03); // str02
+  stdFactors.push_back(1.183938e+04); // str03
+  stdFactors.push_back(3.592660e+04); // str04
+  stdFactors.push_back(9.279702e+04); // str05
+  stdFactors.push_back(2.004188e+05); // str06
+  stdFactors.push_back(3.637891e+05); // str07
+  stdFactors.push_back(5.768587e+05); // str08
+  stdFactors.push_back(8.251717e+05); // str09
+  stdFactors.push_back(1.088304e+06); // str10
+  stdFactors.push_back(1.348686e+06); // str11
 
   // WEIGHTS
   weigths.clear();
@@ -184,8 +184,8 @@ double cmStressStretch_SHRA::evalModelError(stdVec inputs,stdVec& outputs, stdIn
     //}
   
     // Evaluate Objective Function
-    //result = data->evalLogLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
-    result = data->evalOBJ(datasetColumn,keys,computedValues,weigths);
+    result = data->evalLogLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
+    //result = data->evalOBJ(datasetColumn,keys,computedValues,weigths);
     
   }
 

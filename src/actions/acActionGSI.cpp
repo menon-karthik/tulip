@@ -574,7 +574,8 @@ int acActionGSI::go(){
 
     // DEBUG: Write Sensitivity Tables
     if(options.writeDebugData){
-      printSensitivityTablesToLatex(loopA,res_num,par_num,dirTable,totTable);
+      //printSensitivityTablesToLatex(loopA,res_num,par_num,dirTable,totTable);
+      printSensitivityTables(loopA,res_num,par_num,dirTable,totTable);
     }
   }
 

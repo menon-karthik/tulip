@@ -69,7 +69,7 @@ int acAction_OBJProfile::OBJ_Profile(){
   int par_num = model->getParameterTotal();
 
   // Allocate
-  double* start = new double[par_num];    
+  double start[par_num];    
 
   // GET STARTING PARAMETER SET
   if(initialPointFromFile){
