@@ -100,7 +100,7 @@ double daData_multiple_Table::evalLogLikelihood(int dataIndex,stdStringVec keys,
           measured = atof(measuredString.c_str());
           stdDev = fabs(stdFactor);          
           perc = 0.5*(computed - measured)*(computed - measured)/((stdDev * stdDev) * weightVal);
-          // printf("%f\n",perc);
+          // printf("%f\n",perc);          
           result += perc;
           count++;
         }catch(...){
@@ -108,9 +108,15 @@ double daData_multiple_Table::evalLogLikelihood(int dataIndex,stdStringVec keys,
       }
     }
   }
+  // printf("\n");
   // printf("Result: %f\n",result);
   // Return Value
   return result;
+}
+
+double daData_multiple_Table::evalLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+  double ll = evalLogLikelihood(dataIndex,keys,avValues,stdFactors,weights);
+  return log(ll);
 }
 
 void daData_multiple_Table::printAndCompare(int datasetColumn,stdStringVec keys,stdVec values,stdVec weigths){

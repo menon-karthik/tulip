@@ -31,7 +31,7 @@ class cmStressStretch_GOH: public cmModel{
     virtual string getResultName(int resID);
     virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
 
-    void setModelResults(stdVec outputs,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);
+    void setModelResults(const stdVec& outputs,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);
 };
 
 #endif // CMSTRESSSTRETCH_GOH

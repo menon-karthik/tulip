@@ -93,6 +93,29 @@ class daData{
     */
     virtual double evalLogLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights) = 0;
 
+    /*! 
+    \verbatim embed:rst
+    **Purpose**
+    Pure virtual function to evaluated a Gaussian likelihood
+    
+    **Discussion**
+    None
+    
+    **Modified**
+    10 January 2016 - DES
+    
+    **Reference**
+    No Reference    
+    \endverbatim
+    \param dataIndex inputs the column identifying the patient in a multi-patient dataset, not used with single patient datasets
+    \param keys inputs a list of quantities evaluated from the model
+    \param avValues inputs values of the model results associated with the vector keys
+    \param sdValues inputs ratio between standard deviation and average value for all keys
+    \param weights inputs weights that multiply the measurement variance for each quantity
+    \return value of the Gaussian likelihood at the current parameter realization
+    */
+    virtual double evalLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights) = 0;    
+
     /*!
     \verbatim embed:rst 
     **Purpose**

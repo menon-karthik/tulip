@@ -19,19 +19,19 @@ int cmStressStretch_GOH::getResultTotal(){
 }
 void cmStressStretch_GOH::getParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
-  limits[0] = 0.0; limits[1] = 10.0;
-  limits[2] = 0.0; limits[3] = 10.0;
-  limits[4] = 0.0; limits[5] = 5000.0;
+  limits[0] = 0.0; limits[1] = 1.0e8;
+  limits[2] = 0.0; limits[3] = 1.0e8;
+  limits[4] = 0.0; limits[5] = 1.0e3;
   limits[6] = 0.0; limits[7] = 1.0/3.0;
   limits[8] = 0.0; limits[9] = M_PI/2.0;
 }
 void cmStressStretch_GOH::getDefaultParams(stdVec& params){
   params.resize(getParameterTotal());
-  params[0] = 0.01;
-  params[1] = 0.01;
-  params[2] = 50.0;
-  params[3] = 0.01;
-  params[4] = M_PI/8.0;
+  params[0] = 0.50;
+  params[1] = 1.0;
+  params[2] = 350.0;
+  params[3] = 0.15;
+  params[4] = 0.2;
 }
 void cmStressStretch_GOH::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: getPriorMapping Not implemented in cmStressStretch_GOH.\n");
@@ -56,7 +56,7 @@ string cmStressStretch_GOH::getResultName(int resID){
   return res;
 }
 
-void cmStressStretch_GOH::setModelResults(stdVec outputs,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths){
+void cmStressStretch_GOH::setModelResults(const stdVec& outputs,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths){
 
   // KEYS
   keys.clear();
@@ -80,17 +80,28 @@ void cmStressStretch_GOH::setModelResults(stdVec outputs,stdStringVec& keys,stdV
   
   // STANDARD DEVIATIONS
   stdFactors.clear();
-  stdFactors.push_back(5.981552e+03); // str01
-  stdFactors.push_back(6.796677e+03); // str02
-  stdFactors.push_back(1.183938e+04); // str03
-  stdFactors.push_back(3.592660e+04); // str04
-  stdFactors.push_back(9.279702e+04); // str05
-  stdFactors.push_back(2.004188e+05); // str06
-  stdFactors.push_back(3.637891e+05); // str07
-  stdFactors.push_back(5.768587e+05); // str08
-  stdFactors.push_back(8.251717e+05); // str09
-  stdFactors.push_back(1.088304e+06); // str10
-  stdFactors.push_back(1.348686e+06); // str11
+  //stdFactors.push_back(5.981552e+03); // str01
+  //stdFactors.push_back(6.796677e+03); // str02
+  //stdFactors.push_back(1.183938e+04); // str03
+  //stdFactors.push_back(3.592660e+04); // str04
+  //stdFactors.push_back(9.279702e+04); // str05
+  //stdFactors.push_back(2.004188e+05); // str06
+  //stdFactors.push_back(3.637891e+05); // str07
+  //stdFactors.push_back(5.768587e+05); // str08
+  //stdFactors.push_back(8.251717e+05); // str09
+  //stdFactors.push_back(1.088304e+06); // str10
+  //stdFactors.push_back(1.348686e+06); // str11
+  stdFactors.push_back(1.0); // str01
+  stdFactors.push_back(1.0); // str02
+  stdFactors.push_back(1.0); // str03
+  stdFactors.push_back(1.0); // str04
+  stdFactors.push_back(1.0); // str05
+  stdFactors.push_back(1.0); // str06
+  stdFactors.push_back(1.0); // str07
+  stdFactors.push_back(1.0); // str08
+  stdFactors.push_back(1.0); // str09
+  stdFactors.push_back(1.0); // str10
+  stdFactors.push_back(1.0); // str11
 
   // WEIGHTS
   weigths.clear();
@@ -171,7 +182,7 @@ double cmStressStretch_GOH::evalModelError(stdVec inputs,stdVec& outputs, stdInt
     //}
   
     // Evaluate Objective Function
-    result = data->evalLogLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
+    result = data->evalLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
     //result = data->evalOBJ(datasetColumn,keys,computedValues,weigths);
     
   }

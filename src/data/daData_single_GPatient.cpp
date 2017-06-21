@@ -111,6 +111,11 @@ double daData_single_GPatient::evalLogLikelihood(int dataIndex,stdStringVec keys
   return result;
 }
 
+double daData_single_GPatient::evalLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+  double ll = evalLogLikelihood(dataIndex,keys,avValues,stdFactors,weights);
+  return log(ll);
+}
+
 void daData_single_GPatient::printAndCompare(int datasetColumn,stdStringVec keys,stdVec values,stdVec weigths){
   
   // Check The Size of keys and values

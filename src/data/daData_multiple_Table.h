@@ -31,8 +31,10 @@ class daData_multiple_Table: public daData{
     virtual void readFromFile(string fileName);
     virtual double evalOBJ(int dataIndex,stdStringVec keys,stdVec values,stdVec weights);
     virtual double evalLogLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
+    virtual double evalLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
     virtual void printAndCompare(int dataIndex,stdStringVec keys,stdVec values,stdVec weigths);
     virtual int getPatientValue(int patientID,string key,double &result);
+    
 };
 
 #endif // DADATA_MULTIPLE_TABLE_H

@@ -129,6 +129,14 @@ void getMWShiftIndexes(int totDims,
   }
 }
 
+bool measureNotUniform(const stdVec& measure){
+  bool res = true;
+  for(int loopA=0;loopA<measure.size();loopA++){
+    res = res && (fabs(measure[loopA]-1.0)<1.0e-8)
+  }
+  return res;
+}
+
 // =====================
 // MW MATRIX CONSTRUCTOR
 // =====================
@@ -163,7 +171,7 @@ uqMWMatrix::uqMWMatrix(int maxOrder,uqSamples* XValues,
   uqMWBasis* temp;
   for(int loopA=0;loopA<totDims;loopA++){
     // printf("Building Basis for dim: %d\n",loopA);
-    if(addMW){
+    if(measureNotUniform(measure[loopA])){
       temp = new uqMWBasis(maxOrder+1,mwQuadOrder,measure[loopA]);
     }else{
       temp = new uqMWBasis(maxOrder+1);
