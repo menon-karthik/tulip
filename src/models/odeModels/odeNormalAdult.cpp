@@ -285,7 +285,7 @@ double evalElastance(double tr){
   return eMin + eMax* (( num1 / den1 ) * factor2);
 }
 
-void odeNormalAdult::eval(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut){
+void odeNormalAdult::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut){
 
   // Assign the Parameters
   double HR         = params[0]; // Heart Rate

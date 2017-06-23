@@ -696,10 +696,11 @@ void acActionOPT_NM::LPN_opt (){
   for(int loopA=0;loopA<par_num;loopA++){
     inputs.push_back(optParams[loopA]);
   }
+
   stdIntVec errorCodes;
   try{
     ynewlo = model->evalModelError(inputs,outputs,errorCodes);
-    printf("Errore: %d\n",errorCodes[0]);
+    // printf("Errore: %d\n",errorCodes[0]);
     if(errorCodes[0] == 0){
       if(doPrintMessages){
         printf("   LL =  %f\n",ynewlo);
@@ -716,6 +717,8 @@ void acActionOPT_NM::LPN_opt (){
     }
     ynewlo = 10000.0;
   }
+
+  printf("ECCOLO 2\n");
 
   // PRINT FUNCTION VALUE FOR INITIAL POINT
   if(doPrintMessages){

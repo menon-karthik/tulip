@@ -3,14 +3,14 @@
 using namespace std;
 
 // Constructor
-odeIntegratorRK4::odeIntegratorRK4(odeModel* odeModel, double timeStep, int totalSteps, int totalCycles)
-:odeIntegrator(odeModel,timeStep,totalSteps,totalCycles){
+odeIntegratorRK4::odeIntegratorRK4(odeModel* odeModel, double timeStep, int totalCycles)
+:odeIntegrator(odeModel,timeStep,totalCycles){
 }
 
 odeIntegratorRK4::~odeIntegratorRK4(){
 }
 
-int odeIntegratorRK4::run(const stdVec& iniVals,const stdVec& params,stdMat& outVals,stdMat& auxOutVals){
+int odeIntegratorRK4::run(int totalSteps, const stdVec& iniVals,const stdVec& params,stdMat& outVals,stdMat& auxOutVals){
 
   // Intialize Current Time
   double currTime      = 0.0;
@@ -36,16 +36,26 @@ int odeIntegratorRK4::run(const stdVec& iniVals,const stdVec& params,stdMat& out
   stdVec Xk3(totalStates,0.0);
   stdVec Xk4(totalStates,0.0);
 
-  stdVec Ind(totalStates,0.0);
+  stdVec Ind(totalStates,1.0);
 
   // Initialize State and Derivative Vectors
   stdVec Xn(totalStates,0.0);
   stdVec Xn1(totalStates,0.0);
 
+  // Initialize the outputs
+  outVals.resize(totalStates);
+  auxOutVals.resize(totAuxStates);
+  for(int loopA=0;loopA<totalStates;loopA++){
+    outVals[loopA].resize(totalSteps);
+  }
+  for(int loopA=0;loopA<totAuxStates;loopA++){
+    auxOutVals[loopA].resize(totalSteps);
+  }
+
   // Set Initial Conditions
   for(int loopA=0;loopA<ode->getStateTotal();loopA++){
     Xn[loopA] = iniVals[loopA];
-  }
+  }  
 
   // Time loop
   for(int loopA=0;loopA<totalSteps;loopA++){
@@ -54,25 +64,25 @@ int odeIntegratorRK4::run(const stdVec& iniVals,const stdVec& params,stdMat& out
     stepId++;
 
     // Eval K1
-    ode->eval(currTime,Xn,params,forcing,k1,k1AuxOut);
+    ode->evalDeriv(currTime,Xn,params,forcing,k1,k1AuxOut,Ind);    
 
     // Eval K2
     for(int loopB=0;loopB<totalStates;loopB++){
       Xk2[loopB] = Xn[loopB] + ((1.0/3.0)*timeStep) * k1[loopB];
     }
-    ode->eval(currTime + (1.0/3.0) * timeStep,Xk2,params,forcing,k2,k2AuxOut);
+    ode->evalDeriv(currTime + (1.0/3.0) * timeStep,Xk2,params,forcing,k2,k2AuxOut,Ind);
 
     // Eval K3
     for(int loopB=0;loopB<totalStates;loopB++){
       Xk3[loopB] = Xn[loopB] - (1.0/3.0)*timeStep * k1[loopB] + (1.0*timeStep) * k2[loopB];
     }
-    ode->eval(currTime + (2.0/3.0) * timeStep,Xk3,params,forcing,k3,k3AuxOut);
+    ode->evalDeriv(currTime + (2.0/3.0) * timeStep,Xk3,params,forcing,k3,k3AuxOut,Ind);
 
     // Eval K4
     for(int loopB=0;loopB<totalStates;loopB++){
       Xk4[loopB] = Xn[loopB] + timeStep*k1[loopB] - timeStep*k2[loopB] + timeStep * k3[loopB];
     }
-    ode->eval(currTime + timeStep,Xk4,params,forcing,k4,k4AuxOut);
+    ode->evalDeriv(currTime + timeStep,Xk4,params,forcing,k4,k4AuxOut,Ind);
 
     // Eval Xn1
     for(int loopB=0;loopB<totalStates;loopB++){
@@ -102,12 +112,12 @@ int odeIntegratorRK4::run(const stdVec& iniVals,const stdVec& params,stdMat& out
     // Update Current Time
     currTime += timeStep;
 
-    // SAVE OUTPUT FOR EVERY 3D MODEL SOLUTION
+    // Copy Auxiliary outputs at every time step
     for(int loopB=0;loopB<totAuxStates;loopB++){
       auxOutVals[loopB][stepId] = k4AuxOut[loopB];
     }
 
-    // Copy The solution back for each time step
+    // Copy solution at each time step
     for(int loopB=0;loopB<totalStates;loopB++){
       outVals[loopB][stepId] = Xn1[loopB];
     }

@@ -34,8 +34,13 @@ class odeModel{
     virtual void   getDefaultParams(stdVec& params) = 0;
     virtual string getParamName(int parID) = 0;
     virtual string getResultName(int resID) = 0;
-    virtual void   eval(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut) = 0;
-    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
+    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind) = 0;
+    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
+    virtual void   getResultKeys(stdStringVec& keys) = 0;
+    virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs) = 0;
+    virtual void   getDataSTD(stdVec& stds) = 0;
+    virtual void   getResultWeigths(stdVec& weights) = 0;    
+    virtual int    getHRIndex() = 0;
     
 };
 

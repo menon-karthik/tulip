@@ -5,6 +5,7 @@
 The following software is required:
 
 - Boost Libraries
+- Armadillo Library (Numerical linear algebra in c++)
 - SWIG    (Python Interface)
 - Doxygen (Documentation for the C++ code)
 - Sphinx  (HTML Manual)

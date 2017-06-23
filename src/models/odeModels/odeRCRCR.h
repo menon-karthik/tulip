@@ -42,6 +42,6 @@ class odeRCRCR: public odeModel{
     virtual string getResultName(int resID);
   	virtual void   getParameterLimits(stdVec& limits);
   	virtual void   getDefaultParams(stdVec& params);
-    virtual void   eval(double t,const stdVec& Xk,const stdVec& params,stdVec& DXk,stdVec& auxOut);
+    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,stdVec& DXk,stdVec& auxOut);
     virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
 };

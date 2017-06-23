@@ -22,7 +22,7 @@ class odeNormalAdult: public odeModel{
     virtual void   getDefaultParams(stdVec& params);
     virtual string getParamName(int parID);
     virtual string getResultName(int resID);
-    virtual void   eval(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut);
+    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut);
     virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
 };
 

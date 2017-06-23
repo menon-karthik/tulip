@@ -1206,6 +1206,8 @@ void zeroAtValveOpening(int start, int stop, double* curve, double* valveIsOpen)
   if(!foundOpeningTime){
     //printf("Error: Valve Not Opening at zeroAtValveOpening...\n");
     //fflush(stdout);
+    //printf("Warning: Valve is not opening in heart cycle.\n");
+    // return;
     throw cmException("Error: Valve is not opening in heart cycle.\n");
   }
   // Perform Circular Shift

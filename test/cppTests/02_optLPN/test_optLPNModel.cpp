@@ -26,6 +26,10 @@
 # include "daData.h"
 # include "daData_multiple_Table.h"
 
+# include "acAction.h"
+# include "acActionOPT_NM.h"
+
+
 using namespace std;
 
 int main(int argc, char* argv[]){
@@ -57,19 +61,50 @@ int main(int argc, char* argv[]){
     int currPatient = 0;
     lpnModel->setData(data,currPatient);
 
-    // Get Default parameter set
-    stdVec inputs;
-    lpnModel->getDefaultParams(inputs);
+    // Set Optimizer Parameters
+    // Total Number of iterations
+    int totIterations = 5;
+    // Convergence Tolerance
+    double convTol = 1.0e-6;
+    // Check Convergence every convUpdateIt iterations
+    int convUpdateIt = 1;
+    // Maximum Iterations
+    int maxOptIt = 100;
+    // Coefficient for Step increments
+    double stepCoefficient = 0.01;
+    // File with initial starting point
+    bool useStartingParameterFromFile = false;
+    bool startFromCentre = false;
+    string startParameterFile("");
 
-    // Solve Model
-    stdVec outputs;
-    stdIntVec errorCodes;    
-    ll = lpnModel->evalModelError(inputs,outputs,errorCodes);
+    // Construct Action
+    acAction* nm = new acActionOPT_NM(convTol, 
+                                      convUpdateIt,
+                                      maxOptIt,
+                                      stepCoefficient);
     
-  }catch(exception& e){
+    // Set Model
+    nm->setModel(lpnModel);
+
+    // SET INITIAL GUESS
+    ((acActionOPT_NM*)nm)->setInitialParamGuess(useStartingParameterFromFile,
+                                                startFromCentre,
+                                                startParameterFile);        
+
+    for(int loopA=0;loopA<totIterations;loopA++){
+      
+      // PERFORM ACTION
+      nm->go();
+
+      if(loopA == 0){
+        ((acActionOPT_NM*)nm)->setInitialPointFromFile(true);
+        ((acActionOPT_NM*)nm)->setInitialPointFile(string("optParams.txt"));
+      }
+    }
+
+  }catch(exception &e){
     // ERROR: TERMINATED!
     printf("\n");
-    printf("Msg: %s\n",e.what());
     printf("TERMINATED!\n");
     return 0;
   }

@@ -32,4 +32,8 @@
 # include "cmStressStretch_GOH.h"
 # include "cmStressStretch_FR.h"
 
+// ODE Models
+#include "odeModel.h"
+#include "odeNormalAdultSimplePA.h"
+
 #endif // TULIPCM_H

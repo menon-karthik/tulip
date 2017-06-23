@@ -19,6 +19,10 @@
 #include "cmStressStretch_SHRA.h"
 #include "cmStressStretch_GOH.h"
 #include "cmStressStretch_FR.h"
+#include "odeIntegrator.h"
+#include "odeIntegratorRK4.h"
+#include "odeModel.h"
+#include "odeNormalAdultSimplePA.h"
 #include "uqTypes.h"
 %}
 
@@ -49,6 +53,10 @@
 %include "cmStressStretch_SHRA.h"
 %include "cmStressStretch_GOH.h"
 %include "cmStressStretch_FR.h"
+%include "odeIntegrator.h"
+%include "odeIntegratorRK4.h"
+%include "odeModel.h"
+%include "odeNormalAdultSimplePA.h"
 %include "uqTypes.h"
 
 namespace std {

@@ -56,7 +56,7 @@ double solveForEllipseAxis(double area, double perim, double iniVal){
 }
 
 // SOLVE SINGLE ODE STEP
-void odeArmVenousOcclusion::eval(double t,const stdVec& Xk,const stdVec& params,const stdVec& fn, stdVec& DXk, stdVec& auxOut){
+void odeArmVenousOcclusion::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdVec& fn, stdVec& DXk, stdVec& auxOut){
   // Store local copies of the parameters
   // Mean Arterial Pressure
   double map = params[0];

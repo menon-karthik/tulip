@@ -129,10 +129,10 @@ void getMWShiftIndexes(int totDims,
   }
 }
 
-bool measureNotUniform(const stdVec& measure){
+bool measureIsUniform(const stdVec& measure){
   bool res = true;
   for(int loopA=0;loopA<measure.size();loopA++){
-    res = res && (fabs(measure[loopA]-1.0)<1.0e-8)
+    res = res && (fabs(measure[loopA]-1.0)<1.0e-8);
   }
   return res;
 }
@@ -171,10 +171,10 @@ uqMWMatrix::uqMWMatrix(int maxOrder,uqSamples* XValues,
   uqMWBasis* temp;
   for(int loopA=0;loopA<totDims;loopA++){
     // printf("Building Basis for dim: %d\n",loopA);
-    if(measureNotUniform(measure[loopA])){
-      temp = new uqMWBasis(maxOrder+1,mwQuadOrder,measure[loopA]);
+    if(measureIsUniform(measure[loopA])){
+      temp = new uqMWBasis(maxOrder+1);      
     }else{
-      temp = new uqMWBasis(maxOrder+1);
+      temp = new uqMWBasis(maxOrder+1,mwQuadOrder,measure[loopA]);
     }
     myInterps.push_back(temp);
   }  
