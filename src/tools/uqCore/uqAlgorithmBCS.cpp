@@ -741,7 +741,8 @@ double updateNoiseVariance(int totSamples,int totBasis,int totBasisInModel,
   }
 
   // Return the estimate
-  double beta = ((totSamples-alphaSigmaTerm)/diff2Norm);
+  // CHECK !!!
+  double beta = ((totSamples - alphaSigmaTerm)/diff2Norm);
   beta  = min(beta,1.0e6/varY);
   deltaLogBeta = log(beta) - log(oldBeta);
 
@@ -1694,8 +1695,8 @@ double uqAlgorithmBCS::run(int totSamples, int totBasis,
   }
 
   // INVERT COVARIANCE MATRIX
-  stdMat coeffsCovTemp;
-  computeCoefficientsCovariance(opts.printDBGMessages,totBasisInModel,sigmaMat,coeffsCovTemp);
+  // stdMat coeffsCovTemp;
+  // computeCoefficientsCovariance(opts.printDBGMessages,totBasisInModel,sigmaMat,coeffsCovTemp);
   
   // FINAL COPY OF COEFFICIENTS AND COVARIANCES
   // Allocate Coefficient Vector and Covariance Matrix
@@ -1723,7 +1724,10 @@ double uqAlgorithmBCS::run(int totSamples, int totBasis,
     for(int loopB=0;loopB<totBasisInModel;loopB++){
       globalColID = basisInModel[loopB];
       covScaleFactor = (basisScales[globalRowID]*basisScales[globalColID]);
-      coeffsCov[globalRowID][globalColID] = coeffsCovTemp[loopA][loopB]/(covScaleFactor*covScaleFactor);
+      // coeffsCov[globalRowID][globalColID] = coeffsCovTemp[loopA][loopB]/(covScaleFactor*covScaleFactor);
+      coeffsCov[globalRowID][globalColID] = sigmaMat[loopA][loopB]/(covScaleFactor*covScaleFactor);
+      
+      //coeffsCov[globalRowID][globalColID] = coeffsCovTemp[loopA][loopB]/(covScaleFactor);
       //coeffsCov[globalRowID][globalColID] = coeffsCovTemp[loopA][loopB];
     }
     // Plot Basis In Model

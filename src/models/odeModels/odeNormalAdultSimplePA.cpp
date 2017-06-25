@@ -249,32 +249,32 @@ void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){
   // --- Atrial Model Parameters
   limits[30] = 0.1;    limits[31] = 10.0; // K_pas_ra_1 - Atrial passive curve slope, right atrium
   limits[32] = 0.0001; limits[33] = 0.06; // K_pas_ra_2 - Atrial passive curve exponent factor, right atrium
-  limits[34] = 1.0;    limits[35] = 5.0;  // Emax_ra - Atrial active curve slope, right atrium
+  limits[34] = 0.05;    limits[35] = 5.0;  // Emax_ra - Atrial active curve slope, right atrium
   limits[36] = 0.0;    limits[37] = 50.0; // Vra0 - Unstressed right atrial volume
   limits[38] = 0.1;    limits[39] = 10.0; // K_pas_la_1 - Atrial passive curve slope, left atrium
   limits[40] = 0.0001; limits[41] = 0.06; // K_pas_la_2 - Atrial passive curve exponent factor, left atrium
-  limits[42] = 1.0;    limits[43] = 5.0;  // Emax_la - Atrial active curve slope, left atrium
+  limits[42] = 0.05;    limits[43] = 5.0;  // Emax_la - Atrial active curve slope, left atrium
   limits[44] = 0.0;    limits[45] = 50.0; // Vla0 - Unstressed left atrial volume
 
   // --- Ventricular Model Parameters
   limits[46] = 0.1;    limits[47] = 20.0; // K_pas_rv_1 - Ventricular passive curve slope, right ventricle
   limits[48] = 0.0001; limits[49] = 0.01; // K_pas_rv_2 - Ventricular passive curve exponent factor, right ventricle
-  limits[50] = 1.0;    limits[51] = 5.0;  // Emax_rv - Ventricular active curve slope, right ventricle
+  limits[50] = 0.1;    limits[51] = 5.0;  // Emax_rv - Ventricular active curve slope, right ventricle
   limits[52] = 0.0;    limits[53] = 50.0; // Vrv0 - Unstressed right atrial volume
   limits[54] = 0.1;    limits[55] = 20.0; // K_pas_lv_1 - Ventricular passive curve slope, left ventricle
   limits[56] = 0.0001; limits[57] = 0.01; // K_pas_lv_2 - Ventricular passive curve exponent factor, left ventricle
   limits[58] = 1.0;    limits[59] = 5.0;  // Emax_lv - Ventricular active curve slope, left ventricle
-  limits[60] = 0.0;    limits[61] = 5.0;  // Vlv0 - Unstressed left atrial volume
+  limits[60] = 0.0;    limits[61] = 50.0;  // Vlv0 - Unstressed left atrial volume
 
   // --- Atrial and Ventricular Inductances and Resistances
-  limits[62] = 0.05; limits[63] = 1.0;  // L_ra_rv - Inductance of right atrium
-  limits[64] = 5.0;  limits[65] = 20.0; // R_ra_rv - Resistance of right atrium
-  limits[66] = 0.05; limits[67] = 1.0;  // L_rv_pa - Inductance of right ventricle
-  limits[68] = 15.0; limits[69] = 35.0; // R_rv_pa - Resistance of right ventricle
-  limits[70] = 0.05; limits[71] = 1.0;  // L_la_lv - Inductance of left atrium
-  limits[72] = 25.0; limits[73] = 45.0; // R_la_lv - Resistance of left atrium  
-  limits[74] = 0.05; limits[75] = 1.0;  // L_lv_ao - Inductance of left ventricle
-  limits[76] = 45.0; limits[77] = 65.0; // R_lv_ao - Resistance of left ventricle
+  limits[62] = 0.1; limits[63] = 0.1;  // L_ra_rv - Inductance of right atrium
+  limits[64] = 10.0;  limits[65] = 10.0; // R_ra_rv - Resistance of right atrium
+  limits[66] = 0.1; limits[67] = 0.1;  // L_rv_pa - Inductance of right ventricle
+  limits[68] = 15.0; limits[69] = 15.0; // R_rv_pa - Resistance of right ventricle
+  limits[70] = 0.1; limits[71] = 0.1;  // L_la_lv - Inductance of left atrium
+  limits[72] = 8.0;  limits[73] = 8.0; // R_la_lv - Resistance of left atrium  
+  limits[74] = 0.1; limits[75] = 0.1;  // L_lv_ao - Inductance of left ventricle
+  limits[76] = 25.0; limits[77] = 25.0; // R_lv_ao - Resistance of left ventricle
   
   // --- Aortic Arch
   limits[78] = 1.0e-5; limits[79] = 0.001; // C_ao - Aortic capacitance
@@ -320,7 +320,7 @@ void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
   params[7] = 0.0; // Q_la_lv
   params[8] = 100.0 * convertmmHgToBarye; // P_ao
   params[9] = 0.0; // Q_lv_ao
-  params[10] = 0.0; // P_sys
+  params[10] = 50.0 * convertmmHgToBarye; // P_sys
 
   // --- Heart Cycle Parameters
   params[11+0] = 78.0; // HR - Heart Rate (beats per minute)
@@ -356,7 +356,7 @@ void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
   params[11+22] = 0.1;  // L_rv_pa - Inductance of right ventricle
   params[11+23] = 15.0;  // R_rv_pa - Resistance of right ventricle
   params[11+24] = 0.1;   // L_la_lv - Inductance of left atrium
-  params[11+25] = 20.0;  // R_la_lv - Resistance of left atrium
+  params[11+25] = 30.0;  // R_la_lv - Resistance of left atrium
   params[11+26] = 0.1;   // L_lv_ao - Inductance of left ventricle
   params[11+27] = 30.0; // R_lv_ao - Resistance of left ventricle
 
@@ -499,7 +499,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   }
 
   // Check if RA-RV Valve is open
-  if(P_rv >= P_ra){
+  if((P_rv >= P_ra)||(Q_ra_rv < 0.0)){
     Ind[4]=0.0;
   }
 
@@ -513,7 +513,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   }
 
   // Check if RV-PA Valve is open
-  if(P_pa >= P_rv){
+  if((P_pa >= P_rv)||(Q_rv_pa < 0.0)){
     Ind[6]=0.0;
   }
 
@@ -535,7 +535,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   }
 
   // Check if LA-LV Valve is open
-  if(P_lv >= P_la){
+  if((P_lv >= P_la)||(Q_la_lv < 0.0)){
     Ind[7]=0.0;
   }
 
@@ -549,7 +549,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   }
 
   // Check if LV-AO Valve is open
-  if(P_ao >= P_lv){
+  if((P_ao >= P_lv)||(Q_lv_ao < 0.0)){
     Ind[9]=0.0;
   }
 
