@@ -13,8 +13,6 @@ class cmModel{
   public:
     //! Data Object containing patient data
     daData* data;
-    //! dataset column identifying the specific patient for multiple patients datasets
-    int datasetColumn;
     //! List of frozen parameters IDs
     stdIntVec frozenParamIDX;
     //! List of frozen parameters values
@@ -196,7 +194,7 @@ class cmModel{
     virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode) = 0;
 
     // SET DATA OBJECT
-    void setData(daData* locData,int setIDX);
+    void setData(daData* locData);
 
     // EVAL MULTIPLE MODELS
     stdVec evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode);

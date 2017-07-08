@@ -24,16 +24,24 @@ Missing data are identified using the "none" string and discarded.
 
 class daData_multiple_Table: public daData{
   public:
+    
+    //! Data Members
+    bool useSingleColumn;
+    int  columnID;
+
   	//! Default constructor
-  	daData_multiple_Table();
+  	daData_multiple_Table(bool useSingleColumn,int columnID);
   	virtual ~daData_multiple_Table();
   	
-    virtual void readFromFile(string fileName);
-    virtual double evalOBJ(int dataIndex,stdStringVec keys,stdVec values,stdVec weights);
-    virtual double evalLogLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
-    virtual double evalLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
-    virtual void printAndCompare(int dataIndex,stdStringVec keys,stdVec values,stdVec weigths);
-    virtual int getPatientValue(int patientID,string key,double &result);
+    virtual void   readFromFile(string fileName);
+    virtual double evalOBJ(stdStringVec keys,stdVec values,stdVec weights);
+    virtual double evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
+    virtual double evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
+    virtual void   printAndCompare(stdStringVec keys,stdVec values,stdVec weigths);
+    virtual int    getPatientValue(string key,double &result);
+    virtual void   printToScreen();
+
+    void getIndexSet(stdIntVec& indexSet);
     
 };
 

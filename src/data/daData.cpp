@@ -47,12 +47,8 @@ void daData::removeKeyValue(string key){
   }
 }
 
-// Print Dictionary to stdout
-void daData::printToScreen(int patientIndex){
-  printf("---\n");
-  printf("%30s %30s\n","key","value");
-  for(dataMap::iterator it = dict.begin(); it!=dict.end();it++){
-  	printf("%30s %30f\n",it->first.c_str(),atof(it->second[patientIndex].c_str()));
-  }
-  printf("---\n");
+double daData::evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+  double ll = evalLogLikelihood(keys,avValues,stdFactors,weights);
+  return log(ll);  
 }
+

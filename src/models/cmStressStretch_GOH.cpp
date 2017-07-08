@@ -91,17 +91,17 @@ void cmStressStretch_GOH::setModelResults(const stdVec& outputs,stdStringVec& ke
   //stdFactors.push_back(8.251717e+05); // str09
   //stdFactors.push_back(1.088304e+06); // str10
   //stdFactors.push_back(1.348686e+06); // str11
-  stdFactors.push_back(1.0); // str01
-  stdFactors.push_back(1.0); // str02
-  stdFactors.push_back(1.0); // str03
-  stdFactors.push_back(1.0); // str04
-  stdFactors.push_back(1.0); // str05
-  stdFactors.push_back(1.0); // str06
-  stdFactors.push_back(1.0); // str07
-  stdFactors.push_back(1.0); // str08
-  stdFactors.push_back(1.0); // str09
-  stdFactors.push_back(1.0); // str10
-  stdFactors.push_back(1.0); // str11
+  stdFactors.push_back(1.0e6); // str01
+  stdFactors.push_back(1.0e6); // str02
+  stdFactors.push_back(1.0e6); // str03
+  stdFactors.push_back(1.0e6); // str04
+  stdFactors.push_back(1.0e6); // str05
+  stdFactors.push_back(1.0e6); // str06
+  stdFactors.push_back(1.0e6); // str07
+  stdFactors.push_back(1.0e6); // str08
+  stdFactors.push_back(1.0e6); // str09
+  stdFactors.push_back(1.0e6); // str10
+  stdFactors.push_back(1.0e6); // str11
 
   // WEIGHTS
   weigths.clear();
@@ -175,16 +175,8 @@ double cmStressStretch_GOH::evalModelError(stdVec inputs,stdVec& outputs, stdInt
   // Print and compare
   double result = 0.0;
   if(data != NULL){
-
-    // Print Info
-    //if(options.flushData){
-    data->printAndCompare(datasetColumn,keys,computedValues,weigths);
-    //}
-  
-    // Evaluate Objective Function
-    result = data->evalLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
-    //result = data->evalOBJ(datasetColumn,keys,computedValues,weigths);
-    
+    data->printAndCompare(keys,computedValues,weigths);
+    result = data->evalLogLikelihood(keys,computedValues,stdFactors,weigths);
   }
 
   // Set Error Codes

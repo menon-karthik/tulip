@@ -35,7 +35,7 @@ void daData_single_GPatient::readFromFile(string fileName){
   }
 }
 
-double daData_single_GPatient::evalOBJ(int dataIndex,stdStringVec keys,stdVec values,stdVec weights){
+double daData_single_GPatient::evalOBJ(stdStringVec keys,stdVec values,stdVec weights){
   
   // Check The Size of keys and values
   if((keys.size() != values.size())||(keys.size() != weights.size())){
@@ -69,7 +69,7 @@ double daData_single_GPatient::evalOBJ(int dataIndex,stdStringVec keys,stdVec va
   return result;
 }
 
-double daData_single_GPatient::evalLogLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+double daData_single_GPatient::evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
   
   // Check The Size of keys and values
   if((keys.size() != avValues.size())||(keys.size() != stdFactors.size())||(keys.size() != weights.size())){
@@ -111,12 +111,12 @@ double daData_single_GPatient::evalLogLikelihood(int dataIndex,stdStringVec keys
   return result;
 }
 
-double daData_single_GPatient::evalLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
-  double ll = evalLogLikelihood(dataIndex,keys,avValues,stdFactors,weights);
+double daData_single_GPatient::evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+  double ll = evalLogLikelihood(keys,avValues,stdFactors,weights);
   return log(ll);
 }
 
-void daData_single_GPatient::printAndCompare(int datasetColumn,stdStringVec keys,stdVec values,stdVec weigths){
+void daData_single_GPatient::printAndCompare(stdStringVec keys,stdVec values,stdVec weigths){
   
   // Check The Size of keys and values
   if((keys.size() != values.size())||(keys.size() != weigths.size())){
@@ -129,7 +129,7 @@ void daData_single_GPatient::printAndCompare(int datasetColumn,stdStringVec keys
   //  printf("Key %s, Value %f\n",iterator->first.c_str(),iterator->second[1]);
   //}
 
-  if(dict.begin()->second.size() < datasetColumn){
+  if(dict.begin()->second.size() < 0){
     throw daException("Error in evalOBJ invalid data index.\n");
   }
   
@@ -160,7 +160,7 @@ void daData_single_GPatient::printAndCompare(int datasetColumn,stdStringVec keys
   fclose(fp);
 }
 
-int daData_single_GPatient::getPatientValue(int patientID,string key,double &result){
+int daData_single_GPatient::getPatientValue(string key,double &result){
   int retVal = 0;
   if(dict.find(key) != dict.end()){
     try{
@@ -191,5 +191,18 @@ void daData_single_GPatient::getAvailableKeys(stdStringVec& foundKeys){
     currKey = iterator->first;
     // Add Key if you have the same time stamp
     foundKeys.push_back(currKey);
+  }
+}
+
+void daData_single_GPatient::printToScreen(){
+  printf("%30s %15s\n","Key", "Value");
+  typedef map<string,stdStringVec>::iterator it_type;
+  string currKey;
+  string currTimeStamp;
+  int count = 0;
+  for(it_type iterator = dict.begin(); iterator != dict.end(); iterator++){
+    count++;
+    // Get Couple Key,Value
+    printf("%30s %15.3e\n",iterator->first.c_str(), atof(iterator->second[0].c_str()));
   }
 }

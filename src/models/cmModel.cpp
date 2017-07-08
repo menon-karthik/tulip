@@ -9,9 +9,8 @@ cmModel::cmModel(){
 cmModel::~cmModel(){
 }
 
-void cmModel::setData(daData* locData,int setIDX){
+void cmModel::setData(daData* locData){
   data = locData;
-  datasetColumn = setIDX;
 }
 
 stdVec cmModel::evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode){

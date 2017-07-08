@@ -63,12 +63,11 @@ class daData{
     **Reference**
     No Reference    
     \endverbatim
-    \param dataIndex inputs the column identifying the patient in a multi-patient dataset, not used with single patient datasets
     \param keys inputs a list of quantities evaluated from the model
     \param values inputs values of the model results associated with the vector keys
     \param weights inputs weights that multiply the measurement variance for each quantity
     */
-    virtual double evalOBJ(int dataIndex,stdStringVec keys,stdVec values,stdVec weights) = 0;
+    virtual double evalOBJ(stdStringVec keys,stdVec values,stdVec weights) = 0;
 
     /*! 
     \verbatim embed:rst
@@ -84,37 +83,13 @@ class daData{
     **Reference**
     No Reference    
     \endverbatim
-    \param dataIndex inputs the column identifying the patient in a multi-patient dataset, not used with single patient datasets
     \param keys inputs a list of quantities evaluated from the model
     \param avValues inputs values of the model results associated with the vector keys
     \param sdValues inputs ratio between standard deviation and average value for all keys
     \param weights inputs weights that multiply the measurement variance for each quantity
     \return value of the log-likelihood at the current parameter realization
     */
-    virtual double evalLogLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights) = 0;
-
-    /*! 
-    \verbatim embed:rst
-    **Purpose**
-    Pure virtual function to evaluated a Gaussian likelihood
-    
-    **Discussion**
-    None
-    
-    **Modified**
-    10 January 2016 - DES
-    
-    **Reference**
-    No Reference    
-    \endverbatim
-    \param dataIndex inputs the column identifying the patient in a multi-patient dataset, not used with single patient datasets
-    \param keys inputs a list of quantities evaluated from the model
-    \param avValues inputs values of the model results associated with the vector keys
-    \param sdValues inputs ratio between standard deviation and average value for all keys
-    \param weights inputs weights that multiply the measurement variance for each quantity
-    \return value of the Gaussian likelihood at the current parameter realization
-    */
-    virtual double evalLikelihood(int dataIndex,stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights) = 0;    
+    virtual double evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights) = 0;
 
     /*!
     \verbatim embed:rst 
@@ -130,13 +105,12 @@ class daData{
     **Reference**
     No Reference    
     \endverbatim
-    \param dataIndex inputs the column identifying the patient in a multi-patient dataset, not used with single patient datasets
     \param keys inputs a list of quantities evaluated from the model
     \param values inputs values of the model results associated with the vector keys
     \param weights inputs weights that multiply the measurement variance for each quantity
     \return value of the log-likelihood at the current parameter realization
     */
-    virtual void printAndCompare(int dataIndex,stdStringVec keys,stdVec values,stdVec weigths) = 0;
+    virtual void printAndCompare(stdStringVec keys,stdVec values,stdVec weigths) = 0;
 
     /*! 
     \verbatim embed:rst 
@@ -152,12 +126,11 @@ class daData{
     **Reference**
     No Reference
     \endverbatim
-    \param patientID inputs the column identifying the patient in a multi-patient dataset, not used with single patient datasets
     \param key inputs a list of quantities evaluated from the model
     \param result outputs values of the model results associated with the vector keys
     \return error outputs error code 0-OK, 1-Error
     */
-    virtual int getPatientValue(int patientID,string key,double &result) = 0;
+    virtual int getPatientValue(string key,double &result) = 0;
 
     // ===========================
     // PRINTING DICTIONARY CONTENT
@@ -179,7 +152,7 @@ class daData{
     \endverbatim
     \param[in] patientIndex the index of the patient column for files supporting multiple patients
     */
-    void printToScreen(int patientIndex);
+    virtual void printToScreen() = 0;
 
 
     // ========================
@@ -260,6 +233,28 @@ class daData{
     \param[in] key String key to be removed.
     */    
     void removeKeyValue(string key);
+
+    /*!
+    \verbatim embed:rst  
+    **Purpose**
+    Evaluate Likelihood
+    
+    **Discussion**
+    None
+    
+    **Modified**
+    Jul 2017 - DES
+    
+    **Reference**
+    No Reference
+    \endverbatim
+    \param[in] keys,
+    \param[in] avValues,
+    \param[in] stdFactors,
+    \param[in] weights
+    \return value of likelihood
+    */    
+    double evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
 
 };
 

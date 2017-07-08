@@ -123,12 +123,12 @@ double cmLPNModel::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& erro
   if(data != NULL){
 
     // Print Info
-    data->printAndCompare(datasetColumn,keys,outs,weights); 
+    data->printAndCompare(keys,outs,weights); 
       
     // Evaluate Objective Function
-    result = data->evalLogLikelihood(datasetColumn,keys,outs,stds,weights);
+    result = data->evalLogLikelihood(keys,outs,stds,weights);
 
-    //result = data->evalOBJ(datasetColumn,keys,computedValues,weigths);
+    //result = data->evalOBJ(keys,computedValues,weigths);
   }
 
   // Return 

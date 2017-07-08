@@ -199,7 +199,13 @@ int acActionLSI_FD::go(){
   }
 
   // PRINT SENSITIVITY TABLE
-  WriteSentitivityTableToFile("LSI_Table.txt",par_num,res_num,sensTable);
+  string fileName;
+  if(evalDeriv){
+    fileName = "DERIV_Table.txt";
+  }else{
+    fileName = "LSI_Table.txt";
+  }
+  WriteSentitivityTableToFile(fileName,par_num,res_num,sensTable);
 
   // Return No Error
   return 0;

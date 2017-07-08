@@ -3363,7 +3363,7 @@ double* acActionDREAM::prior_sample ( int par_num, int prior_num, int* prPtr, ve
   // ALLOCATE SAMPLE
   zp = ( double * ) malloc ( par_num * sizeof ( double ) );
   
-  // GET PARAMETER RANGES FOR HEART LPN MODELS
+  // GET PARAMETER RANGES
   stdVec currLimits;
   model->getParameterLimits(currLimits);
   double limits[(int)currLimits.size()];

@@ -110,10 +110,10 @@ double cmTutorial::evalModelError(stdVec inputs,stdVec& outputs,stdIntVec& error
   if(data != NULL){
 
     // Print the comparison
-    data->printAndCompare(datasetColumn,keys,computedValues,weights); 
+    data->printAndCompare(keys,computedValues,weights); 
   
     // Evaluate Objective Function
-    result = data->evalLogLikelihood(datasetColumn,keys,computedValues,stdFactors,weights);
+    result = data->evalLogLikelihood(keys,computedValues,stdFactors,weights);
   }
 
   // Return 
