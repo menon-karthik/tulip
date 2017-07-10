@@ -1,3 +1,6 @@
+#ifndef UQALGORITHMBCS_H
+#define UQALGORITHMBCS_H
+
 # include <vector>
 
 # include "uqTypes.h"
@@ -21,7 +24,6 @@ struct rvmOptionRecord {
   int maxBetaIterations;
 };
 
-
 class uqAlgorithmBCS: public uqAlgorithm{
   public:
     // Algorithm Options
@@ -38,5 +40,5 @@ class uqAlgorithmBCS: public uqAlgorithm{
 };
 
 
-
+#endif // UQALGORITHMBCS_H
 

@@ -7,35 +7,26 @@
 
 using namespace std;
 
-// Define the type of polynomial interpolation
-const int ipHermite  = 0;
-const int ipLegendre = 1;
-
-// DEFINE LSI OPTIONS
-struct gsiOptions{
-  bool writeDebugData;
-  int maxOrder;
-};
-
 // ===========
 // CONSTRUCTOR
 // ===========
-acActionGSI::acActionGSI(){
-  // Init Parameters
-  useDefaultRange = true;
-  priorParamFile = "";
+acActionGSI::acActionGSI(int sampleType,int distributionSource,string priorParamFile,bool writeDebugData,int maxOrder,int coeffAlg){
+  this->sampleType = sampleType;
+  this->distributionSource = distributionSource;
+  this->priorParamFile = priorParamFile;
+  this->writeDebugData = writeDebugData;
+  this->maxOrder = maxOrder;
+  this->coeffAlg = coeffAlg;
 }
 
 // ================================
 // PRINT SENSITIVITY TABLES - LATEX
 // ================================
-void acActionGSI::printSensitivityTablesToLatex(int index, int res_num,int par_num,vector<vector<double> > dirTable,vector<vector<double> > totTable){
+void acActionGSI::printSensitivityTablesToLatex(int res_num,int par_num,const stdMat& dirTable,const stdMat& totTable){
   FILE* stateFile;
   string resName;
   string parName; 
-  char idx[15];
-  sprintf(idx, "%d", index);
-  string fileName = "sensTables_" + string(idx) + ".txt";
+  string fileName = "sensTables.txt";
   stateFile = fopen(fileName.c_str(),"w");
 
   // DIRECT SENSITIVITY TABLE
@@ -111,11 +102,9 @@ void acActionGSI::printSensitivityTablesToLatex(int index, int res_num,int par_n
 // ========================
 // PRINT SENSITIVITY TABLES
 // ========================
-void acActionGSI::printSensitivityTables(int index, int res_num,int par_num,vector<vector<double> > dirTable,vector<vector<double> > totTable){
+void acActionGSI::printSensitivityTables(int res_num,int par_num,const stdMat& dirTable,const stdMat& totTable){
   FILE* outFile;
-  char idx[15];
-  sprintf(idx, "%d", index);
-  string fileName = "sensTables_" + string(idx) + ".txt";
+  string fileName = "sensTables.txt";
   outFile = fopen(fileName.c_str(),"w");
 
   fprintf(outFile,"\n");
@@ -161,11 +150,13 @@ void acActionGSI::printSensitivityTables(int index, int res_num,int par_num,vect
 // ================================
 // PRINT SIGMA COEFFICIENTS TO FILE
 // ================================
-void acActionGSI::printSigmaCoeffs(int index, int res_num,int basis_num,vector<vector<double> > sigmaCoeffs){
+void acActionGSI::printSigmaCoeffs(const stdMat& sigmaCoeffs){
+
+  int res_num   = sigmaCoeffs.size();
+  int basis_num = sigmaCoeffs[0].size();
+
   FILE* outFile;
-  char idx[15];
-  sprintf(idx, "%d", index);
-  string fileName = "sigmaCoeffs_" + string(idx) + ".txt";
+  string fileName = "sigmaCoeffs.txt";
   outFile = fopen(fileName.c_str(),"w");
 
   // Header
@@ -206,7 +197,7 @@ void printGridToFile(int order,int grid_size,int par_num,double* nodes,double* w
 // =========================
 // PRINT MULTI-INDEX TO FILE
 // =========================
-void printMultiIndexToFile(int basis_num,int par_num,vector<vector<int> > multiIndex){
+void printMultiIndexToFile(int basis_num,int par_num,const stdIntMat& multiIndex){
   FILE* outFile;
   outFile = fopen("multiIndex.txt","w");
   for(int loopA=0;loopA<basis_num;loopA++){
@@ -222,21 +213,21 @@ void printMultiIndexToFile(int basis_num,int par_num,vector<vector<int> > multiI
 // ============================================================
 // CHECK IF MULTI-INDEX IS ZERO FOR A GIVEN DIMENSION AND BASIS
 // ============================================================
-bool doesNotHaveIndex(int index,int row,vector<vector<int> > table){  
+bool doesNotHaveIndex(int index,int row,const stdIntMat& table){  
   return (table[row][index] == 0);
 }
 
 // ============================================================
 // CHECK IF MULTI-INDEX IS ZERO FOR A GIVEN DIMENSION AND BASIS
 // ============================================================
-bool doesHaveIndex(int index,int row,vector<vector<int> > table){  
+bool doesHaveIndex(int index,int row,const stdIntMat& table){  
   return (table[row][index] != 0);
 }
 
 // ============================================================
 // CHECK IF MULTI-INDEX IS ZERO FOR A GIVEN DIMENSION AND BASIS
 // ============================================================
-bool hasOnlyIndex(int index,int row,int par_num,vector<vector<int> > table){
+bool hasOnlyIndex(int index,int row,int par_num,const stdMat& table){
   // ALL DIMENSIONS BUT INDEX WITH ZEROS
   bool result = true;
   for(int loopA=0;loopA<par_num;loopA++){
@@ -254,8 +245,10 @@ bool hasOnlyIndex(int index,int row,int par_num,vector<vector<int> > table){
 // EXTRACT GSI COEFFICIENT FROM THE TABLE OF POLYCHAOS COEFFICIENTS
 // ================================================================
 void extractGSICoefficients(int basis_num,int res_num,int par_num,
-                            vector<vector<int> > multiIndex,vector<vector<double> > sigmaCoeffs,
-                            vector<vector<double> > &dirTable,vector<vector<double> > &totTable){
+                            const stdIntMat& multiIndex,
+                            const stdMat& sigmaCoeffs,
+                            stdMat& dirTable,
+                            stdMat& totTable){
   // DIRECT COEFFICIENTS
   // dirTable 
   // - Columns GSI for a single Result Quantity.
@@ -263,13 +256,13 @@ void extractGSICoefficients(int basis_num,int res_num,int par_num,
   double currVariance = 0.0;
   double currFirstOrderCoeffDir = 0.0;
   double currFirstOrderCoeffTot = 0.0;
-  vector<double> tempDirTable;
-  vector<double> tempTotTable;
+  stdVec tempDirTable;
+  stdVec tempTotTable;
 
   dirTable.clear();
   totTable.clear();
   for(int loopA=0;loopA<res_num;loopA++){
-
+    
     // Compute total Variance
     // CARE: the last index is the average!!!
     // Note that sigmaCoeffs(nResults,nBasis)
@@ -309,92 +302,28 @@ void extractGSICoefficients(int basis_num,int res_num,int par_num,
         tempTotTable.push_back(0.0);              
       }
     }
+
     // Accumulate in table
     dirTable.push_back(tempDirTable);
     totTable.push_back(tempTotTable);
   }
 }
 
-
 // =================================================================
 // TRANSFORM GRID POINT TO SAMPLE FROM PARAMETER NORMAL DISTRIBUTION
 // =================================================================
-void evalMultiDPoly(int polyType,int current_basis,int totalNodes,double* nodes,int par_num,vector<vector<int> > multiIndex,double* results){
-  
-  // Declare
-  double nodeResult;
-  double xValue;
-  int currPolyOrder;
-  double currBaseValue;
-
-  // Create polynomial interpolator
-  uqPolyBasis* myInterp = new uqPolyBasis(kPolyHermite,3);
-
-  // Loop on the grid points
-  for(int loopA=0;loopA<totalNodes;loopA++){
-
-    // Loop through the dimensions
-    nodeResult = 1.0;
-    for(int loopB=0;loopB<par_num;loopB++){
-      // Copy X Value
-      xValue = nodes[par_num*loopA + loopB];
-      // Eval Order from multi-index
-      currPolyOrder = multiIndex[current_basis][loopB];
-      // Eval function Value
-      currBaseValue = myInterp->evaluate(xValue,currPolyOrder);
-      // Fill Constraint Mat
-      nodeResult = nodeResult*currBaseValue;
-    }
-    results[loopA] = nodeResult;
-  }
-}
-
-// =================================================================
-// TRANSFORM GRID POINT TO SAMPLE FROM PARAMETER NORMAL DISTRIBUTION
-// =================================================================
-void transformToSampleGaussian(int curr_sample, int par_num, double* nodes,vector<double> prAv,vector<double> prSd,stdVec& currParams){
+void transformGridToSample(int sampleType,const stdVec& gridSample,const stdVec& prStat1,const stdVec& prStat2,stdVec& currParams){
   double currValue = 0.0;
-  for(int loopA=0;loopA<par_num;loopA++){
-    currValue = nodes[curr_sample*par_num + loopA];
-    if(prSd[loopA]>1.0e-8){
-      // Sample from a Normal Distribution
-      currParams[loopA] = currValue*prSd[loopA] + prAv[loopA];
+  for(int loopA=0;loopA<gridSample.size();loopA++){
+    currValue = gridSample[loopA];
+    if(sampleType == ipUniformSampling){
+      // Uniform Sample
+      currParams[loopA] = prStat1[loopA] + currValue*(prStat2[loopA] - prStat1[loopA]);
     }else{
-      // Return with Average Value	
-      currParams[loopA] = prAv[loopA];
+      // Gaussian Sample
+      currParams[loopA] = currValue*prStat2[loopA] + prStat1[loopA];
     }
   }  
-}
-
-// =======================================================
-// GENERATE THE MULTI-INDEX FOR THE SELECTED MAXIMUM ORDER
-// =======================================================
-void generateMultiIndex(int dim, int order,int &basis_num,vector<vector<int> > &multiIndex){
-
-  // Allocate
-  vector<int> vecStore;
-  int x[dim];
-  for(int loopA=0;loopA<dim;loopA++){
-    x[loopA] = 0;
-  }
-  vecStore.clear();
-  for(int loopB=0;loopB<dim;loopB++){
-    vecStore.push_back(x[loopB]);
-  }
-  multiIndex.push_back(vecStore);
-
-  // Get the number of Monomials
-  basis_num = mono_upto_enum(dim,order);
-
-  // Loop to generatre the multi-index
-  for(int loopA=0;loopA<(basis_num-1);loopA++){
-    mono_next_grlex(dim,x);
-    vecStore.clear();
-    for(int loopB=0;loopB<dim;loopB++){
-      vecStore.push_back(x[loopB]);
-    }
-    multiIndex.push_back(vecStore);
-  }
 }
 
 // =======================================
@@ -402,161 +331,212 @@ void generateMultiIndex(int dim, int order,int &basis_num,vector<vector<int> > &
 // =======================================
 int acActionGSI::go(){
 
-  // Set Options
-  gsiOptions options;
-  options.writeDebugData = true;
-
-
-  vector<double> prAv;
-  vector<double> prSd;  
+  // Init Parameter Gaussian Statistics
+  stdVec prStat1;
+  stdVec prStat2;  
 
   // Get Number Of Parameters for this Model
   int par_num = model->getParameterTotal();
   int res_num = model->getResultTotal();
   stdVec currParams;
-  stdVec lpnRes;
+  stdVec modelRes;
+  stdVec currGridSample;
+  stdVec currModelRes;
+  stdMat sigmaCoeffs;  
+  stdVec oneResCoeff;
+  stdVec rhs;
   currParams.resize(par_num);
-  lpnRes.resize(res_num);
+  modelRes.resize(res_num);
+  stdMat dirTable;
+  stdMat totTable;
 
   // Read Marginal Statistic (First and Second Order) from file or limits
   double currRange = 0.0;
+  stdVec limits;
 
   printf("\n");
-  printf("--- PROCESSING PARAMETERS\n");
+  printf("--- Processing Parameters\n");
 
-  if(useDefaultRange){
-  	printf("PARAMETER RANGES FROM MODEL LIMITS\n");
-    stdVec limits;
-    model->getParameterLimits(limits);
-    for(int loopA=0;loopA<par_num;loopA++){
-      prAv.push_back(0.5*(limits[loopA*2+1] + limits[loopA*2+0]));
-      prSd.push_back((1.0/sqrt(12))*(limits[loopA*2+1] - limits[loopA*2+0]));
+  if(distributionSource == ipDistributionsFromLimits){
+    if(sampleType == ipUniformSampling){    
+      printf("Independent Uniform Parameters from Model Limits\n");
+      model->getParameterLimits(limits);
+      for(int loopA=0;loopA<par_num;loopA++){
+        prStat1.push_back(limits[loopA*2+0]);
+        prStat2.push_back(limits[loopA*2+1]);
+      }
+    }else{
+      printf("Independent Gaussian Parameters from Model Limits\n");
+      model->getParameterLimits(limits);
+      for(int loopA=0;loopA<par_num;loopA++){
+        prStat1.push_back(0.5*(limits[loopA*2+1] + limits[loopA*2+0]));
+        prStat2.push_back((1.0/sqrt(12))*(limits[loopA*2+1] - limits[loopA*2+0]));
+      }
     }
   }else{
     // Read Marginal Statistics From File
     int prior_num = 0;
-    int error = readPriorFromFile(priorParamFile,prior_num,prAv,prSd);
+    int error = readPriorFromFile(priorParamFile,prior_num,prStat1,prStat2);
     if((error != 0)||(prior_num != par_num)){
-      printf("ERROR: INVALID FILE WITH PRIOR PARAMETERS.\n");
+      printf("ERROR: Invalid file with prior parameters.\n");
       exit(1);
     }
-  }  
+  }
 
   // PRINT ADOPTED PARAMETER RANGES
-  printf("%10s %10s %10s\n","NUM","MEAN","STD");
+  if(sampleType == ipUniformSampling){    
+    printf("%10s %10s %10s\n","n.","Min","Max");
+  }else{
+    printf("%10s %10s %10s\n","n.","Mean","Std");
+  }
   for(int loopA=0;loopA<par_num;loopA++){
-    printf("%10d %10f %10f\n",loopA,prAv[loopA],prSd[loopA]);
+    printf("%10d %10f %10f\n",loopA,prStat1[loopA],prStat2[loopA]);
   }
 
-  // Set Maximum Interpolation Order
-  options.maxOrder = 3;
-
-  // Get Start Indexes
-  int startIDX[options.maxOrder];
-  int endIDX[options.maxOrder];
-
-  // Eval Sparse Grid Point Locations and Weights
-  int totalNodes = nwspgr_size (gqn_order, par_num, options.maxOrder);
-  int totalNodesAfterMerge = 0;
-  double* nodes = new double[par_num*totalNodes];
-  double* weights = new double[totalNodes];
-  double polyResult[totalNodes];
-  vector<vector<double> > modelResult;
-  vector<vector<double> > sigmaCoeffs;
-  vector<double> currModelRes;
-  vector<double> oneResCoeff;
-  vector<vector<double> > dirTable;
-  vector<vector<double> > totTable;
-
+  // Generate Independent Gaussian Samples
+  uqSamples* samples = new uqSamples(par_num);
   
-  // Generate Multi-index for the maximum order
-  printf("\n");
-  printf("FORMING MULTI-INDEX...");
-  int basis_num = 0;
-  vector<vector<int> > multiIndex;
-  generateMultiIndex(par_num,options.maxOrder,basis_num,multiIndex);
-  printf("Done.\n");
-
-  // DEBUG: Write Multi-index
-  if(options.writeDebugData){
-  	printMultiIndexToFile(basis_num,par_num,multiIndex);
+  // Add Variables
+  int varType = 0;
+  if(sampleType == ipUniformSampling){
+    varType = kSAMPLEUniform;      
+  }else{
+    varType = kSAMPLEGaussian;
   }
+  for(int loopA=0;loopA<par_num;loopA++){
+    samples->addVariable("var_" + to_string(loopA),varType,prStat1[loopA],prStat2[loopA]);
+  }
+
+  // Generate a Sparse Grid of a Certain Order
+  // Need to get a list with starting and ending points of the various orders
+  stdIntVec orderID;
   
-   // Main Loop on the Order of the polynomial Surrogate
+  // FIX IT!!!
+  // samples->generateSparseGrid(maxOrder,orderID);
+  samples->generateSparseGrid(maxOrder);
+
+  // Print Grid to file if required
+  if(writeDebugData){
+    string outGridFile("sampleGrid.txt");
+    bool printTitle = true;
+    samples->printToFile(outGridFile,printTitle);
+  }
+
+   // EVAL ALL MODELS
   int startSampleId = 0;
   int endSampleId = 0;
-  for(int loopA=1;loopA<=options.maxOrder;loopA++){
+  int orderStart = 0;
+  int orderEnd = 0;
 
-    // Find the Start and end index for the Sparse Grid
-    totalNodes = nwspgr_size (gqn_order, par_num, loopA);
-    basis_num = mono_upto_enum(par_num,loopA-1);
-    nwspgr (gqn, gqn_order, par_num, loopA, totalNodes, totalNodesAfterMerge, nodes, weights);
-    startSampleId = 0;
-    endSampleId = totalNodes;
+  printf("Total Model Evaluations: %d\n",samples->getTotSamples());
 
-    printf("\n");
-    printf("EVALUATING INTEGRATION ORDER: %d\n",loopA);
-    printf("TOTAL MODEL EVALUATIONS: %d\n",totalNodes);
-    printf("\n");
+  // Clear Model Results
+  stdMat modelResult;
+  for(int loopA=0;loopA<samples->getTotSamples();loopA++){
 
-    // DEBUG: Write Multi-inde
-    if(options.writeDebugData){
-      printGridToFile(loopA,totalNodes,par_num,nodes,weights);
+    // Transform Samples
+    currGridSample.clear();
+    for(int loopB=0;loopB<samples->getTotDims();loopB++){
+      currGridSample.push_back(samples->getValuesAt(loopA,loopB));
     }
+    //transformGridToSample(sampleType,currGridSample,prStat1,prStat2,currParams);
 
-    // Model Evaluation Loop
-    modelResult.clear();
-    for(int loopB=startSampleId;loopB<endSampleId;loopB++){  
-      printf("MODEL EVALUATION: %d\n",loopB);
+    // Write Sample Point if debug
+    if(writeDebugData){
+      printf("CURRENT PARAMETER SAMPLE\n");
+      for(int loopC=0;loopC<par_num;loopC++){
+        // printf("%d %f\n",loopC,currParams[loopC]);
+        printf("%d %f\n",loopC,currGridSample[loopC]);
+      }
       printf("\n");
-
-      // Transform Samples
-      transformToSampleGaussian(loopB,par_num,nodes,prAv,prSd,currParams);
-
-      // Write Sample Point if Debug
-      //if(options.writeDebugData){
-     // 	printf("CURRENT PARAMETER SAMPLE\n");
-     // 	for(int loopC=0;loopC<par_num;loopC++){
-      //    printf("%d %f\n",loopC,currParams[loopC]);
-     // 	}
-    //  	printf("\n");
-    //  }
-
-      // Solve Model
-      stdIntVec errorCode;
-      double ll = model->evalModelError(currParams,lpnRes,errorCode);
-      if(errorCode[0] != 0){
-        printf("ERROR: INVALID GRID POINT EVALUATION.\n");
-        exit(1);
-      }
-      printf("MODEL EVALUATION OK\n");
-      // Store results
-      currModelRes.clear();
-      for(int loopC=0;loopC<res_num;loopC++){
-        currModelRes.push_back(lpnRes[loopC]);
-      }
-      modelResult.push_back(currModelRes);
     }
-  
+
+    // Solve Model
+    stdIntVec errorCode;
+    double ll = model->evalModelError(currParams,modelRes,errorCode);
+    if(errorCode[0] != 0){
+      printf("ERROR: INVALID GRID POINT EVALUATION.\n");
+      exit(1);
+    }
+        
+    // Store results
+    currModelRes.clear();
+    for(int loopC=0;loopC<res_num;loopC++){
+      currModelRes.push_back(modelRes[loopC]);
+    }
+    modelResult.push_back(currModelRes);
+  }
+
+  // RESCALE SAMPLES TO EVALUATE POLYNOMIAL MATRIX
+  stdVec currLimits;
+  samples->getSampleLimits(currLimits);
+  samples->rescaleOnHypercube(currLimits);
+
+  if(writeDebugData){
+    string outGridFile("sampleRescaledGrid.txt");
+    bool printTitle = true;
+    samples->printToFile(outGridFile,printTitle);
+  }
+
+  // EVAL POLYNOMIAL MATRIX AT INTEGRATION POINTS
+  int matType = 0;
+  if(sampleType == ipUniformSampling){
+    matType = kPolyLegendre;      
+  }else{
+    matType = kPolyHermite;
+  }
+  uqPolyMatrix* polyMat = new uqPolyMatrix(samples,maxOrder,kPolyLegendre,kMIPartialOrder);
+
+  // Explicitly Evaluate MultiIndex
+  uqMultiIndex* mi = new uqMultiIndex(samples->getTotDims(),maxOrder,kMIPartialOrder);
+
+  printf("Computing Coefficients...\n");
+
+  // EVAL COEFFICIENTS
+  if(coeffAlg == algUseRegression){
+
+    // USE REGRESSION
+
+    // Use Bayesian CS for Random Samples
+    uqAlgorithmBCS* bcs = new uqAlgorithmBCS();
+    // Set Options
+    bcs->opts.printProgressToScreen = false;
+    bcs->opts.printDBGMessages      = false;
+
+    stdVec coeffs;
+    stdMat coeffPrec;
+    double resNorm;
+    double noiseStd;
+
+    sigmaCoeffs.clear();
+    for(int loopA=0;loopA<res_num;loopA++){
+
+      // Fill RHS With Model Result Evaluations
+      rhs.clear();
+      for(int loopB=0;loopB<samples->getTotSamples();loopB++){
+        rhs.push_back(modelResult[loopA][loopB]);
+      }
+
+      oneResCoeff.clear();
+      coeffs.clear();
+      noiseStd = bcs->run(polyMat->getRowCount(),polyMat->getColCount(),rhs,polyMat->getMatrix(),coeffs,coeffPrec,resNorm);
+    }
+              
+  }else if(coeffAlg == algUseQuadrature){
+
+    // USE QUADRATURE
+
     // Compute gPC Coefficients
     sigmaCoeffs.clear();
     for(int loopB=0;loopB<res_num;loopB++){
       // Clear Vector
       oneResCoeff.clear();
-      for(int loopC=0;loopC<basis_num;loopC++){
-        
-        // Eval The polynomial at cardinality loopC and for all grid points
-        evalMultiDPoly(ipHermite,loopC,totalNodes,nodes,par_num,multiIndex,polyResult);
-
-        //printf("CHECK INTEGRATION: RES %d BASIS %d\n",loopB,loopC);
-        //for(int loopD=0;loopD<totalNodes;loopD++){
-        //  printf("%f %f %f \n",modelResult[loopD][loopB],polyResult[loopD],weights[loopD]);
-        //}
-        
+      for(int loopC=0;loopC<polyMat->getColCount();loopC++){
+         
         // wSPGrid ALREADY CONSTAINS THE GAUSSIAN WEIGHT FUNCTION VALUES
         double currValue = 0.0;
-        for(int loopD=0;loopD<totalNodes;loopD++){
-          currValue += modelResult[loopD][loopB]*polyResult[loopD]*weights[loopD];
+        for(int loopD=0;loopD<samples->getTotSamples();loopD++){
+          currValue += modelResult[loopD][loopB]*polyMat->getMatrixAt(loopD,loopC)*samples->getWeightAt(loopD,maxOrder);
         }
         // Increment the value of the Polynomial Chaos Expansion Coefficient
         oneResCoeff.push_back(currValue);
@@ -565,25 +545,26 @@ int acActionGSI::go(){
     }
 
     // DEBUG: Write Sigma Coefficients
-    if(options.writeDebugData){
-      printSigmaCoeffs(loopA,res_num,basis_num,sigmaCoeffs);
+    if(writeDebugData){
+      printSigmaCoeffs(sigmaCoeffs);
     }
 
-    // EXTRACT FIRST ORDER DIRECT AND TOTAL COEFFICIENTS
-    extractGSICoefficients(basis_num,res_num,par_num,multiIndex,sigmaCoeffs,dirTable,totTable);
-
-    // DEBUG: Write Sensitivity Tables
-    if(options.writeDebugData){
-      //printSensitivityTablesToLatex(loopA,res_num,par_num,dirTable,totTable);
-      printSensitivityTables(loopA,res_num,par_num,dirTable,totTable);
-    }
+  }else{
+    throw acException("ERROR: Invalid Algorithm for GSI Coefficient Computation.\n");
   }
 
-  // Free Memory
-  delete [] nodes;
-  delete [] weights;
+  // EXTRACT FIRST ORDER DIRECT AND TOTAL COEFFICIENTS
+  printf("Computing GSI...\n");
+  extractGSICoefficients(polyMat->getColCount(),res_num,samples->getTotDims(),mi->getMultiIndex(),sigmaCoeffs,dirTable,totTable);
+
+  // Print Resulting Global Sensitivities
+  // printSensitivityTablesToLatex(loopA,res_num,par_num,dirTable,totTable);
+  printf("Printing GSI...\n");
+  printSensitivityTables(res_num,samples->getTotDims(),dirTable,totTable);
 
   // Completed
-  printf("Completed.\n");
+  printf("Completed!\n");
+
+  // Return
   return 0;
 }

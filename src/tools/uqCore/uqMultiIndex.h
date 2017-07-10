@@ -17,6 +17,7 @@ class uqMultiIndex{
     void generateMultiIndex_Partial(int dim, int order);
     void generateMultiIndex_Full(int dim, int order);
   public:
+    
     // CONSTRUCTOR
     uqMultiIndex(int dim, int order, int miType);
 
@@ -25,6 +26,8 @@ class uqMultiIndex{
 
     // ACCESS TO MEMBERS
     double operator()(const int nRow, const int nCol);
+    double getMultiIndexAt(const int nRow, const int nCol);
+    stdIntMat getMultiIndex();
 
     // CHECK IF A CERTAIN COMPONENT OF MULTI-INDEX CONTAINS A VARIABLE
     bool contains(int variable,int component);

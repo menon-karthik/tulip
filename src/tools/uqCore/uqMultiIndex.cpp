@@ -111,6 +111,15 @@ double uqMultiIndex::operator()(const int nRow, const int nCol){
   return multiIndex[nRow][nCol];
 }
 
+double uqMultiIndex::getMultiIndexAt(const int nRow, const int nCol){
+  return multiIndex[nRow][nCol];   
+}
+
+stdIntMat uqMultiIndex::getMultiIndex(){
+  return multiIndex;
+}
+
+
 // =========================================
 // CHECK IF A CERTAIN COMPONENT IS CONTAINED
 // =========================================
