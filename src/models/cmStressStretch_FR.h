@@ -5,17 +5,19 @@
 # include <math.h>
 
 # include "uqTypes.h"
+# include "cmModel.h"
+# include "cmException.h"
 
 using namespace std;
 
 // GENERIC CLASS FOR MODELS
-class cmStressStretch_FR{
+class cmStressStretch_FR: public cmModel{
   public:
     // Experimental Stretches
-    stdVec sigmaZ;    
+    stdVec lambdaZ;
 
     //! Default constructor
-    cmStressStretch_FR(const stdVec& sigma);
+    cmStressStretch_FR(const stdVec& lambdaZ);
     //! Virtual destructor
     virtual ~cmStressStretch_FR();
 

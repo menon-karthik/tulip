@@ -36,10 +36,10 @@ class daData_multiple_Table: public daData{
     virtual void   readFromFile(string fileName);
     virtual double evalOBJ(stdStringVec keys,stdVec values,stdVec weights);
     virtual double evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
-    virtual double evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
     virtual void   printAndCompare(stdStringVec keys,stdVec values,stdVec weigths);
     virtual int    getPatientValue(string key,double &result);
     virtual void   printToScreen();
+    virtual void   getTable(stdMat& table);
 
     void getIndexSet(stdIntVec& indexSet);
     

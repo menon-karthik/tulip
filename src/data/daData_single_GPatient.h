@@ -37,6 +37,7 @@ class daData_single_GPatient: public daData{
     virtual void   printAndCompare(stdStringVec keys,stdVec values,stdVec weigths);
     virtual int    getPatientValue(string key,double &result);
     virtual void   printToScreen();
+    virtual void   getTable(stdMat& table);
 
     void getAvailableKeys(stdStringVec& foundKeys);
 };

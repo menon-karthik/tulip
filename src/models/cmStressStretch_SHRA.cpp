@@ -21,17 +21,17 @@ int cmStressStretch_SHRA::getResultTotal(){
 }
 void cmStressStretch_SHRA::getParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
-  limits[0] = 0.0; limits[1] = 1.4e+10;
-  limits[2] = 0.0; limits[3] = 1.4e+10;
+  limits[0] = 0.0; limits[1] = 1.0e8;
+  limits[2] = 0.0; limits[3] = 1.0e8;
   limits[4] = 0.0; limits[5] = M_PI/2.0;
   limits[6] = 0.0; limits[7] = M_PI/2.0;
 }
 void cmStressStretch_SHRA::getDefaultParams(stdVec& params){
   params.resize(getParameterTotal());
-  params[0] = 0.5;
-  params[1] = 8.0;
-  params[2] = 11.0;
-  params[3] = 52.0;
+  params[0] = 1.0;
+  params[1] = 10.0;
+  params[2] = M_PI/2.0;
+  params[3] = M_PI/16.0;
 }
 void cmStressStretch_SHRA::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: getPriorMapping Not implemented in cmStressStretch_SHRA.\n");
@@ -91,17 +91,17 @@ void cmStressStretch_SHRA::setModelResults(stdVec outputs,stdStringVec& keys,std
   // stdFactors.push_back(1.088304e+06); // str10
   // stdFactors.push_back(1.348686e+06); // str11
 
-  stdFactors.push_back(1.0e6); // str01
-  stdFactors.push_back(1.0e6); // str02
-  stdFactors.push_back(1.0e6); // str03
-  stdFactors.push_back(1.0e6); // str04
-  stdFactors.push_back(1.0e6); // str05
-  stdFactors.push_back(1.0e6); // str06
-  stdFactors.push_back(1.0e6); // str07
-  stdFactors.push_back(1.0e6); // str08
-  stdFactors.push_back(1.0e6); // str09
-  stdFactors.push_back(1.0e6); // str10
-  stdFactors.push_back(1.0e6); // str11
+  stdFactors.push_back(5.0e5); // str01
+  stdFactors.push_back(5.0e5); // str02
+  stdFactors.push_back(5.0e5); // str03
+  stdFactors.push_back(5.0e5); // str04
+  stdFactors.push_back(5.0e5); // str05
+  stdFactors.push_back(5.0e5); // str06
+  stdFactors.push_back(5.0e5); // str07
+  stdFactors.push_back(5.0e5); // str08
+  stdFactors.push_back(5.0e5); // str09
+  stdFactors.push_back(5.0e5); // str10
+  stdFactors.push_back(5.0e5); // str11
 
 
   // WEIGHTS

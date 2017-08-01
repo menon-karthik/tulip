@@ -49,6 +49,6 @@ void daData::removeKeyValue(string key){
 
 double daData::evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
   double ll = evalLogLikelihood(keys,avValues,stdFactors,weights);
-  return log(ll);  
+  return exp(-ll);  
 }
 

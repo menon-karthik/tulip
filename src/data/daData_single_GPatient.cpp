@@ -11,6 +11,10 @@ daData_single_GPatient::~daData_single_GPatient(){
 
 }
 
+void daData_single_GPatient::getTable(stdMat& table){
+  throw daException("ERROR: getTable not implemented for daData_single_GPatient.\n");
+}
+
 void daData_single_GPatient::readFromFile(string fileName){
   stdStringMat stringTable;
   stdStringVec temp;

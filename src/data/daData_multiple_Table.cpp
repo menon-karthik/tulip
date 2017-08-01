@@ -156,11 +156,6 @@ double daData_multiple_Table::evalLogLikelihood(stdStringVec keys,stdVec avValue
   return result;
 }
 
-double daData_multiple_Table::evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
-  double ll = evalLogLikelihood(keys,avValues,stdFactors,weights);
-  return log(ll);
-}
-
 void daData_multiple_Table::printAndCompare(stdStringVec keys,stdVec values,stdVec weigths){
   
   // Check The Size of keys and values
@@ -214,7 +209,6 @@ void daData_multiple_Table::printAndCompare(stdStringVec keys,stdVec values,stdV
       }
     }
   }
-
   fprintf(fp,"\n");
   fclose(fp);
 }
@@ -238,11 +232,11 @@ int daData_multiple_Table::getPatientValue(string key,double &result){
     return retVal;  
   }else{
     printf("Warning: columnID not specified in daData_multiple_Table::getPatientValue.");
-    return 0.0;
+    return 0;
   }
 }
 
-    // Print Dictionary to stdout
+// Print dictionary to stdout
 void daData_multiple_Table::printToScreen(){
 
   // Get Index Set
@@ -261,5 +255,27 @@ void daData_multiple_Table::printToScreen(){
       printf("%30s %30f\n",it->first.c_str(),atof(it->second[dataIndex].c_str()));
     }
     printf("---\n");
+  }
+}
+
+// Get Full Data Table
+void daData_multiple_Table::getTable(stdMat& table){
+
+  // Get Index Set
+  stdIntVec indexSet;
+  getIndexSet(indexSet);
+
+  int dataIndex = 0;
+
+  // Loop on the keys  
+  table.clear();
+  stdVec tmp;
+  for(dataMap::iterator it = dict.begin(); it!=dict.end();it++){
+    tmp.clear();
+    for(int loopIndex=0;loopIndex<indexSet.size();loopIndex++){
+      dataIndex = indexSet[loopIndex];
+      tmp.push_back(atof(it->second[dataIndex].c_str()));
+    }
+    table.push_back(tmp);
   }
 }

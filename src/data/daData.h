@@ -154,6 +154,24 @@ class daData{
     */
     virtual void printToScreen() = 0;
 
+    /*! 
+    \verbatim embed:rst 
+    **Purpose**
+    Get table if data permits
+    
+    **Discussion**
+    None
+    
+    **Modified**
+    Aug 2017 - DES
+    
+    **Reference**
+    No Reference    
+    \endverbatim
+    \param[out] table the dictionary values without the keys
+    */
+    virtual void   getTable(stdMat& table) = 0;
+
 
     // ========================
     // DIRECT DICTIONARY ACCESS

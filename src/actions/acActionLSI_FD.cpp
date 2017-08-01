@@ -63,9 +63,10 @@ int acActionLSI_FD::solveModel(int par_num, double* allParams, int res_num, doub
   try{
     for(int loopA=0;loopA<par_num;loopA++){
       inputs.push_back(allParams[loopA]);
-    }    
+    } 
     ll = model->evalModelError(inputs,outputs,errorCode);
     for(int loopA=0;loopA<res_num;loopA++){
+
       results[loopA] = outputs[loopA];
     }
     error = errorCode[0];

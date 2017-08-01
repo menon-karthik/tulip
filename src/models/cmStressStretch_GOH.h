@@ -14,7 +14,7 @@ using namespace std;
 class cmStressStretch_GOH: public cmModel{
   public:
     // Experimental Stretches
-    vector<double> lambdaZ;
+    stdVec lambdaZ;
 
     //! Default constructor
     cmStressStretch_GOH(const stdVec& lambda);
