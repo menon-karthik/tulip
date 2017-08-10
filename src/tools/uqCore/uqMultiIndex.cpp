@@ -115,8 +115,8 @@ double uqMultiIndex::getMultiIndexAt(const int nRow, const int nCol){
   return multiIndex[nRow][nCol];   
 }
 
-stdIntMat uqMultiIndex::getMultiIndex(){
-  return multiIndex;
+void uqMultiIndex::getMultiIndex(stdIntMat& res){
+  res = this->multiIndex;
 }
 
 

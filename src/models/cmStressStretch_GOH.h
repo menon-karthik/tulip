@@ -12,12 +12,14 @@ using namespace std;
 
 // GENERIC CLASS FOR MODELS
 class cmStressStretch_GOH: public cmModel{
+    
   public:
     // Experimental Stretches
     stdVec lambdaZ;
+    bool includeDataStdAsParam;
 
     //! Default constructor
-    cmStressStretch_GOH(const stdVec& lambda);
+    cmStressStretch_GOH(const stdVec& lambda,bool includeDataStdAsParam);
     //! Virtual destructor
     virtual ~cmStressStretch_GOH();
 
@@ -31,7 +33,7 @@ class cmStressStretch_GOH: public cmModel{
     virtual string getResultName(int resID);
     virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
 
-    void setModelResults(const stdVec& outputs,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);
+    void setModelResults(const stdVec& outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);
 };
 
 #endif // CMSTRESSSTRETCH_GOH

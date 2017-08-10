@@ -82,9 +82,15 @@ double uqPolyBasis::evaluate(double XValue, int order){
     case kPolyLegendre:
       result = evalLegendre(order,XValue);
       break;
+    case kPolyRescaledLegendre:
+      result = evalLegendre(order,2.0*XValue-1.0);
+      break;    
     case kPolyHermite:
       result = evalHermite(order,XValue);
       break;
+    default:
+      throw uqException("ERROR: Invalid Polynomial Type in uqPolyBasis::evaluate.\n");   
+      return 0.0;
   }
   return result;
 }

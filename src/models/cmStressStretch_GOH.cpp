@@ -2,14 +2,19 @@
 
 using namespace std;
 
-cmStressStretch_GOH::cmStressStretch_GOH(const stdVec& lambda){
-  lambdaZ = lambda;
+cmStressStretch_GOH::cmStressStretch_GOH(const stdVec& lambda,bool includeDataStdAsParam){
+  this->lambdaZ = lambda;
+  this->includeDataStdAsParam = includeDataStdAsParam;
 }
 cmStressStretch_GOH::~cmStressStretch_GOH(){
   lambdaZ.clear();
 }
 int cmStressStretch_GOH::getParameterTotal(){
-  return 5;
+  if(includeDataStdAsParam){
+    return 6;
+  }else{
+    return 5;
+  }  
 }
 int cmStressStretch_GOH::getStateTotal(){
   return 0;
@@ -24,6 +29,9 @@ void cmStressStretch_GOH::getParameterLimits(stdVec& limits){
   limits[4] = 0.0; limits[5] = 1.0e3;
   limits[6] = 0.0; limits[7] = 1.0/3.0;
   limits[8] = 0.0; limits[9] = M_PI/2.0;
+  if(includeDataStdAsParam){
+  	limits[10] = 0.1; limits[11] = 1.0;
+  }
 }
 void cmStressStretch_GOH::getDefaultParams(stdVec& params){
   params.resize(getParameterTotal());
@@ -32,6 +40,9 @@ void cmStressStretch_GOH::getDefaultParams(stdVec& params){
   params[2] = 350.0;
   params[3] = 0.15;
   params[4] = 0.2;
+  if(includeDataStdAsParam){
+  	params[5] = 1.0;
+  }
 }
 void cmStressStretch_GOH::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: getPriorMapping Not implemented in cmStressStretch_GOH.\n");
@@ -47,6 +58,8 @@ string cmStressStretch_GOH::getParamName(int parID){
     return string("K");
   }else if(parID == 4){
     return string("alpha");
+  }else if((includeDataStdAsParam)&&(parID == 5)){
+    return string("dataStd");
   }else{
     throw cmException("ERROR: invalid parameter ID.\n");
   }
@@ -56,7 +69,7 @@ string cmStressStretch_GOH::getResultName(int resID){
   return res;
 }
 
-void cmStressStretch_GOH::setModelResults(const stdVec& outputs,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths){
+void cmStressStretch_GOH::setModelResults(const stdVec& outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths){
 
   // KEYS
   keys.clear();
@@ -91,17 +104,17 @@ void cmStressStretch_GOH::setModelResults(const stdVec& outputs,stdStringVec& ke
   //stdFactors.push_back(8.251717e+05); // str09
   //stdFactors.push_back(1.088304e+06); // str10
   //stdFactors.push_back(1.348686e+06); // str11
-  stdFactors.push_back(1.0e6); // str01
-  stdFactors.push_back(1.0e6); // str02
-  stdFactors.push_back(1.0e6); // str03
-  stdFactors.push_back(1.0e6); // str04
-  stdFactors.push_back(1.0e6); // str05
-  stdFactors.push_back(1.0e6); // str06
-  stdFactors.push_back(1.0e6); // str07
-  stdFactors.push_back(1.0e6); // str08
-  stdFactors.push_back(1.0e6); // str09
-  stdFactors.push_back(1.0e6); // str10
-  stdFactors.push_back(1.0e6); // str11
+  stdFactors.push_back(1.0e6*dataStd); // str01
+  stdFactors.push_back(1.0e6*dataStd); // str02
+  stdFactors.push_back(1.0e6*dataStd); // str03
+  stdFactors.push_back(1.0e6*dataStd); // str04
+  stdFactors.push_back(1.0e6*dataStd); // str05
+  stdFactors.push_back(1.0e6*dataStd); // str06
+  stdFactors.push_back(1.0e6*dataStd); // str07
+  stdFactors.push_back(1.0e6*dataStd); // str08
+  stdFactors.push_back(1.0e6*dataStd); // str09
+  stdFactors.push_back(1.0e6*dataStd); // str10
+  stdFactors.push_back(1.0e6*dataStd); // str11
 
   // WEIGHTS
   weigths.clear();
@@ -126,6 +139,10 @@ double cmStressStretch_GOH::evalModelError(stdVec inputs,stdVec& outputs, stdInt
   double c2    = inputs[2];
   double K     = inputs[3];
   double alpha = inputs[4];
+  double dataStd = 1.0;
+  if(includeDataStdAsParam){
+  	double dataStd = inputs[5];
+  }
 
   // Init quantities derived from lambdaZ
   vector<double> Frr(lambdaZ);
@@ -170,7 +187,7 @@ double cmStressStretch_GOH::evalModelError(stdVec inputs,stdVec& outputs, stdInt
   stdVec computedValues;
   stdVec stdFactors;
   stdVec weigths;
-  setModelResults(outputs,keys,computedValues,stdFactors,weigths);
+  setModelResults(outputs,dataStd,keys,computedValues,stdFactors,weigths);
 
   // Print and compare
   double result = 0.0;

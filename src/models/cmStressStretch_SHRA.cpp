@@ -2,8 +2,9 @@
 
 using namespace std;
 
-cmStressStretch_SHRA::cmStressStretch_SHRA(const stdVec& lambda){
-  lambdaZ = lambda;
+cmStressStretch_SHRA::cmStressStretch_SHRA(const stdVec& lambda,bool includeDataStdAsParam){
+  this->lambdaZ = lambda;
+  this->includeDataStdAsParam = includeDataStdAsParam;
 }
 
 cmStressStretch_SHRA::~cmStressStretch_SHRA(){
@@ -11,7 +12,11 @@ cmStressStretch_SHRA::~cmStressStretch_SHRA(){
 }
 
 int cmStressStretch_SHRA::getParameterTotal(){
-  return 4;
+  if(includeDataStdAsParam){
+    return 5;
+  }else{
+  	return 4;
+  }
 }
 int cmStressStretch_SHRA::getStateTotal(){
   return 0;
@@ -25,6 +30,9 @@ void cmStressStretch_SHRA::getParameterLimits(stdVec& limits){
   limits[2] = 0.0; limits[3] = 1.0e8;
   limits[4] = 0.0; limits[5] = M_PI/2.0;
   limits[6] = 0.0; limits[7] = M_PI/2.0;
+  if(includeDataStdAsParam){
+    limits[8] = 0.1; limits[9] = 10.0;
+  }
 }
 void cmStressStretch_SHRA::getDefaultParams(stdVec& params){
   params.resize(getParameterTotal());
@@ -32,6 +40,9 @@ void cmStressStretch_SHRA::getDefaultParams(stdVec& params){
   params[1] = 10.0;
   params[2] = M_PI/2.0;
   params[3] = M_PI/16.0;
+  if(includeDataStdAsParam){
+    params[4] = 1.0;
+  }  
 }
 void cmStressStretch_SHRA::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: getPriorMapping Not implemented in cmStressStretch_SHRA.\n");
@@ -45,6 +56,8 @@ string cmStressStretch_SHRA::getParamName(int parID){
     return string("theta0");
   }else if(parID == 3){
     return string("psi");
+  }else if((includeDataStdAsParam)&&(parID == 4)){
+    return string("dataStd");
   }else{
     throw cmException("ERROR: invalid parameter ID.\n");
   }
@@ -54,7 +67,7 @@ string cmStressStretch_SHRA::getResultName(int resID){
   return res;
 }
 
-void cmStressStretch_SHRA::setModelResults(stdVec outputs,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths){
+void cmStressStretch_SHRA::setModelResults(stdVec outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths){
 
   // KEYS
   keys.clear();
@@ -91,17 +104,17 @@ void cmStressStretch_SHRA::setModelResults(stdVec outputs,stdStringVec& keys,std
   // stdFactors.push_back(1.088304e+06); // str10
   // stdFactors.push_back(1.348686e+06); // str11
 
-  stdFactors.push_back(5.0e5); // str01
-  stdFactors.push_back(5.0e5); // str02
-  stdFactors.push_back(5.0e5); // str03
-  stdFactors.push_back(5.0e5); // str04
-  stdFactors.push_back(5.0e5); // str05
-  stdFactors.push_back(5.0e5); // str06
-  stdFactors.push_back(5.0e5); // str07
-  stdFactors.push_back(5.0e5); // str08
-  stdFactors.push_back(5.0e5); // str09
-  stdFactors.push_back(5.0e5); // str10
-  stdFactors.push_back(5.0e5); // str11
+  stdFactors.push_back(1.0e6*dataStd); // str01
+  stdFactors.push_back(1.0e6*dataStd); // str02
+  stdFactors.push_back(1.0e6*dataStd); // str03
+  stdFactors.push_back(1.0e6*dataStd); // str04
+  stdFactors.push_back(1.0e6*dataStd); // str05
+  stdFactors.push_back(1.0e6*dataStd); // str06
+  stdFactors.push_back(1.0e6*dataStd); // str07
+  stdFactors.push_back(1.0e6*dataStd); // str08
+  stdFactors.push_back(1.0e6*dataStd); // str09
+  stdFactors.push_back(1.0e6*dataStd); // str10
+  stdFactors.push_back(1.0e6*dataStd); // str11
 
 
   // WEIGHTS
@@ -127,6 +140,10 @@ double cmStressStretch_SHRA::evalModelError(stdVec inputs,stdVec& outputs, stdIn
   double psi    = inputs[3];
   // Fibril helix angle
   double alpha  = 0.0;
+  double dataStd = 1.0;
+  if(includeDataStdAsParam){
+  	double dataStd = inputs[4];
+  }
 
   // Init quantities derived from lambdaZ
   vector<double> Frr(lambdaZ);
@@ -186,7 +203,7 @@ double cmStressStretch_SHRA::evalModelError(stdVec inputs,stdVec& outputs, stdIn
   stdVec computedValues;
   stdVec stdFactors;
   stdVec weigths;
-  setModelResults(outputs,keys,computedValues,stdFactors,weigths);
+  setModelResults(outputs,dataStd,keys,computedValues,stdFactors,weigths);
 
   // Print and compare
   double result = 0.0;

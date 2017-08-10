@@ -2,14 +2,19 @@
 
 using namespace std;
 
-cmStressStretch_FR::cmStressStretch_FR(const stdVec& lambdaZ){
+cmStressStretch_FR::cmStressStretch_FR(const stdVec& lambdaZ,bool includeDataStdAsParam){
   this->lambdaZ = lambdaZ;
+  this->includeDataStdAsParam = includeDataStdAsParam;
 }
 cmStressStretch_FR::~cmStressStretch_FR(){
   lambdaZ.clear();
 }
 int cmStressStretch_FR::getParameterTotal(){
-  return 3;
+  if(includeDataStdAsParam){
+    return 4;
+  }else{
+    return 3;
+  }
 }
 int cmStressStretch_FR::getStateTotal(){
   return 0;
@@ -22,12 +27,18 @@ void cmStressStretch_FR::getParameterLimits(stdVec& limits){
   limits[0] = 0.0;  limits[1] = 1.4e+10;
   limits[2] = 0.0;  limits[3] = 1.4e+10;
   limits[4] = 10.0; limits[5] = 1000.0;
+  if(includeDataStdAsParam){
+    limits[6] = 0.1; limits[7] = 10.0;
+  }
 }
 void cmStressStretch_FR::getDefaultParams(stdVec& params){
   params.resize(getParameterTotal());
   params[0] = 1.0;
   params[1] = 1.0;
   params[2] = 100.0;
+  if(includeDataStdAsParam){
+    params[3] = 1.0;
+  }  
 }
 void cmStressStretch_FR::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: getPriorMapping Not implemented in cmStressStretch_FR.\n");
@@ -39,6 +50,8 @@ string cmStressStretch_FR::getParamName(int parID){
     return string("Ee");
   }else if(parID == 2){
     return string("b");
+  }else if((includeDataStdAsParam)&&(parID == 3)){
+  	return string("dataStd");
   }else{
     throw cmException("ERROR: invalid parameter ID.\n");
   }
@@ -62,6 +75,10 @@ double cmStressStretch_FR::evalModelError(stdVec inputs,stdVec& outputs, stdIntV
   double Ec = inputs[0];
   double Ee = inputs[1];
   double b  = inputs[2];
+  double dataStd = 1.0;
+  if(includeDataStdAsParam){
+  	double dataStd = inputs[3];
+  }
 
   // Get Stresses from Data Object
   stdMat stressVals;
@@ -123,17 +140,17 @@ double cmStressStretch_FR::evalModelError(stdVec inputs,stdVec& outputs, stdIntV
   // Set standard deviations
   stdVec stdFactors;
   stdFactors.clear();
-  stdFactors.push_back(0.01); // str01
-  stdFactors.push_back(0.01); // str02
-  stdFactors.push_back(0.01); // str03
-  stdFactors.push_back(0.01); // str04
-  stdFactors.push_back(0.01); // str05
-  stdFactors.push_back(0.01); // str06
-  stdFactors.push_back(0.01); // str07
-  stdFactors.push_back(0.01); // str08
-  stdFactors.push_back(0.01); // str09
-  stdFactors.push_back(0.01); // str10
-  stdFactors.push_back(0.01); // str11
+  stdFactors.push_back(0.01*dataStd); // str01
+  stdFactors.push_back(0.01*dataStd); // str02
+  stdFactors.push_back(0.01*dataStd); // str03
+  stdFactors.push_back(0.01*dataStd); // str04
+  stdFactors.push_back(0.01*dataStd); // str05
+  stdFactors.push_back(0.01*dataStd); // str06
+  stdFactors.push_back(0.01*dataStd); // str07
+  stdFactors.push_back(0.01*dataStd); // str08
+  stdFactors.push_back(0.01*dataStd); // str09
+  stdFactors.push_back(0.01*dataStd); // str10
+  stdFactors.push_back(0.01*dataStd); // str11
 
   // Weights
   stdVec weigths;

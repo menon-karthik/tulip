@@ -11,13 +11,15 @@ const int kLegendreRange = 0;
 //! Haar wavelet range [0,1].
 const int kHaarRange = 1;
 
-// TYPES OF POLYNOMIALS
+// TYPES OF POLYNOMIAL BASIS
 //! Simple monomials.
-const int kPolyMonomials = 0;
+const int kPolyMonomials         = 0;
 //! Polynomials from the Legendre family.
-const int kPolyLegendre  = 1;
+const int kPolyLegendre          = 1;
+//! Polynomials from the Legendre family.
+const int kPolyRescaledLegendre  = 2;
 //! Polynomials from the Hermite family.
-const int kPolyHermite   = 2;
+const int kPolyHermite           = 3;
 
 // TYPE OF MULTI-INDEX
 //! Full tensor product multi-index for multi-d polynomials

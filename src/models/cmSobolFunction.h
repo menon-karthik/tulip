@@ -1,7 +1,7 @@
-#ifndef CMSTRESSSTRETCH_SHRA_H
-#define CMSTRESSSTRETCH_SHRA_H
+#ifndef CMSOBOLFUNCTION_H
+#define CMSOBOLFUNCTION_H
 
-# include <vector>
+# include <string>
 
 # include "uqTypes.h"
 # include "cmModel.h"
@@ -10,17 +10,14 @@
 using namespace std;
 
 // GENERIC CLASS FOR MODELS
-class cmStressStretch_SHRA: public cmModel{
+class cmSobolFunction: public cmModel{
   public:
-    vector<double> lambdaZ;
-    bool includeDataStdAsParam;
 
     //! Default constructor
-    cmStressStretch_SHRA(const stdVec& lambda,bool includeDataStdAsParam);
+    cmSobolFunction();
     //! Virtual destructor
-    virtual ~cmStressStretch_SHRA();
+    virtual ~cmSobolFunction();
 
-    // Virtual Functions
     virtual int getParameterTotal();
     virtual int getStateTotal();
     virtual int getResultTotal();
@@ -30,8 +27,6 @@ class cmStressStretch_SHRA: public cmModel{
     virtual string getParamName(int parID);
     virtual string getResultName(int resID);
     virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
-
-    void setModelResults(stdVec outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);
 };
 
-#endif //CMSTRESSSTRETCH_SHRA_H
+#endif // CMSOBOLFUNCTION_H

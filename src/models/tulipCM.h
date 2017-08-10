@@ -9,6 +9,8 @@
 
 # include "cmTutorial.h"
 
+# include "cmSobolFunction.h"
+
 # include "cmAnalyticalExpressionModel.h"
 
 # include "cmLPNModel.h"

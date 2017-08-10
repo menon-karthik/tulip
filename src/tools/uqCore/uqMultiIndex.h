@@ -27,7 +27,7 @@ class uqMultiIndex{
     // ACCESS TO MEMBERS
     double operator()(const int nRow, const int nCol);
     double getMultiIndexAt(const int nRow, const int nCol);
-    stdIntMat getMultiIndex();
+    void   getMultiIndex(stdIntMat& res);
 
     // CHECK IF A CERTAIN COMPONENT OF MULTI-INDEX CONTAINS A VARIABLE
     bool contains(int variable,int component);

@@ -44,7 +44,11 @@ int cmAnalyticalExpressionModel::getParameterTotal(){
 
 // Get Parameter Names
 string cmAnalyticalExpressionModel::getParamName(int parID){
-  return string("");
+  if(parID<getParameterTotal()){
+    return string("Par" + to_string(parID));  
+  }else{
+    throw new cmException("ERROR: Invalid Parameter ID");
+  }
 }
 
 int cmAnalyticalExpressionModel::getStateTotal(){
@@ -144,6 +148,7 @@ double cmAnalyticalExpressionModel::evalModelError(stdVec inputs, stdVec& output
     errorCode.push_back(0);
     // Evaluate Function
     outputs.push_back(inputs[0]*inputs[1]);
+    //outputs.push_back(inputs[0]);
     return 0.0;
   }else if(modelType == kModelDiscAgarwal){
     // No Error

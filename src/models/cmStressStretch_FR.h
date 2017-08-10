@@ -15,9 +15,10 @@ class cmStressStretch_FR: public cmModel{
   public:
     // Experimental Stretches
     stdVec lambdaZ;
+    bool includeDataStdAsParam;
 
     //! Default constructor
-    cmStressStretch_FR(const stdVec& lambdaZ);
+    cmStressStretch_FR(const stdVec& lambdaZ,bool includeDataStdAsParam);
     //! Virtual destructor
     virtual ~cmStressStretch_FR();
 

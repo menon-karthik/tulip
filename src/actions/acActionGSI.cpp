@@ -120,7 +120,7 @@ void acActionGSI::printSensitivityTables(int res_num,int par_num,const stdMat& d
   for(int loopA=0;loopA<par_num;loopA++){
   	fprintf(outFile,"%20s ",model->getParamName(loopA).c_str());
     for(int loopB=0;loopB<res_num;loopB++){
-      fprintf(outFile,"%20.3f ",dirTable[loopB][loopA]);
+      fprintf(outFile,"%20.10f ",dirTable[loopB][loopA]);
     }
     fprintf(outFile,"\n");
   }
@@ -138,7 +138,7 @@ void acActionGSI::printSensitivityTables(int res_num,int par_num,const stdMat& d
   for(int loopA=0;loopA<par_num;loopA++){
   	fprintf(outFile,"%20s ",model->getParamName(loopA).c_str());
     for(int loopB=0;loopB<res_num;loopB++){
-      fprintf(outFile,"%20.3f ",totTable[loopB][loopA]);
+      fprintf(outFile,"%20.10f ",totTable[loopB][loopA]);
     }
     fprintf(outFile,"\n");
   }
@@ -213,31 +213,17 @@ void printMultiIndexToFile(int basis_num,int par_num,const stdIntMat& multiIndex
 // ============================================================
 // CHECK IF MULTI-INDEX IS ZERO FOR A GIVEN DIMENSION AND BASIS
 // ============================================================
-bool doesNotHaveIndex(int index,int row,const stdIntMat& table){  
-  return (table[row][index] == 0);
-}
-
-// ============================================================
-// CHECK IF MULTI-INDEX IS ZERO FOR A GIVEN DIMENSION AND BASIS
-// ============================================================
-bool doesHaveIndex(int index,int row,const stdIntMat& table){  
-  return (table[row][index] != 0);
-}
-
-// ============================================================
-// CHECK IF MULTI-INDEX IS ZERO FOR A GIVEN DIMENSION AND BASIS
-// ============================================================
-bool hasOnlyIndex(int index,int row,int par_num,const stdMat& table){
+bool hasOnlyIndex(int index,int row,int par_num,uqMultiIndex* mi){
   // ALL DIMENSIONS BUT INDEX WITH ZEROS
   bool result = true;
   for(int loopA=0;loopA<par_num;loopA++){
     if(loopA != index){
-      result = (result && (table[row][loopA] == 0));
+      result = (result && (mi->getMultiIndexAt(row,loopA) == 0));
     }
   }
 
   // CHECK LAST CONDITION THAT INDEX SHOULD BE NOT ZERO
-  result = (result && (table[row][index] != 0));
+  result = (result && (mi->getMultiIndexAt(row,index) != 0));
   return result;
 }
 
@@ -245,7 +231,7 @@ bool hasOnlyIndex(int index,int row,int par_num,const stdMat& table){
 // EXTRACT GSI COEFFICIENT FROM THE TABLE OF POLYCHAOS COEFFICIENTS
 // ================================================================
 void extractGSICoefficients(int basis_num,int res_num,int par_num,
-                            const stdIntMat& multiIndex,
+                            uqMultiIndex* mi,
                             const stdMat& sigmaCoeffs,
                             stdMat& dirTable,
                             stdMat& totTable){
@@ -282,21 +268,18 @@ void extractGSICoefficients(int basis_num,int res_num,int par_num,
       for(int loopC=1;loopC<basis_num;loopC++){
         // Verify multi-index does not start from 0
         // Direct Coefficient
-        //if(hasOnlyIndex(loopB,loopC,par_num,multiIndex)){
-        if(doesHaveIndex(loopB,loopC,multiIndex)){
-          //printf("DIRECT: PARAM %d BASIS %d\n",loopB,loopC);
+        if(hasOnlyIndex(loopB,loopC,par_num,mi)){
           currFirstOrderCoeffDir = currFirstOrderCoeffDir + sigmaCoeffs[loopA][loopC]*sigmaCoeffs[loopA][loopC];
         }
         // Total Coefficent
-        if(doesNotHaveIndex(loopB,loopC,multiIndex)){
-          //printf("TOTAL: PARAM %d BASIS %d\n",loopB,loopC);
+        if(mi->getMultiIndexAt(loopC,loopB) != 0){
           currFirstOrderCoeffTot = currFirstOrderCoeffTot + sigmaCoeffs[loopA][loopC]*sigmaCoeffs[loopA][loopC];
         }
       }
       // Store Table Value
-      if(abs(currVariance)>1.0e-3){
-        tempDirTable.push_back((currFirstOrderCoeffDir/currVariance)*100.0);
-        tempTotTable.push_back((1.0-(currFirstOrderCoeffTot/currVariance))*100.0);
+      if(abs(currVariance)>1.0e-5){
+        tempDirTable.push_back(currFirstOrderCoeffDir/currVariance);
+        tempTotTable.push_back(currFirstOrderCoeffTot/currVariance);
       }else{
         tempDirTable.push_back(0.0);
         tempTotTable.push_back(0.0);              
@@ -409,10 +392,6 @@ int acActionGSI::go(){
 
   // Generate a Sparse Grid of a Certain Order
   // Need to get a list with starting and ending points of the various orders
-  stdIntVec orderID;
-  
-  // FIX IT!!!
-  // samples->generateSparseGrid(maxOrder,orderID);
   samples->generateSparseGrid(maxOrder);
 
   // Print Grid to file if required
@@ -421,6 +400,17 @@ int acActionGSI::go(){
     bool printTitle = true;
     samples->printToFile(outGridFile,printTitle);
   }
+
+  // Check the weight sum at each order
+  double weightSum = 0.0;
+  for(int loopA=0;loopA<maxOrder;loopA++){
+    weightSum = 0.0;
+    for(int loopB=0;loopB<samples->getTotSamples();loopB++){
+      weightSum += samples->getWeightAt(loopB,loopA);
+    }
+    printf("Order %d, Integration Weight Sum: %f\n",loopA,weightSum);
+  }
+  
 
    // EVAL ALL MODELS
   int startSampleId = 0;
@@ -445,7 +435,6 @@ int acActionGSI::go(){
     if(writeDebugData){
       printf("CURRENT PARAMETER SAMPLE\n");
       for(int loopC=0;loopC<par_num;loopC++){
-        // printf("%d %f\n",loopC,currParams[loopC]);
         printf("%d %f\n",loopC,currGridSample[loopC]);
       }
       printf("\n");
@@ -453,7 +442,7 @@ int acActionGSI::go(){
 
     // Solve Model
     stdIntVec errorCode;
-    double ll = model->evalModelError(currParams,modelRes,errorCode);
+    double ll = model->evalModelError(currGridSample,modelRes,errorCode);
     if(errorCode[0] != 0){
       printf("ERROR: INVALID GRID POINT EVALUATION.\n");
       exit(1);
@@ -465,6 +454,16 @@ int acActionGSI::go(){
       currModelRes.push_back(modelRes[loopC]);
     }
     modelResult.push_back(currModelRes);
+  }
+
+  if(writeDebugData){
+    printf("Model Result Table\n");
+    for(int loopA=0;loopA<modelResult.size();loopA++){
+      for(int loopB=0;loopB<modelResult[loopA].size();loopB++){
+        printf("%5.3f ",modelResult[loopA][loopB]);
+      }
+      printf("\n");
+    }
   }
 
   // RESCALE SAMPLES TO EVALUATE POLYNOMIAL MATRIX
@@ -481,14 +480,17 @@ int acActionGSI::go(){
   // EVAL POLYNOMIAL MATRIX AT INTEGRATION POINTS
   int matType = 0;
   if(sampleType == ipUniformSampling){
-    matType = kPolyLegendre;      
+    matType = kPolyRescaledLegendre;      
   }else{
     matType = kPolyHermite;
   }
-  uqPolyMatrix* polyMat = new uqPolyMatrix(samples,maxOrder,kPolyLegendre,kMIPartialOrder);
+  uqPolyMatrix* polyMat = new uqPolyMatrix(samples,maxOrder,matType,kMIPartialOrder);
 
   // Explicitly Evaluate MultiIndex
   uqMultiIndex* mi = new uqMultiIndex(samples->getTotDims(),maxOrder,kMIPartialOrder);
+
+  string outMiFile("multiIndexGSI.txt");
+  mi->printToFile(outMiFile,true);
 
   printf("Computing Coefficients...\n");
 
@@ -514,12 +516,15 @@ int acActionGSI::go(){
       // Fill RHS With Model Result Evaluations
       rhs.clear();
       for(int loopB=0;loopB<samples->getTotSamples();loopB++){
-        rhs.push_back(modelResult[loopA][loopB]);
+        rhs.push_back(modelResult[loopB][loopA]);
       }
 
-      oneResCoeff.clear();
       coeffs.clear();
+      coeffPrec.clear();
       noiseStd = bcs->run(polyMat->getRowCount(),polyMat->getColCount(),rhs,polyMat->getMatrix(),coeffs,coeffPrec,resNorm);
+
+      // Store in Sigma Coefficients
+      sigmaCoeffs.push_back(coeffs);
     }
               
   }else if(coeffAlg == algUseQuadrature){
@@ -544,18 +549,18 @@ int acActionGSI::go(){
       sigmaCoeffs.push_back(oneResCoeff);
     }
 
-    // DEBUG: Write Sigma Coefficients
-    if(writeDebugData){
-      printSigmaCoeffs(sigmaCoeffs);
-    }
-
   }else{
     throw acException("ERROR: Invalid Algorithm for GSI Coefficient Computation.\n");
   }
 
+  // DEBUG: Write Sigma Coefficients
+  if(writeDebugData){
+    printSigmaCoeffs(sigmaCoeffs);
+  }
+
   // EXTRACT FIRST ORDER DIRECT AND TOTAL COEFFICIENTS
   printf("Computing GSI...\n");
-  extractGSICoefficients(polyMat->getColCount(),res_num,samples->getTotDims(),mi->getMultiIndex(),sigmaCoeffs,dirTable,totTable);
+  extractGSICoefficients(polyMat->getColCount(),res_num,samples->getTotDims(),mi,sigmaCoeffs,dirTable,totTable);
 
   // Print Resulting Global Sensitivities
   // printSensitivityTablesToLatex(loopA,res_num,par_num,dirTable,totTable);
