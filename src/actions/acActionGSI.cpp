@@ -19,126 +19,32 @@ acActionGSI::acActionGSI(int sampleType,int distributionSource,string priorParam
   this->coeffAlg = coeffAlg;
 }
 
-// ================================
-// PRINT SENSITIVITY TABLES - LATEX
-// ================================
-void acActionGSI::printSensitivityTablesToLatex(int res_num,int par_num,const stdMat& dirTable,const stdMat& totTable){
-  FILE* stateFile;
-  string resName;
-  string parName; 
-  string fileName = "sensTables.txt";
-  stateFile = fopen(fileName.c_str(),"w");
-
-  // DIRECT SENSITIVITY TABLE
-
-  fprintf(stateFile,"\\begin{table}[h!]\n");
-  fprintf(stateFile,"\\centering\n");
-  fprintf(stateFile,"\\begin{tabular}{l ");
-  // Table Header
-  for(int loopA=0;loopA<res_num;loopA++){
-    fprintf(stateFile,"c ");
-  } 
-  fprintf(stateFile,"}\n");
-
-  fprintf(stateFile,"\\toprule\n");
-  fprintf(stateFile,"Param ");
-  for(int loopA=0;loopA<res_num;loopA++){
-    resName = model->getResultName(loopA);
-    fprintf(stateFile,"& %s ",resName.c_str());
-  } 
-  fprintf(stateFile,"\\\\\n");
-  fprintf(stateFile,"\\midrule\n");
-  for(int loopA=0;loopA<par_num;loopA++){
-    // First Column Parameter Name
-    parName = model->getParamName(loopA);
-    fprintf(stateFile,"%s ",parName.c_str());
-    for(int loopB=0;loopB<res_num;loopB++){
-      fprintf(stateFile,"& %20.3f ",dirTable[loopB][loopA]);
-    }
-    fprintf(stateFile,"\\\\\n");
-  }
-  fprintf(stateFile,"\\bottomrule\n");
-  fprintf(stateFile,"\\end{tabular}\n");
-  fprintf(stateFile,"\\caption{Full model (Stage12Blocks) Direct GSI results for patient \\patient}\n");
-  fprintf(stateFile,"\\end{table}\n");
-
-  // TOTAL SENSITIVITY TABLE
-
-  fprintf(stateFile,"\\begin{table}[h!]\n");
-  fprintf(stateFile,"\\centering\n");
-  fprintf(stateFile,"\\begin{tabular}{l ");
-  // Table Header
-  for(int loopA=0;loopA<res_num;loopA++){
-    fprintf(stateFile,"c ");
-  } 
-  fprintf(stateFile,"}\n");
-
-  fprintf(stateFile,"\\toprule\n");
-  fprintf(stateFile,"Param ");
-  for(int loopA=0;loopA<res_num;loopA++){
-    resName = model->getResultName(loopA);
-    fprintf(stateFile,"& %s ",resName.c_str());
-  } 
-  fprintf(stateFile,"\\\\\n");
-  fprintf(stateFile,"\\midrule\n");
-  for(int loopA=0;loopA<par_num;loopA++){
-    // First Column Parameter Name
-    parName = model->getParamName(loopA);
-    fprintf(stateFile,"%s ",parName.c_str());
-    for(int loopB=0;loopB<res_num;loopB++){
-      fprintf(stateFile,"& %20.3f ",totTable[loopB][loopA]);
-    }
-    fprintf(stateFile,"\\\\\n");
-  }
-  fprintf(stateFile,"\\bottomrule\n");
-  fprintf(stateFile,"\\end{tabular}\n");
-  fprintf(stateFile,"\\caption{Full model (Stage12Blocks) Total GSI results for patient \\patient}\n");
-  fprintf(stateFile,"\\end{table}\n");
-
-  // Close State File
-  fclose(stateFile);    
-}
-
 // ========================
 // PRINT SENSITIVITY TABLES
 // ========================
 void acActionGSI::printSensitivityTables(int res_num,int par_num,const stdMat& dirTable,const stdMat& totTable){
   FILE* outFile;
-  string fileName = "sensTables.txt";
+  string fileName = "GSI_Table.txt";
   outFile = fopen(fileName.c_str(),"w");
 
-  fprintf(outFile,"\n");
-  fprintf(outFile,"DIRECT COEFFICIENT TABLE\n");
-  fprintf(outFile,"\n");
-
-  fprintf(outFile,"%20s ","Param ");
+  fprintf(outFile,"%20s ","Res ");
   for(int loopA=0;loopA<res_num;loopA++){ 
   	fprintf(outFile,"%20s ",model->getResultName(loopA).c_str());
   }
   fprintf(outFile,"\n");
 
   for(int loopA=0;loopA<par_num;loopA++){
-  	fprintf(outFile,"%20s ",model->getParamName(loopA).c_str());
+  	fprintf(outFile,"%20s ",string("Dir-" + model->getParamName(loopA)).c_str());
     for(int loopB=0;loopB<res_num;loopB++){
-      fprintf(outFile,"%20.10f ",dirTable[loopB][loopA]);
+      fprintf(outFile,"%20.5f ",dirTable[loopB][loopA]);
     }
     fprintf(outFile,"\n");
   }
 
-  fprintf(outFile,"\n");
-  fprintf(outFile,"TOTAL COEFFICIENT TABLE\n");
-  fprintf(outFile,"\n");
-
-  fprintf(outFile,"%20s ","Param ");
-  for(int loopA=0;loopA<res_num;loopA++){ 
-  	fprintf(outFile,"%20s ",model->getResultName(loopA).c_str());
-  }
-  fprintf(outFile,"\n");
-
   for(int loopA=0;loopA<par_num;loopA++){
-  	fprintf(outFile,"%20s ",model->getParamName(loopA).c_str());
+  	fprintf(outFile,"%20s ",string("Tot-" + model->getParamName(loopA)).c_str());
     for(int loopB=0;loopB<res_num;loopB++){
-      fprintf(outFile,"%20.10f ",totTable[loopB][loopA]);
+      fprintf(outFile,"%20.5f ",totTable[loopB][loopA]);
     }
     fprintf(outFile,"\n");
   }
@@ -199,7 +105,7 @@ void printGridToFile(int order,int grid_size,int par_num,double* nodes,double* w
 // =========================
 void printMultiIndexToFile(int basis_num,int par_num,const stdIntMat& multiIndex){
   FILE* outFile;
-  outFile = fopen("multiIndex.txt","w");
+  outFile = fopen("GSI_mi.txt","w");
   for(int loopA=0;loopA<basis_num;loopA++){
     for(int loopB=0;loopB<par_num;loopB++){
       fprintf(outFile,"%d ",multiIndex[loopA][loopB]);
