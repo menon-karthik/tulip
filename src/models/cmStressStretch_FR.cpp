@@ -24,8 +24,8 @@ int cmStressStretch_FR::getResultTotal(){
 }
 void cmStressStretch_FR::getParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
-  limits[0] = 0.0;  limits[1] = 1.4e+10;
-  limits[2] = 0.0;  limits[3] = 1.4e+10;
+  limits[0] = 0.001;  limits[1] = 1.0e8;
+  limits[2] = 0.001;  limits[3] = 1.0e8;
   limits[4] = 10.0; limits[5] = 1000.0;
   if(includeDataStdAsParam){
     limits[6] = 0.1; limits[7] = 10.0;

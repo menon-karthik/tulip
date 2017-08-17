@@ -26,10 +26,10 @@ int cmStressStretch_SHRA::getResultTotal(){
 }
 void cmStressStretch_SHRA::getParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
-  limits[0] = 0.0; limits[1] = 1.0e8;
-  limits[2] = 0.0; limits[3] = 1.0e8;
-  limits[4] = 0.0; limits[5] = M_PI/2.0;
-  limits[6] = 0.0; limits[7] = M_PI/2.0;
+  limits[0] = 0.0;   limits[1] = 1.0e8;
+  limits[2] = 0.0;   limits[3] = 1.0e8;
+  limits[4] = 0.001; limits[5] = M_PI/2.0;
+  limits[6] = 0.0;   limits[7] = M_PI/2.0;
   if(includeDataStdAsParam){
     limits[8] = 0.1; limits[9] = 10.0;
   }

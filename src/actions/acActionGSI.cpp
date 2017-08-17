@@ -223,6 +223,9 @@ int acActionGSI::go(){
   // Init Parameter Gaussian Statistics
   stdVec prStat1;
   stdVec prStat2;  
+  stdVec tempStat1;
+  stdVec tempStat2;  
+
 
   // Get Number Of Parameters for this Model
   int par_num = model->getParameterTotal();
@@ -265,10 +268,30 @@ int acActionGSI::go(){
   }else{
     // Read Marginal Statistics From File
     int prior_num = 0;
-    int error = readPriorFromFile(priorParamFile,prior_num,prStat1,prStat2);
+    printf("Reading marginal statistics from file %s\n",priorParamFile.c_str());
+    int error = readPriorFromFile(priorParamFile,prior_num,tempStat1,tempStat2);
     if((error != 0)||(prior_num != par_num)){
       printf("ERROR: Invalid file with prior parameters.\n");
       exit(1);
+    }
+    if(sampleType == ipUniformSampling){ 
+      printf("Using Uniform Independent Variables.\n");
+      for(int loopA=0;loopA<par_num;loopA++){
+        prStat1.push_back(tempStat1[loopA] - 3.0*tempStat2[loopA]);
+        prStat2.push_back(tempStat1[loopA] + 3.0*tempStat2[loopA]);
+      } 
+      // Check that ranges do not exceed parameter limits
+      model->getParameterLimits(limits);     
+      for(int loopA=0;loopA<par_num;loopA++){
+        if(prStat1[loopA]<limits[2*loopA+0]){
+          prStat1[loopA] = limits[2*loopA+0];
+        }
+        if(prStat2[loopA]>limits[2*loopA+1]){
+          prStat2[loopA] = limits[2*loopA+1];
+        }
+      } 
+    }else{
+      printf("Using Gaussian Independent Variables.\n");
     }
   }
 
