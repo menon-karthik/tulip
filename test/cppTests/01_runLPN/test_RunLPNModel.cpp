@@ -37,8 +37,10 @@ int main(int argc, char* argv[]){
     // Create new data object
     int keyColumn = 0;
     int timeStampColumn = 0;
+    int columnID = 0;
+    bool useSingleColumn = true;
     string currPatientFile("heartFailure.dat");
-    daData* data = new daData_multiple_Table();
+    daData* data = new daData_multiple_Table(useSingleColumn,columnID);
     data->readFromFile(currPatientFile);
 
     // Create a ODE Model
@@ -55,7 +57,7 @@ int main(int argc, char* argv[]){
 
     // Assign Dataset to model
     int currPatient = 0;
-    lpnModel->setData(data,currPatient);
+    lpnModel->setData(data);
 
     // Get Default parameter set
     stdVec inputs;

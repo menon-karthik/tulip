@@ -11,7 +11,7 @@
 # include "uqOrthoPolyBasis.h"
 # include "uqMWBasis.h"
 
-# include "lpnUtils.h"
+# include "cmUtils.h"
 
 using namespace std;
 
@@ -45,9 +45,9 @@ int main(int argc, char* argv[]){
     double currentLoc = 0.0;
     for(int loopA=0;loopA<steps;loopA++){
       currentLoc = loopA/(double)(steps - 1);
-      results[loopA][0] = ((uqPolyBasis*)polyIntMonomial)->eval(currentLoc,currOrder);
-      results[loopA][1] = ((uqPolyBasis*)polyIntLegendre)->eval(currentLoc,currOrder);
-      results[loopA][2] = ((uqPolyBasis*)polyIntHermite)->eval(currentLoc,currOrder);
+      results[loopA][0] = ((uqPolyBasis*)polyIntMonomial)->evaluate(currentLoc,currOrder);
+      results[loopA][1] = ((uqPolyBasis*)polyIntLegendre)->evaluate(currentLoc,currOrder);
+      results[loopA][2] = ((uqPolyBasis*)polyIntHermite)->evaluate(currentLoc,currOrder);
     }
 
     // ORTHOGONAL POLYNOMIALS
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]){
     currentLoc = 0.0;
     for(int loopA=0;loopA<steps;loopA++){
       currentLoc = loopA/(double)(steps - 1);
-      results[loopA][3] = ((uqOrthoPolyBasis*)orthoPolyInt)->eval(currentLoc,currOrder);
+      results[loopA][3] = ((uqOrthoPolyBasis*)orthoPolyInt)->evaluate(currentLoc,currOrder);
     }
 
     // MULTIWAVELETS
