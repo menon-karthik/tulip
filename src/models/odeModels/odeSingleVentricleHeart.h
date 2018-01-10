@@ -1,32 +1,42 @@
-#ifndef ODEMODEL_H
-#define ODEMODEL_H
+#ifndef ODESINGLEVENTRICLEHEART_H
+#define ODESINGLEVENTRICLEHEART_H
 
 # include <string>
+# include "math.h"
 
 # include "uqTypes.h"
-# include "daData.h"
+# include "odeModel.h"
+# include "cmUtils.h"
+# include "cmException.h"
 
-using namespace std;
+// Output State Constants
+const int ipVsv = 0;
+const int ipVsa = 1;
+const int ipPAo = 2;
+const int ipQav = 3;
 
-// GENERIC CLASS FOR MODELS
-class odeModel{
-  public:
-    //! Data Object containing patient data
-    daData* data;
-    //! dataset column identifying the specific patient for multiple patients datasets
-    int datasetColumn;
-    //! List of frozen parameters IDs
-    stdIntVec frozenParamIDX;
-    //! List of frozen parameters values
-    stdVec    frozenParamVAL;
+// Auxiliary Output Constants
+const int ipPsvEff     = 0;
+const int ipPsa        = 1;
+const int ipQAo        = 2;
+const int ipQven       = 3;
+const int ipLVOF       = 4;
+const int iptc         = 5;
+const int ipAA         = 6;
+const int ipAV         = 7;
+const int ipPsaActive  = 8;
+const int ipPsaPassive = 9;
+const int ipPsvActive  = 10;
+const int ipPsvPassive = 11;
+const int ipQreg       = 12;
 
+// GENERIC CLASS FOR SAMPLES
+class odeSingleVentricleHeart: public odeModel{
+    
     //! Default constructor
-    odeModel();
+    odeSingleVentricleHeart();
     //! Virtual destructor
-    virtual ~odeModel();
-
-    // Implemented Functions
-    void getParameterLimits(stdVec& limits);
+    virtual ~odeSingleVentricleHeart();
 
     // Virtual functions to be implemented by child classes
     virtual int    getParameterTotal() = 0;
@@ -44,7 +54,6 @@ class odeModel{
     virtual void   getDataSTD(stdVec& stds) = 0;
     virtual void   getResultWeigths(stdVec& weights) = 0;    
     virtual int    getHRIndex() = 0;
-    
 };
 
-#endif // ODEMODEL_H
+#endif // ODESINGLEVENTRICLEHEART_H

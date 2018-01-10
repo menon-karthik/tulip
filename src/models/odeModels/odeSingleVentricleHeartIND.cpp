@@ -2,443 +2,271 @@
 
 using namespace std;
 
-// SIMULATION COUNTER
-int simulCount = 0;
 
-// Numerical Constants
-const double pi = 3.1415926535897;
 
-// Output State Constants
-const int ipVsv = 0;
-const int ipVsa = 1;
-const int ipQav = 2;
-const int ipPAA = 3;
 
-// Auxiliary Output Constants
-const int ipPsvEff     = 0;
-const int ipPsa        = 1;
-const int ipQven       = 2;
-const int ipLVOF       = 3;
-const int iptc         = 4;
-const int ipAA         = 5;
-const int ipAV         = 6;
-const int ipPsaActive  = 7;
-const int ipPsaPassive = 8;
-const int ipPsvActive  = 9;
-const int ipPsvPassive = 10;
-const int ipPAo        = 11;
-const int ipQreg       = 12;
-const int ipQAA	       = 13;
+  virtual int    getAuxStateTotal() = 0;
+
+  
+  
+  
+  
+  virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
+  virtual void   getResultKeys(stdStringVec& keys) = 0;
+  virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs) = 0;
+  virtual void   getDataSTD(stdVec& stds) = 0;
+  virtual void   getResultWeigths(stdVec& weights) = 0;    
+  virtual int    getHRIndex() = 0;
+
 
 // ========================
 // GET NUMBER OF PARAMETERS
 // ========================
-int odeSingleVentricleHeartIND::getModelParameterTotal(){
+int odeSingleVentricleHeartIND::getParameterTotal(){
   return 27;
 }
 
 // ========================
 // GET NUMBER OF PARAMETERS
 // ========================
-int odeSingleVentricleHeartIND::getModelStateTotal(){
+int odeSingleVentricleHeartIND::getStateTotal(){
   return 4; 
 }
 
 // ===========================
 // GET TOTAL NUMBER OF RESULTS
 // ===========================
-int odeSingleVentricleHeartIND::getModelResultTotal(){
+int odeSingleVentricleHeartIND::getResultTotal(){
   return 9;  
 }
 
 // ===========================
 // GET NAME OF RESULT QUANTITY
 // ===========================
-string odeSingleVentricleHeartIND::getResultName(int index){
-  switch(index){
+string odeSingleVentricleHeartIND::getResultName(int resID){
+  string res;
+  switch(resID){
     case 0:
-    {      
-      return string("mPascAo");
+      res = string("mPascAo");
       break;
-    }
     case 1:
-    {      
-      return string("maxPAo");
+      res = string("maxPAo");
       break;
-    }
     case 2:
-    {      
-      return string("mPsa");
+      res = string("mPsa");
       break;
-    }
     case 3:
-    {      
-      return string("maxPsv");
+      res = string("maxPsv");
       break;
-    }
     case 4:
-    {      
-      return string("maxVsv");
+      res = string("maxVsv");
       break;
-    }
     case 5:
-    {      
-      return string("maxQAA");
+      res = string("maxQAA");
       break;
-    }
     case 6:
-    {      
-      return string("PsvZero");
+      res = string("PsvZero");
       break;
-    }
     case 7:
-    {      
-      return string("maxPsa");
+      res = string("maxPsa");
       break;
-    }
     case 8:
-    {      
-      return string("mQreg");
+      res = string("mQreg");
       break;
-    }    
   }
+  return res;
 }
 
 // ==================
 // GET PARAMETER NAME
 // ==================
-string odeSingleVentricleHeartIND::getParamName(int index){
-  switch(index){
+string odeSingleVentricleHeartIND::getParamName(int parID){
+  string res;
+  switch(parID){
     case 0:
-    {
-      return string("Heart Rate");
+      res = string("Heart Rate");
       break;
-    }
     case 1:
-    {
-      return string("Csa");
+      res = string("Csa");
       break;
-    }
     case 2:
-    {      
-      return string("csa");
+      res = string("csa");
       break;
-    }
     case 3:
-    {      
-      return string("dsa");
+      res = string("dsa");
       break;
-    }
     case 4:
-    {      
-      return string("Vsa0");
+      res = string("Vsa0");
       break;
-    }
     case 5:
-    {      
-      return string("tsas-ratio");
+      res = string("tsas-ratio");
       break;
-    }
     case 6:
-    {      
-      return string("t1-ratio");
+      res = string("t1-ratio");
       break;
-    }
     case 7:
-    {      
-      return string("a");
+      res = string("a");
       break;
-    }
     case 8:
-    {      
-      return string("b");
+      res = string("b");
       break;
-    }
     case 9:
-    {      
-      return string("csv");
+      res = string("csv");
       break;
-    }
     case 10:
-    {      
-      return string("dsv");
+      res = string("dsv");
       break;
-    }
     case 11:
-    {      
-      return string("Vsv0");
+      res = string("Vsv0");
       break;
-    }
     case 12:
-    {      
-      return string("tsvs-ratio");
+      res = string("tsvs-ratio");
       break;
-    }    
     case 13:
-    {      
-      return string("Rmyo");
+      res = string("Rmyo");
       break;
-    }
     case 14:
-    {      
-      return string("alpha");
+      res = string("alpha");
       break;
-    }
     case 15:
-    {      
-      return string("Kao");
+      res = string("Kao");
       break;
-    }
     case 16:
-    {      
-      return string("CAo");
+      res = string("CAo");
       break;
-    }
     case 17:
-    {      
-      return string("tdelay1");
+      res = string("tdelay1");
       break;
-    }
     case 18:
-    {      
-      return string("tdelay2");
+      res = string("tdelay2");
       break;
-    }
     case 19:
-    {      
-      return string("beta");
+      res = string("beta");
       break;
-    }
     case 20:
-    {      
-      return string("k-bw");
+      res = string("k-bw");
       break;
-    }
     case 21:
-    {      
-      return string("RAA");
+      res = string("RAA");
       break;
-    }
     case 22:
-    {      
-      return string("CAA");
+      res = string("CAA");
       break;
-    }    
     case 23:
-    {      
-      return string("Vsv");
+      res = string("Vsv");
       break;
-    }
     case 24:
-    {      
-      return string("Vsa");
+      res = string("Vsa");
       break;
-    }
     case 25:
-    {      
-      return string("Qav");
+      res = string("Qav");
       break;
-    }
     case 26:
-    {      
-      return string("PAA");
+      res = string("PAA");
       break;
-    }
     case 27:
-    {      
-      return string("QAA");
+      res = string("QAA");
       break;
-    }    
   }
+  return res;
 }
 
 // ====================
 // GET MODEL PARAMETERS
 // ====================
-void odeSingleVentricleHeartIND::getDefaultModelParams(int modelID, double* zp){
-  switch(modelID){
-// [0]HR [1]Csa [2]csa [3]dsa [4]Vsa0 [5]tsas [6]t1_ratio [7]a [8]b [9]csv [10]dsv 
-// [11]Vsv0 [12]tsvs [13]Rmyo [14]Kav [15]Kao [16]CAo [17]tdelay1 [18]tdelay2 [19]Lav [20]k_bw
-// [21]RAA [22]CAA  
-// [23]Vsv [24]Vsa [25]Qav [26]PAA [27]QAA  
-  	case piMUSC7:
-      zp[0] = 117.65; zp[1] = 1; zp[2] = 0.78541; zp[3] = 0.20142;
-      zp[4] = 0.96742; zp[5] = 0.20149; zp[6] = 0.11024; zp[7] = -0.10783;
-      zp[8] = 14.106; zp[9] = 0.97372; zp[10] = 0.065337; zp[11] = 9.5631;
-      zp[12] = 0.31523; zp[13] = 0.091782; zp[14] = 24.203; zp[15] = 0.0002;
-      zp[16] = 0.15; zp[17] = 0; zp[18] = 0; zp[19] = 0.72;
-      zp[20] = 0.0; zp[21] = 0.1;zp[22] = 0.1; zp[23] = 32.937; zp[24] = 1.632; zp[25] = 0;	
-      zp[26] =35;//zp[27] = 0;    //fare lo stesso per gli altri pazienti
-  //      zp[0] = 117.65; zp[1]=	0.76569; zp[2]=	0.01; zp[3]=	0.8; zp[4]=	2.5;
-  //	zp[5]=	0.25; zp[6]=	0.1; zp[7]=	-0.12; zp[8]=	14; zp[9]=	1; zp[10]=	0.065;
-  //	zp[11]=	9.7786; zp[12]=	0.31; zp[13]=	0.1; zp[14]=	24.474;
-  //	zp[15]=	0.00025; zp[16]=	0.24; zp[17]=	0; zp[18]=	0; zp[19]=	0.95; zp[20]=	0;
-  //	zp[21] = 0.000356;zp[22] = 0.188; zp[23] = 32.937; zp[24] = 1.632; zp[25] = -1.3068;	
-  //     zp[26] =35;//zp[27] = 0;  
-
-  	  break;
-  	case piGOSH22:
-      zp[0] = 116.0; zp[1] = 2.4765; zp[2] = 0.1728; zp[3] = 0.17056;
-      zp[4] = 0.079096; zp[5] = 0.23413; zp[6] = 0.0055602; zp[7] = -0.085834;
-      zp[8] = 13.533; zp[9] = 2.8973;  zp[10] = 0.065016; zp[11] = 11.498;
-      zp[12] = 0.31666; zp[13] = 0.20595; zp[14] = 9.9642; zp[15] = 0.0011649;
-      zp[16] = 0.25607; zp[17] = -0.21709; zp[18] = 0.13899; zp[19] = 12.835;
-      zp[20] = 0.0; zp[21] = 35.348; zp[22] = 2.2357; zp[23] = 56.622; zp[24] = 0.56854;
-  	  break;
-  	case piUM5:
-      zp[0] = 90.0; zp[1] = 0.18912; zp[2] = 0.30883; zp[3] = 0.27342;
-      zp[4] = 0.82973; zp[5] = 0.20019; zp[6] = 0.079075; zp[7] = -0.1482;
-      zp[8] = 12.1; zp[9] = 1.3514; zp[10] = 0.076565; zp[11] = 10.135; zp[12] = 0.3192;
-      zp[13] = 0.11537; zp[14] = 11.615; zp[15] = 0.00022209; zp[16] = 0.12032; zp[17] = 0.75256;
-      zp[18] = 0.2024; zp[19] = 1.7829; zp[20] = 0.0; zp[21] = 32.549;
-      zp[22] = 3.1777; zp[23] = 61.526; zp[24] = 1.3197;
-  	  break;
-  	case piUM10:
-      zp[0] = 141.0; zp[1] = 0.29453; zp[2] = 0.024235; zp[3] = 0.65256;
-      zp[4] = 6.0299; zp[5] = 0.23062; zp[6] = 0.024539; zp[7] = -0.010698;
-      zp[8] = 14.575; zp[9] = 0.14423; zp[10] = 0.060348; zp[11] = 7.7896;
-      zp[12] = 0.28067; zp[13] = 0.156; zp[14] = 8.2046; zp[15] = 0.00045862;
-      zp[16] = 0.17557; zp[17] = -1.3849; zp[18] = 0.012945; zp[19] = 10.07;
-      zp[20] = 0.036166; zp[21] = 11.208; zp[22] = 13.566; zp[23] = 50.049; zp[24] = 12.469;
-  	  break;
-  }
+void odeSingleVentricleHeartIND::getDefaultParams(stdVec& params){
+  params.resize(getParameterTotal());
+  params[0]  = 117.65; //HR 
+  params[1]  = 1.0; //Csa 
+  params[2]  = 0.78541; //csa 
+  params[3]  = 0.20142; //dsa 
+  params[4]  = 0.96742; //Vsa0 
+  params[5]  = 0.20149; //tsas 
+  params[6]  = 0.11024; //t1_ratio 
+  params[7]  = -0.10783; //a 
+  params[8]  = 14.106; //b 
+  params[9]  = 0.97372; //csv 
+  params[10] = 0.065337; //dsv 
+  params[11] = 9.5631; //Vsv0 
+  params[12] = 0.31523; //tsvs 
+  params[13] = 0.091782; //Rmyo 
+  params[14] = 24.203; //Kav 
+  params[15] = 0.0002; //Kao 
+  params[16] = 0.15; //CAo 
+  params[17] = 0; //tdelay1 
+  params[18] = 0; //tdelay2 
+  params[19] = 0.72; //Lav 
+  params[20] = 0.0; //k_bw
+  params[21] = 0.1; //RAA 
+  params[22] = 0.1; //CAA  
+  params[23] = 32.937; //Vsv 
+  params[24] = 1.632; //Vsa 
+  params[25] = 0; //Qav 
+  params[26] = 35.0; //PAA 
+  params[27] = 0; //QAA  
 }
 
 // ====================
 // GET PARAMETER RANGES
 // ====================
-void odeSingleVentricleHeartIND::getModelLimits(int model,int par_num,double* limits){
-  switch(model){
-    case piMUSC7:
-      limits[0]=117.65; limits[1]=117.65; // HR
-      limits[40]=0.000; limits[41]=0.000; // k_bw
-      break;
-    case piGOSH22:
-      limits[0]=116.00; limits[1]=116.00; // HR
-      limits[40]=0.000; limits[41]=0.000; // k_bw
-      break;
-    case piUM5:
-      limits[0]=90.000; limits[1]=90.000; // HR
-      limits[40]=0.000; limits[41]=0.000; // k_bw
-      break;
-    case piUM10:
-      limits[0]=141.00; limits[1]=141.00; // HR
-      limits[40]=0.015; limits[41]=0.022; // k_bw
-      break;
-  }
-
-// COMMON PARAMETER RANGES
-limits[2]=0.05;      limits[3]=2.0;         // Csa
-limits[4]=0.01;      limits[5]=0.8;         // csa
-limits[6]=0.16;     limits[7]=0.8;          // dsa
-limits[8]=0.1;      limits[9]=15.0;         // Vsa0
-limits[10]=0.1739;     limits[11]=0.2599; // tsas
-limits[12]=0.01;     limits[13]=0.15;       // t1_ratio
-limits[14]=-0.20;     limits[15]=-0.005;    // a
-limits[16]=8.0;      limits[17]=15.0;       // b
-limits[18]=0.1;      limits[19]=5.0;        // csv
-limits[20]=0.04;     limits[21]=0.08;       // dsv
-limits[22]=2.0;      limits[23]=15.0;       // Vsv0
-limits[24]=0.2478;  limits[25]=0.3718;    // tsvs
-limits[26]=0.001;     limits[27]=0.1;       // Rmyo
-limits[28]=1.0;     limits[29]=30.0;       // alpha
-limits[30]=1.00E-04; limits[31]=2.50E-04;   // Kao
-limits[32]=0.05;     limits[33]=1.0;        // CAo
-limits[34]=-0.2;     limits[35]=0.2;        // tdelay1
-limits[36]=-0.2;     limits[37]=0.2;        // tdelay2
-limits[38]=0.0;     limits[39]=1.00;        // beta
-limits[42]=0.1;   limits[43]=0.7;           //RAA
-limits[44]=0.05;    limits[45]=1.0;         //CAA
-limits[46]=5.0;     limits[47]=40.0;        // Vsv
-limits[48]=1.0;      limits[49]=15.0;       // Vsa
-limits[50]=-0.1;     limits[51]=100.0;      // Qav
-// CHECK RANGES ??
-limits[52]=10.0;    limits[53]=80.0; //PAA
-//limits[54]=-10.0;   limits[55]=100.0; //QAA
-
+void odeSingleVentricleHeartIND::getDefaultParameterLimits(stdVec& limits){
+  limits.resize(2*getParameterTotal());
+  // COMMON PARAMETER RANGES
+  limits[0]=117.65;    limits[1]=117.65; // HR      
+  limits[2]=0.05;      limits[3]=2.0; // Csa
+  limits[4]=0.01;      limits[5]=0.8; // csa
+  limits[6]=0.16;      limits[7]=0.8; // dsa
+  limits[8]=0.1;       limits[9]=15.0; // Vsa0
+  limits[10]=0.1739;   limits[11]=0.2599; // tsas
+  limits[12]=0.01;     limits[13]=0.15; // t1_ratio
+  limits[14]=-0.20;    limits[15]=-0.005; // a
+  limits[16]=8.0;      limits[17]=15.0; // b
+  limits[18]=0.1;      limits[19]=5.0; // csv
+  limits[20]=0.04;     limits[21]=0.08; // dsv
+  limits[22]=2.0;      limits[23]=15.0; // Vsv0
+  limits[24]=0.2478;   limits[25]=0.3718; // tsvs
+  limits[26]=0.001;    limits[27]=0.1; // Rmyo
+  limits[28]=1.0;      limits[29]=30.0; // alpha
+  limits[30]=1.00E-04; limits[31]=2.50E-04; // Kao
+  limits[32]=0.05;     limits[33]=1.0; // CAo
+  limits[34]=-0.2;     limits[35]=0.2; // tdelay1
+  limits[36]=-0.2;     limits[37]=0.2; // tdelay2
+  limits[38]=0.0;      limits[39]=1.00; // beta
+  limits[40]=0.000;    limits[41]=0.000; // k_bw
+  limits[42]=0.1;      limits[43]=0.7; //RAA
+  limits[44]=0.05;     limits[45]=1.0; //CAA
+  limits[46]=5.0;      limits[47]=40.0; // Vsv
+  limits[48]=1.0;      limits[49]=15.0; // Vsa
+  limits[50]=-0.1;     limits[51]=100.0; // Qav
+  limits[52]=10.0;     limits[53]=80.0; //PAA
+  limits[54]=-10.0;    limits[55]=100.0; //QAA
 }
 
 // =======================================
 // GET FOURIER COEFFICIENTS FOR ALL MODELS
 // =======================================
-void getFourierCoefficients(int patientID,
-                            double &ain1,double &ain2,double &ain3,double &ain4,double &ain5,double &ain6,double &ain7,double &ain8,double &ain9,
+void getFourierCoefficients(double &ain1,double &ain2,double &ain3,double &ain4,double &ain5,double &ain6,double &ain7,double &ain8,double &ain9,
                             double &bin1,double &bin2,double &bin3,double &bin4,double &bin5,double &bin6,double &bin7,double &bin8,
                             double &aout1,double &aout2,double &aout3,double &aout4,double &aout5,double &aout6,double &aout7,double &aout8,double &aout9,
                             double &bout1,double &bout2,double &bout3,double &bout4,double &bout5,double &bout6,double &bout7,double &bout8){
 
-  switch(patientID){
-    case piMUSC7:
-      // IN
-      ain9  = 25.27; ain1  = 4.215; bin1  = 0.8914; ain2  = -15.74;
-      bin2  = 18.16; ain3  = 0.8737; bin3  = 13.62; ain4  = 1.966;
-      bin4  = 1.185; ain5  = -0.9142; bin5  = -0.928; ain6  = -0.8623;
-      bin6  = -0.7006; ain7  = -0.7609; bin7  = -0.7781; ain8  = -0.3597;
-      bin8  = -0.2047;
-      // OUT
- //     aout9 = 25.27; aout1 = 2.985; bout1 = 38.75; aout2 = -20.02;
- //     bout2 = 5.519; aout3 = -4.378; bout3 = -2.792; aout4 = -3.966;
- //     bout4 = -2.693; aout5 = 0.3378; bout5 = -1.732; aout6 = -1.418;
- //     bout6 = -0.7536; aout7 = 0.4665; bout7 = -1.528; aout8 = 0.1099;
- //     bout8 = -0.1978;
+  ain9  = 25.27; ain1  = 4.215; bin1  = 0.8914; ain2  = -15.74;
+  bin2  = 18.16; ain3  = 0.8737; bin3  = 13.62; ain4  = 1.966;
+  bin4  = 1.185; ain5  = -0.9142; bin5  = -0.928; ain6  = -0.8623;
+  bin6  = -0.7006; ain7  = -0.7609; bin7  = -0.7781; ain8  = -0.3597;
+  bin8  = -0.2047;
 
-       aout9 = 52.41; aout1 = -10.71; bout1 = 16.74; aout2 = -8.7; bout2 = 0.7979;
-       aout3 = -3.689; bout3 = -3.076; aout4 = -0.3673; bout4 = -2.749; aout5 = 0.8319;       
-       bout5 = -1.328; aout6 = 0.7661; bout6 = -0.3316; aout7 = 0.4237;
-       bout7 = 0.006969; aout8 = 0.2383; bout8 = 0.04639;
-
-      break;
-    case piGOSH22:
-      // IN
-      ain9 = 30.9000; ain1 = 12.68; bin1 = 8.084; ain2 = -5.854;
-      bin2 = 12.94; ain3 = 2.268; bin3 = 14.5; ain4 = 5.428;
-      bin4 = 5.509; ain5 = 1.127; bin5 = -0.02417; ain6 = -0.9529;
-      bin6 = 1.288; ain7 = 0.02309; bin7 = 2.042; ain8 = 1.701;
-      bin8 = 1.185; 
-
-      // OUT
-      aout9 = 30.9; aout1 = -6.947; bout1 = 44.99; aout2 = -19.54;
-      bout2 = -5.84; aout3 = -4.985; bout3 = -1.725; aout4 = -0.6823;
-      bout4 = -7.198; aout5 = 0.9297; bout5 = 0.1342; aout6 = 2.621;
-      bout6 = -2.509; aout7 = -0.3764; bout7 = 0.2258; aout8 = 3.036;
-      bout8 = 0.981;
-      break;    
-    case piUM5:
-      // IN
-      ain9  = 27.0; ain1  = 7.542; bin1  = -13.82; ain2  = -6.66;
-      bin2  = 4.644; ain3  = 9.326; bin3  = 5.277; ain4  = 2.712;
-      bin4  = -4.035; ain5  = -2.085; bin5  = 0.6408; ain6  = 0.6892;
-      bin6  = 0.9538; ain7  = 0.1489; bin7  = -0.4545; ain8  = -0.146;
-      bin8  = 0.1484;
-
-      // UM5
-      aout9 = 27.0; aout1 = -3.363; bout1 = 45.75; aout2 = -27.08;
-      bout2 = -6.219; aout3 = 2.727; bout3 = -5.342; aout4 = -4.479;
-      bout4 = -4.271; aout5 = 6.097; bout5 = -3.46; aout6 = 0.006244;
-      bout6 = 1.076; aout7 = 3.617; bout7 = -0.4042; aout8 = -0.8963;
-      bout8 = 2.68;
-      break;    
-    case piUM10:
-      // IN
-      ain9  = 31.00; ain1  = 52.14; bin1  = 48.68; ain2  = 41.51;
-      bin2  = -16.3; ain3  = -10.94; bin3  = -15.69; ain4  = -2.48;
-      bin4  = 8.581; ain5  = 5.62; bin5  = -2.684; ain6  = -3.14;
-      bin6  = -1.915; ain7  = -0.7532; bin7  = 2.063; ain8  = 0.6098;
-      bin8  = -0.06847;
-      // OUT
-      aout9 = 31.0; aout1 = -21.39; bout1 = 38.55; aout2 = -6.096;
-      bout2 = -10.44; aout3 = -5.572; bout3 = -0.8667; aout4 = 3.533;
-      bout4 = -1.758; aout5 = -0.03423; bout5 = -1.978; aout6 = 2.069;
-      bout6 = 0.1064; aout7 = 0.3559; bout7 = -0.8598; aout8 = -0.3213;
-      bout8 = 1.997;
-      break;
-  }
+  aout9 = 52.41; aout1 = -10.71; bout1 = 16.74; aout2 = -8.7; bout2 = 0.7979;
+  aout3 = -3.689; bout3 = -3.076; aout4 = -0.3673; bout4 = -2.749; aout5 = 0.8319;       
+  bout5 = -1.328; aout6 = 0.7661; bout6 = -0.3316; aout7 = 0.4237;
+  bout7 = 0.006969; aout8 = 0.2383; bout8 = 0.04639;
 }
 
 // =====================
 // SOLVE SINGLE ODE STEP
 // =====================
-void heartODE(int patientID, double tn, double* Xn, double* params, double* Xn1,double* out){
+void odeSingleVentricleHeartIND::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, 
+                                           stdVec& DXk, stdVec& auxOut, stdVec& Ind){
 
   // INITIALIZE VARIABLES
   // STORE LOCAL COPIES OF PARAMETERS
@@ -690,105 +518,6 @@ void heartODE(int patientID, double tn, double* Xn, double* params, double* Xn1,
   out[13] = QAA;
 }
 
-// =============================
-// EVAL MODEL FOR RK4 ITERATIONS
-// =============================
-void evalModel(int modelID, double t,int totalStates,double* Xk,double* params,double* DXk,double* auxOut){
-  // SOLVE HEART MODEL
-  heartODE(modelID,t,Xk,params,DXk,auxOut);
-}
-
-// ==================
-// SOLVE ODE WITH RK4
-// ==================
-void PerformRK4Steps(int modelID, int totalSteps,double timeStep,int totalStates,int totAuxStates,double* iniVals,int totalParams, double* params,double** outVals,double** auxOutVals){
-
-  // Intialize Current Time
-  double currTime = 0.0;
-  int stepId = 0;
-  const bool printIC = false;
-
-  // Allocate Temporary Variables
-  double k1[totalStates];
-  double k2[totalStates];
-  double k3[totalStates];
-  double k4[totalStates];
-  double k1AuxOut[totAuxStates];
-  double k2AuxOut[totAuxStates];
-  double k3AuxOut[totAuxStates];
-  double k4AuxOut[totAuxStates];
-  double Xk2[totalStates];
-  double Xk3[totalStates];
-  double Xk4[totalStates];
-
-  // Initialize State Vectors and Copy Initial Conditions
-  double Xn[totalStates];
-  double Xn1[totalStates];
-  for(int loopA=0;loopA<totalStates;loopA++){
-    Xn[loopA] = iniVals[loopA];
-  }
-
-  // TIME LOOP
-  for(int loopA=0;loopA<totalSteps;loopA++){
-    // Increment Time Step
-    stepId++;
-
-    // Update Current Time
-    if(loopA>0){
-      currTime += timeStep;
-    }
-    // Eval K1
-    evalModel(modelID,currTime,totalStates,Xn,params,k1,k1AuxOut);
-    // Eval K2
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xk2[loopB] = Xn[loopB] + (0.5*timeStep) * k1[loopB];
-    }
-    evalModel(modelID,currTime + 0.5 * timeStep,totalStates,Xk2,params,k2,k2AuxOut);
-    // Eval K3
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xk3[loopB] = Xn[loopB] + (0.5*timeStep) * k2[loopB];
-    }
-    evalModel(modelID,currTime + 0.5 * timeStep,totalStates,Xk3,params,k3,k3AuxOut);
-    // Eval K4
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xk4[loopB] = Xn[loopB] + timeStep * k3[loopB];
-    }
-    evalModel(modelID,currTime + timeStep,totalStates,Xk4,params,k4,k4AuxOut);
-
-    // Eval Xn1
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xn1[loopB] = Xn[loopB] + (1.0/6.0)*timeStep*(k1[loopB] + 2.0 * k2[loopB] + 2.0 * k3[loopB] + k4[loopB]);
-    }
-
-    // Update Xn
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xn[loopB] = Xn1[loopB];
-    }
-
-    // Copy back k1AuxOut for each time step
-    for(int loopB=0;loopB<totAuxStates;loopB++){
-      auxOutVals[loopA][loopB] = k1AuxOut[loopB];
-    }
-    // Copy The solution back for each time step
-    for(int loopB=0;loopB<totalStates;loopB++){
-      outVals[loopA][loopB] = Xn1[loopB];
-    }
-  }
-}
-
-// ================================
-// WRITE TARGET QUANTITTIES TO FILE
-// ================================
-void WriteTargetsToFile(std::string outputFileName,int totTargets,double* targetVals){
-  // WRITE TO FILE
-  FILE* outFile;
-  outFile = fopen(outputFileName.c_str(),"w");
-  for(int loopA=0;loopA<totTargets;loopA++){
-    fprintf(outFile,"%f\n",targetVals[loopA]);
-  }
-  // CLOSE THE FILE
-  fclose(outFile);
-}
 
 // =================================
 // EVAL SIMULATION TARGET QUANTITIES
@@ -840,152 +569,6 @@ void EvalSimulationTargets(int totalSteps,double timeStep,double singleCycleTime
     }
   }
   strokeVolLV = maxVol - minVol;
-}
-
-// =====================
-// PRINT PARAMETER TABLE
-// =====================
-void printParamTable(double cycleTime,int numCycles,double totalTime,double timeStep,
-                   int totalSteps,int totalStepsOnSingleCycle,double* params,double* iniVals){
-  FILE* outFile;
-  outFile = fopen("paramTable.txt","w");
-  // Print Header
-  fprintf(outFile,"\\begin{table}[h!]\n");
-  fprintf(outFile,"\\centering\n");
-  fprintf(outFile,"\\begin{tabular}{l c}\n");
-  fprintf(outFile,"\\toprule\n");
-  fprintf(outFile,"Parameter & Value\\\\\n");
-  fprintf(outFile,"\\midrule\n");
-  fprintf(outFile,"Heart Rate & %f\\\\\n",params[0]);
-  fprintf(outFile,"Heart Cycle Time [s] & %f\\\\\n",cycleTime);
-  fprintf(outFile,"Number of Heart Cycles [s] & %d\\\\\n",numCycles);
-  fprintf(outFile,"Total Simulation Time [s] & %f\\\\\n",totalTime);
-  fprintf(outFile,"Time Step [s] & %f\\\\\n",timeStep);
-  fprintf(outFile,"Total Simulation Steps & %d\\\\\n",totalSteps);
-  fprintf(outFile,"Steps per Heart Cycle & %d\\\\\n",totalStepsOnSingleCycle);
-  fprintf(outFile,"\\midrule\n");
-  fprintf(outFile,"Heart Rate & %f\\\\\n",params[0]);
-  fprintf(outFile,"$C_{sa}$ & %f\\\\\n",params[1]);
-  fprintf(outFile,"$c_{sa}$ & %f\\\\\n",params[2]);
-  fprintf(outFile,"$dsa$ & %f\\\\\n",params[3]);
-  fprintf(outFile,"$V_{sa,0}$ & %f\\\\\n",params[4]);
-  fprintf(outFile,"$t_{sas,r}$ & %f\\\\\n",params[5]);    
-  fprintf(outFile,"$t_{1,r}$ & %f\\\\\n",params[6]);
-  fprintf(outFile,"$a$ & %f\\\\\n",params[7]);
-  fprintf(outFile,"$b$ & %f\\\\\n",params[8]);
-  fprintf(outFile,"$c_{sv}$ & %f\\\\\n",params[9]);
-  fprintf(outFile,"$d_{sv}$ & %f\\\\\n",params[10]);
-  fprintf(outFile,"$V_{sv,0}$ & %f\\\\\n",params[11]);
-  fprintf(outFile,"$t_{svs,r}$ & %f\\\\\n",params[12]);
-  fprintf(outFile,"$R_{myo}$ & %f\\\\\n",params[13]);
-  fprintf(outFile,"$\\alpha$ & %f\\\\\n",params[14]);
-  fprintf(outFile,"$K_{ao}$ & %f\\\\\n",params[15]);
-  fprintf(outFile,"$C_{Ao}$ & %f\\\\\n",params[16]);
-  fprintf(outFile,"$t_{d,1}$ & %f\\\\\n",params[17]);
-  fprintf(outFile,"$t_{d,2}$ & %f\\\\\n",params[17]);
-  fprintf(outFile,"$\\beta$ & %f\\\\\n",params[19]);
-  fprintf(outFile,"$k_{bw}$ & %f\\\\\n",params[20]);
-  fprintf(outFile,"$L_{AA}$ & %f\\\\\n",params[21]);
-  fprintf(outFile,"$Q_{AA}$ & %f\\\\\n",params[22]);
-  fprintf(outFile,"\\midrule\n");
-  fprintf(outFile,"$V_{sv}$ & %f\\\\\n",iniVals[0]);
-  fprintf(outFile,"$V_{sa}$ & %f\\\\\n",iniVals[1]);
-  fprintf(outFile,"$Q_{av}$ & %f\\\\\n",iniVals[2]);
-  fprintf(outFile,"$P_{AA}$ & %f\\\\\n",iniVals[3]);
-  //fprintf(outFile,"$Q_{AA}$ & %f\\\\\n",iniVals[4]);
-  fprintf(outFile,"\\bottomrule\n");
-  fprintf(outFile,"\\end{tabular}\n");
-  fprintf(outFile,"\\caption{Optimal Heart Model (with Inductance) Parameters for patient \\patient}\n");
-  fprintf(outFile,"\\end{table}\n");
-  // CLOSE THE FILE
-  fclose(outFile);
-}
-
-// =====================
-// PRINT PARAMETER TABLE
-// =====================
-void printParamLimitsTable(int model, int par_num){
-  string currParamName;
-  // Get Model Limits
-  double limits[2*par_num];
-  getModelLimits(model,par_num,limits);
-  // Print Table
-  FILE* outFile;
-  outFile = fopen("paramLimitsTable.txt","w");
-  // Print Header
-  fprintf(outFile,"\\begin{table}[h!]\n");
-  fprintf(outFile,"\\centering\n");
-  fprintf(outFile,"\\begin{tabular}{l c c}\n");
-  fprintf(outFile,"\\toprule\n");
-  fprintf(outFile,"Parameter & Min & Max\\\\\n");
-  fprintf(outFile,"\\midrule\n");
-  for(int loopA=0;loopA<par_num;loopA++){
-    currParamName = getParamName(loopA);
-    fprintf(outFile,"%s & %f & %f\\\\\n",currParamName.c_str(),limits[loopA*2 + 0],limits[loopA*2 + 1]);
-  }
-  fprintf(outFile,"\\bottomrule\n");
-  fprintf(outFile,"\\end{tabular}\n");
-  fprintf(outFile,"\\caption{Parameter limits used for heart model (with Inductance) identification, patient \\patient}\n");
-  fprintf(outFile,"\\end{table}\n");
-  // CLOSE THE FILE
-  fclose(outFile);
-}
-
-// ========================
-// FLUSH MODEL DATA TO FILE
-// ========================
-void flushHeartModelDataToFile(string outFileName,int start, int stop ,double* t,double** outVals,double** auxOutVals){
-
-  FILE* outFile;
-  outFile = fopen(outFileName.c_str(),"w");
-  fprintf(outFile,"%20s %20s %20s %20s %20s %20s %20s %20s %20s %20s\n","t","Vsv","Vsa","Qven","Qav","QAA","Psv","Psa","PAo","PAA");
-  for(int loopA=start;loopA<stop;loopA++){    
-    fprintf(outFile,"%20e %20e %20e %20e %20e %20e %20e %20e %20e %20e\n",
-    	    t[loopA],outVals[loopA][ipVsv],outVals[loopA][ipVsa],auxOutVals[loopA][ipQven],outVals[loopA][ipQav],auxOutVals[loopA][ipQAA],
-            auxOutVals[loopA][ipPsvEff],auxOutVals[loopA][ipPsa],auxOutVals[loopA][ipPAo],outVals[loopA][ipPAA]);
-  }
-  fclose(outFile);
-}
-
-// ==============================
-// CHECK IF THE RESULTS ARE VALID
-// ==============================
-bool validHeartLPNResults(double* results){
-  bool answer = true;
-
-  // mPascAo;
-  if((results[0]<0.0)||(results[0]>300.0)){
-  	answer = false;
-  	return answer;
-  }
-
-  // maxPAo;
-  if((results[1]<0.0)||(results[1]>300.0)){
-  	answer = false;
-  	return answer;
-  }
-
-  // mPsa;
-  if((results[2]<0.0)||(results[2]>300.0)){
-  	answer = false;
-  	return answer;
-  }
-
-  // maxPsv;
-  if((results[3]<0.0)||(results[3]>300.0)){
-  	answer = false;
-  	return answer;
-  }
-
-  // maxVsv;
-  if((results[4]<0.0)||(results[4]>300.0)){
-  	answer = false;
-  	return answer;
-  }
-
-  // RETURN
-  return answer;
-
 }
 
 // ================================
@@ -1192,24 +775,6 @@ int solveLPN(int modelID, lpnOptions options, int totalStates, double* iniVals,i
   results[6] = Psv[0];
   results[7] = maxPsa;
   results[8] = mQreg;
-
-  // printf("%f %f %f %f %f\n",mPascAo,maxPAo,mPsa,maxPsv,maxVsv);
-
-  if(!validHeartLPNResults(results)){
-  	// Return invalid
-    return 1;
-  }
-
-  // FREE MEMORY
-  for(int loopA=0;loopA<totalSteps;loopA++){
-    delete [] outVals[loopA];
-    delete [] auxOutVals[loopA];
-  }
-  delete [] outVals;
-  delete [] auxOutVals;
-
-  // Solution Successful
-  return 0;
 
 }
 

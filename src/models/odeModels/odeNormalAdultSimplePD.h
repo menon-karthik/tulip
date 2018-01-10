@@ -1,16 +1,26 @@
-#ifndef ODENORMALADULTSIMPLEPA_H
-#define ODENORMALADULTSIMPLEPA_H
+#ifndef ODENORMALADULTSIMPLEPD_H
+#define ODENORMALADULTSIMPLEPD_H
 
+# include <string>
 # include <stdio.h>
 # include <string>
-# include "stdlib.h"
 # include "math.h"
 # include "uqTypes.h"
 # include "odeModel.h"
-# include "cmModel.h"
-# include "cmConstants.h"
 # include "cmUtils.h"
+# include "cmConstants.h"
 # include "cmException.h"
+
+// Constants for Variable and Auxiliary outputs
+const int ipAuxRAPressure = 5;
+const int ipAuxRVPressure = 7;
+const int ipAuxLVPressure = 8;
+const int ipPAAPressure = 5;
+const int ipPAVPressure = 6;
+const int ipAOPressure = 9;
+const int ipRVVolume = 2;
+const int ipLVVolume = 3;
+const int ipAOFlow = 10;
 
 // Constants for Result Quantities
 // Results v-0001
@@ -58,42 +68,35 @@ const int ip_0002_pap_diastolic              = 23;
 const int ip_0002_pap_systolic               = 24;
 const int ip_0002_wedge_pressure             = 25;
 
-// Types of target configuration
-const int ipTargetConfig_ExcludePAP = 0;
-const int ipTargetConfig_HRBPCVP    = 1;
-
-// GENERIC CLASS FOR SAMPLES
-class odeNormalAdultSimplePA: public odeModel{
+class odeNormalAdultSimplePD: public odeModel{
   private:
     // Types of result configuration
     int modelVersion;
-    // Set Target Configuration Mode
-    int targetConfigMode;
 
   public:
+
+    //! Default constructor
+    odeNormalAdultSimplePD(int modelVersion);
+    //! Virtual destructor
+    virtual ~odeNormalAdultSimplePD();
+
+    // Virtual functions to be implemented by child classes
+    virtual int    getParameterTotal() = 0;
+    virtual int    getStateTotal() = 0;
+    virtual int    getResultTotal() = 0;
+    virtual int    getAuxStateTotal() = 0;
+    virtual void   getDefaultParams(stdVec& params) = 0;
+    virtual void   getDefaultParameterLimits(stdVec& limits) = 0;
+    virtual string getParamName(int parID) = 0;
+    virtual string getResultName(int resID) = 0;
+    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind) = 0;
+    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
+    virtual void   getResultKeys(stdStringVec& keys) = 0;
+    virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs) = 0;
+    virtual void   getDataSTD(stdVec& stds) = 0;
+    virtual void   getResultWeigths(stdVec& weights) = 0;    
+    virtual int    getHRIndex() = 0;
     
-    // CONSTRUCTOR
-    odeNormalAdultSimplePA(int modelVersion,int targetConfigMode);
-
-    // DESTRUCTOR
-    virtual ~odeNormalAdultSimplePA();
-
-    // VIRTUAL FUNCTIONS TO IMPLEMENT
-    virtual int    getParameterTotal();
-    virtual string getParamName(int parID);
-    virtual int    getStateTotal();
-    virtual int    getResultTotal();
-    virtual int    getAuxStateTotal();
-    virtual string getResultName(int resID);
-    virtual void   getDefaultParameterLimits(stdVec& limits);
-    virtual void   getDefaultParams(stdVec& params);
-    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind);
-    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
-    virtual void   getResultKeys(stdStringVec& keys);
-    virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs);
-    virtual void   getDataSTD(stdVec& stds);
-    virtual void   getResultWeigths(stdVec& weights);
-    virtual int    getHRIndex();
 };
 
-#endif // ODENORMALADULTSIMPLEPA_H
+#endif // ODENORMALADULTSIMPLEPD_H

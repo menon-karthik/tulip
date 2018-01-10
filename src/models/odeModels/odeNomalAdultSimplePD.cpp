@@ -1,68 +1,12 @@
 # include "odeNormalAdultSimplePD.h"
 
-// Constants for Variable and Auxiliary outputs
-const int ipAuxRAPressure = 5;
-const int ipAuxRVPressure = 7;
-const int ipAuxLVPressure = 8;
-const int ipPAAPressure = 5;
-const int ipPAVPressure = 6;
-const int ipAOPressure = 9;
-const int ipRVVolume = 2;
-const int ipLVVolume = 3;
-const int ipAOFlow = 10;
-
-// Constants for Result Quantities
-// Results v-0001
-const int ip_0001_HR   = 0;
-const int ip_0001_SBP  = 1;
-const int ip_0001_DBP  = 2;
-const int ip_0001_mBP  = 3;
-const int ip_0001_RAP  = 4;
-const int ip_0001_sPAP = 5;
-const int ip_0001_dPAP = 6;
-const int ip_0001_mPAP = 7;
-const int ip_0001_PWP  = 8;
-const int ip_0001_CO   = 9;
-const int ip_0001_PVR  = 10;
-const int ip_0001_SVR  = 11;
-const int ip_0001_CVP  = 12;
-const int ip_0001_LVEF = 13;
-const int ip_0001_RVEF = 14;
-
-// Results v-0002
-const int ip_0002_heart_rate2                = 0;
-const int ip_0002_systolic_bp_2              = 1;
-const int ip_0002_diastolic_bp_2             = 2;
-const int ip_0002_cardiac_output             = 3;
-const int ip_0002_systemic_vascular_resistan = 4;
-const int ip_0002_pulmonary_vascular_resista = 5;
-const int ip_0002_cvp                        = 6;
-const int ip_0002_right_ventricle_diastole   = 7;
-const int ip_0002_right_ventricle_systole    = 8;
-const int ip_0002_rvedp                      = 9;
-const int ip_0002_aov_mean_pg                = 10;
-const int ip_0002_aov_peak_pg                = 11;
-const int ip_0002_mv_decel_time              = 12;
-const int ip_0002_mv_e_a_ratio               = 13;
-const int ip_0002_pv_at                      = 14;
-const int ip_0002_pv_max_pg                  = 15;
-const int ip_0002_ra_pressure                = 16;
-const int ip_0002_ra_vol_a4c                 = 17;
-const int ip_0002_la_vol_a4c                 = 18;
-const int ip_0002_lv_esv                     = 19;
-const int ip_0002_lv_vol                     = 20;
-const int ip_0002_lvef                       = 21;
-const int ip_0002_lvot_max_flow              = 22;
-const int ip_0002_pap_diastolic              = 23;
-const int ip_0002_pap_systolic               = 24;
-const int ip_0002_wedge_pressure             = 25;
-
 using namespace std;
 
-odeNormalAdultSimplePD::odeNormalAdultSimplePD(int cycles, int stepsPerCycle){
-  this->data = NULL;
-  this->numCycles = cycles;
-  this->totalStepsOnSingleCycle = stepsPerCycle;
+odeNormalAdultSimplePD::odeNormalAdultSimplePD(int modelVersion){
+  this->modelVersion = modelVersion;
+}
+
+odeNormalAdultSimplePD::~odeNormalAdultSimplePD(){
 }
 
 int odeNormalAdultSimplePD::getParameterTotal(){
@@ -81,210 +25,213 @@ int odeNormalAdultSimplePD::getResultTotal(){
   return 15;  
 }
 
+int odeNormalAdultSimplePD::getHRIndex(){
+  return 12;
+}
+
 string odeNormalAdultSimplePD::getParamName(int index){
+  string res;
   switch(index){
     case 0:
-      return string("V_ra_ini");
+      res = string("V_ra_ini");
       break;
     case 1:
-      return string("V_la_ini");
+      res = string("V_la_ini");
       break;
     case 2:
-      return string("V_rv_ini");
+      res = string("V_rv_ini");
       break;
     case 3:
-      return string("V_lv_ini");
+      res = string("V_lv_ini");
       break;
     case 4:
-      return string("Q_ra_rv_ini");
+      res = string("Q_ra_rv_ini");
       break;
     case 5:
-      return string("P_pa_a_ini");
+      res = string("P_pa_a_ini");
       break;
     case 6:
-      return string("P_pa_v_ini");
+      res = string("P_pa_v_ini");
       break;
     case 7:
-      return string("Q_rv_pa_ini");
+      res = string("Q_rv_pa_ini");
       break;
     case 8:
-      return string("Q_la_lv_ini");
+      res = string("Q_la_lv_ini");
       break;
     case 9:
-      return string("P_ao_ini");
+      res = string("P_ao_ini");
       break;
     case 10:
-      return string("Q_lv_ao_ini");
+      res = string("Q_lv_ao_ini");
       break;
     case 11:
-      return string("P_sys_ini");
+      res = string("P_sys_ini");
       break;
     case 12:
-      return string("HR");
+      res = string("HR");
       break;
     case 13:
-      return string("tsas");
+      res = string("tsas");
       break;
     case 14:
-      return string("tpws");
+      res = string("tpws");
       break;
     case 15:
-      return string("tsvs");
+      res = string("tsvs");
       break;
     case 16:
-      return string("K_pas_ra_1");
+      res = string("K_pas_ra_1");
       break;
     case 17:
-      return string("K_pas_ra_2");
+      res = string("K_pas_ra_2");
       break;
     case 18:
-      return string("Emax_ra");
+      res = string("Emax_ra");
       break;
     case 19:
-      return string("Vra0");
+      res = string("Vra0");
       break;
     case 20:
-      return string("K_pas_la_1");
+      res = string("K_pas_la_1");
       break;
     case 21:
-      return string("K_pas_la_2");
+      res = string("K_pas_la_2");
       break;
     case 22:
-      return string("Emax_la");
+      res = string("Emax_la");
       break;
     case 23:
-      return string("Vla0");
+      res = string("Vla0");
       break;
     case 24:
-      return string("K_pas_rv_1");
+      res = string("K_pas_rv_1");
       break;
     case 25:
-      return string("K_pas_rv_2");
+      res = string("K_pas_rv_2");
       break;
     case 26:
-      return string("Emax_rv");
+      res = string("Emax_rv");
       break;
     case 27:
-      return string("Vrv0");
+      res = string("Vrv0");
       break;
     case 28:
-      return string("K_pas_lv_1");
+      res = string("K_pas_lv_1");
       break;
     case 29:
-      return string("K_pas_lv_2");
+      res = string("K_pas_lv_2");
       break;
     case 30:
-      return string("Emax_lv");
+      res = string("Emax_lv");
       break;
     case 31:
-      return string("Vlv0");
+      res = string("Vlv0");
       break;
     case 32:
-      return string("L_ra_rv");
+      res = string("L_ra_rv");
       break;
     case 33:
-      return string("R_ra_rv");
+      res = string("R_ra_rv");
       break;
     case 34:
-      return string("L_rv_pa");
+      res = string("L_rv_pa");
       break;
     case 35:
-      return string("R_rv_pa");
+      res = string("R_rv_pa");
       break;
     case 36:
-      return string("L_la_lv");
+      res = string("L_la_lv");
       break;
     case 37:
-      return string("R_la_lv");
+      res = string("R_la_lv");
       break;
     case 38:
-      return string("L_lv_ao");
+      res = string("L_lv_ao");
       break;
     case 39:
-      return string("R_lv_ao");
+      res = string("R_lv_ao");
       break;
     case 40:
-      return string("C_ao");
+      res = string("C_ao");
       break;
     case 41:
-      return string("C_pa_a");
+      res = string("C_pa_a");
       break;
     case 42:
-      return string("C_pa_v");
+      res = string("C_pa_v");
       break;
     case 43:
-      return string("R_pa_a");
+      res = string("R_pa_a");
       break;
     case 44:
-      return string("R_pa_c");
+      res = string("R_pa_c");
       break;
     case 45:
-      return string("R_pa_v");
+      res = string("R_pa_v");
       break;
     case 46:
-      return string("C_sys");
+      res = string("C_sys");
       break;
     case 47:
-      return string("R_sys_a");
+      res = string("R_sys_a");
       break;
     case 48:
-      return string("R_sys_v");
+      res = string("R_sys_v");
       break;
   }
+  return res;
 }
 
 string odeNormalAdultSimplePD::getResultName(int index){
+  string res;
   switch(index){
     case 0:
-      return string("HR");
+      res = string("HR");
       break;
     case 1:
-      return string("SBP");
+      res = string("SBP");
       break;
     case 2:
-      return string("DBP");
+      res = string("DBP");
       break;
     case 3:
-      return string("mBP");
+      res = string("mBP");
       break;
     case 4:
-      return string("RAP");
+      res = string("RAP");
       break;
     case 5:
-      return string("sPAP");
+      res = string("sPAP");
       break;
     case 6:
-      return string("dPAP");
+      res = string("dPAP");
       break;
     case 7:
-      return string("mPAP");
+      res = string("mPAP");
       break;
     case 8:
-      return string("PWP");
+      res = string("PWP");
       break;
     case 9:
-      return string("CO");
+      res = string("CO");
       break;
     case 10:
-      return string("PVR");
+      res = string("PVR");
       break;
     case 11:
-      return string("SVR");
+      res = string("SVR");
       break;
     case 12:
-      return string("CVP");
+      res = string("CVP");
       break;
     case 13:
-      return string("LVEF");
+      res = string("LVEF");
       break;
     case 14:
-      return string("RVEF");
+      res = string("RVEF");
       break;
   }
-}
-
-void odeNormalAdultSimplePD::getPriorMapping(int priorModelType,int* prPtr){
-  throw cmException("Not Implemented!");
 }
 
 void odeNormalAdultSimplePD::getDefaultParams(stdVec& params){
@@ -436,20 +383,8 @@ void odeNormalAdultSimplePD::getDefaultParameterLimits(stdVec& limits){
 
 }
 
-void odeNormalAdultSimplePD::getParameterLimits(stdVec& limits){
-  // Get Default Parameters
-  getDefaultParameterLimits(limits);
-  // Change the limits bases on the Fixed Parameter List
-  int currParam = 0;
-  for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
-    currParam = frozenParamIDX[loopA];
-    // Assign the new lower and upper bounds to the center
-    limits[currParam*2]     = frozenParamVAL[loopA];
-    limits[currParam*2 + 1] = frozenParamVAL[loopA];
-  }
-}
-
-void odeNormalAdultSimplePD::lpnODE(double tn, stdVec Xn, stdVec params, stdVec& Xn1, stdVec& out, stdVec& Ind){
+void odeNormalAdultSimplePD::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, 
+                                       stdVec& DXk, stdVec& auxOut, stdVec& Ind){
 
   // Assign the Parameters
   double HR         = params[0]; // Heart Rate
@@ -499,33 +434,33 @@ void odeNormalAdultSimplePD::lpnODE(double tn, stdVec Xn, stdVec params, stdVec&
   double R_sys_v    = params[36];
 
   // Assign state variables
-  double V_ra    = Xn[0];
-  double V_la    = Xn[1];
-  double V_rv    = Xn[2];
-  double V_lv    = Xn[3];
-  double Q_ra_rv = Xn[4];
-  double P_pa_a  = Xn[5];
-  double P_pa_v  = Xn[6];
-  double Q_rv_pa = Xn[7];
-  double Q_la_lv = Xn[8];
-  double P_ao    = Xn[9];
-  double Q_lv_ao = Xn[10];
-  double P_sys   = Xn[11];
+  double V_ra    = Xk[0];
+  double V_la    = Xk[1];
+  double V_rv    = Xk[2];
+  double V_lv    = Xk[3];
+  double Q_ra_rv = Xk[4];
+  double P_pa_a  = Xk[5];
+  double P_pa_v  = Xk[6];
+  double Q_rv_pa = Xk[7];
+  double Q_la_lv = Xk[8];
+  double P_ao    = Xk[9];
+  double Q_lv_ao = Xk[10];
+  double P_sys   = Xk[11];
 
   // SET OPTIONS
   bool printMessages = false;
-  int totalStates = Xn.size();
+  int totalStates = Xk.size();
 
   // Set Time integration parameters
   double tc = 60.0/HR;
   double tsa = tc * tsas;
   double tsv = tc * tsvs;
   double tpw = tc/(double)tpws;
-  double tcr = fmod(tn,tc);
+  double tcr = fmod(t,tc);
 
   if(printMessages){
     printf("--- TIME CYCLE\n");
-    printf("Current Time: %f\n",tn);
+    printf("Current Time: %f\n",t);
   }
 
   // ====================================================
@@ -534,7 +469,7 @@ void odeNormalAdultSimplePD::lpnODE(double tn, stdVec Xn, stdVec params, stdVec&
 
   // Heart function
   double tmv = tcr; // Ventricle time
-  double tma = fmod(tn+tsa-tpw,tc); // Atrium time
+  double tma = fmod(t+tsa-tpw,tc); // Atrium time
   
   // Ventricle activation
   double fAV = 0.0;
@@ -704,38 +639,38 @@ void odeNormalAdultSimplePD::lpnODE(double tn, stdVec Xn, stdVec params, stdVec&
   double P_sys_p = (1.0/C_sys) * ( Q_sys_a - Q_sys_v );  
 
   // Store the derivatives
-  Xn1[0] = V_ra_p;
-  Xn1[1] = V_la_p;
-  Xn1[2] = V_rv_p;
-  Xn1[3] = V_lv_p;
-  Xn1[4] = Q_ra_rv_p;
-  Xn1[5] = P_pa_a_p;
-  Xn1[6] = P_pa_v_p;
-  Xn1[7] = Q_rv_pa_p;
-  Xn1[8] = Q_la_lv_p;
-  Xn1[9] = P_ao_p;
-  Xn1[10] = Q_lv_ao_p;
-  Xn1[11] = P_sys_p;
+  DXk[0] = V_ra_p;
+  DXk[1] = V_la_p;
+  DXk[2] = V_rv_p;
+  DXk[3] = V_lv_p;
+  DXk[4] = Q_ra_rv_p;
+  DXk[5] = P_pa_a_p;
+  DXk[6] = P_pa_v_p;
+  DXk[7] = Q_rv_pa_p;
+  DXk[8] = Q_la_lv_p;
+  DXk[9] = P_ao_p;
+  DXk[10] = Q_lv_ao_p;
+  DXk[11] = P_sys_p;
 
   // Get Auxiliary Results
-  out[0] = tn; // Current Time
-  out[1] = tcr; // Relative Cycle Time
-  out[2] = fAA; // Atrial Activation Function
-  out[3] = fAV; // Right Ventricle Elastance
-  out[4] = 0.0;
-  out[5] = P_ra; // Right Atrial Pressure
-  out[6] = P_la; // Left Atrial Pressure
-  out[7] = P_rv; // Right Ventricular Pressure
-  out[8] = P_lv; // Left Ventricular Pressure
-  out[9] = Q_pul_a; // Pulmonary Arterial flow rate
-  out[10] = Q_pul_c; // Pulmonary Capillary flow rate
-  out[11] = Q_pul_v; // Pulmonary Venous flow rate
-  out[12] = Q_sys_a; // Systemic flow Rate - Arteries
-  out[13] = Q_sys_v; // Systemic flow Rate - Veins
-  out[14] = Ind[4]; // RA-RV valve status
-  out[15] = Ind[7]; // RV-PA valve status
-  out[16] = Ind[8]; // LA-LV valve status
-  out[17] = Ind[10]; // LV-AO valve status
+  auxOut[0] = t; // Current Time
+  auxOut[1] = tcr; // Relative Cycle Time
+  auxOut[2] = fAA; // Atrial Activation Function
+  auxOut[3] = fAV; // Right Ventricle Elastance
+  auxOut[4] = 0.0;
+  auxOut[5] = P_ra; // Right Atrial Pressure
+  auxOut[6] = P_la; // Left Atrial Pressure
+  auxOut[7] = P_rv; // Right Ventricular Pressure
+  auxOut[8] = P_lv; // Left Ventricular Pressure
+  auxOut[9] = Q_pul_a; // Pulmonary Arterial flow rate
+  auxOut[10] = Q_pul_c; // Pulmonary Capillary flow rate
+  auxOut[11] = Q_pul_v; // Pulmonary Venous flow rate
+  auxOut[12] = Q_sys_a; // Systemic flow Rate - Arteries
+  auxOut[13] = Q_sys_v; // Systemic flow Rate - Veins
+  auxOut[14] = Ind[4]; // RA-RV valve status
+  auxOut[15] = Ind[7]; // RV-PA valve status
+  auxOut[16] = Ind[8]; // LA-LV valve status
+  auxOut[17] = Ind[10]; // LV-AO valve status
 
   // Stop every iteration when printing messages
   if(printMessages){
@@ -743,292 +678,15 @@ void odeNormalAdultSimplePD::lpnODE(double tn, stdVec Xn, stdVec params, stdVec&
   }
 }
 
-int odeNormalAdultSimplePD::PerformRK4Steps(int totalSteps,double timeStep,stdVec iniVals,stdVec params,stdMat& outVals,stdMat& auxOutVals){
-
-  // Intialize Current Time
-  double currTime = 0.0;
-  int stepId = 0;
-  bool printIC = false;
-  bool isValidDouble = true;
-
-  // Get Total number of States
-  int totalStates = getStateTotal();
-  int totAuxStates = getAuxStateTotal();
-
-  // Allocate Temporary Variables
-  stdVec k1;
-  k1.resize(totalStates);
-  stdVec k2;
-  k2.resize(totalStates);
-  stdVec k3;
-  k3.resize(totalStates);
-  stdVec k4;
-  k4.resize(totalStates);
-  stdVec k1AuxOut;
-  k1AuxOut.resize(totAuxStates);
-  stdVec k2AuxOut;
-  k2AuxOut.resize(totAuxStates);
-  stdVec k3AuxOut;
-  k3AuxOut.resize(totAuxStates);
-  stdVec k4AuxOut;
-  k4AuxOut.resize(totAuxStates);
-  stdVec Xk2;
-  Xk2.resize(totalStates);
-  stdVec Xk3;
-  Xk3.resize(totalStates);
-  stdVec Xk4;
-  Xk4.resize(totalStates);
-  stdVec Ind;
-  Ind.resize(totalStates);
-
-  // Initialize State Vectors and Copy Initial Conditions
-  stdVec Xn;
-  Xn.resize(totalStates);
-  stdVec Xn1;
-  Xn1.resize(totalStates);
-
-  // Initialize Variables
-  for(int loopA=0;loopA<totalStates;loopA++){
-    k1[loopA] = 0.0;
-    k2[loopA] = 0.0;
-    k3[loopA] = 0.0;
-    k4[loopA] = 0.0;
-
-    Xk2[loopA] = 0.0;
-    Xk3[loopA] = 0.0;
-    Xk4[loopA] = 0.0;
-    Ind[loopA] = 1.0;
-    Xn[loopA] = 0.0;
-    Xn1[loopA] = 0.0;
-  }
-  for(int loopA=0;loopA<totAuxStates;loopA++){
-    k1AuxOut[loopA] = 0.0;
-    k2AuxOut[loopA] = 0.0;
-    k3AuxOut[loopA] = 0.0;
-    k4AuxOut[loopA] = 0.0;
-  }
-
-  // Set Initial Conditions
-  for(int loopA=0;loopA<getStateTotal();loopA++){
-    Xn[loopA] = iniVals[loopA];
-  }
-
-  // =========
-  // TIME LOOP
-  // =========
-  for(int loopA=0;loopA<totalSteps;loopA++){
-
-    // Increment Time Step
-    stepId++;
-
-    // Eval K1
-    lpnODE(currTime,Xn,params,k1,k1AuxOut,Ind);
-
-    // Eval K2
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xk2[loopB] = Xn[loopB] + ((1.0/3.0)*timeStep) * k1[loopB];
-    }
-    lpnODE(currTime + (1.0/3.0) * timeStep,Xk2,params,k2,k2AuxOut,Ind);
-    
-    // Eval K3
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xk3[loopB] = Xn[loopB] - (1.0/3.0)*timeStep * k1[loopB] + (1.0*timeStep) * k2[loopB];
-    }
-    lpnODE(currTime + (2.0/3.0) * timeStep,Xk3,params,k3,k3AuxOut,Ind);
-    
-    // Eval K4
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xk4[loopB] = Xn[loopB] + timeStep*k1[loopB] - timeStep*k2[loopB] + timeStep * k3[loopB];
-    }
-    lpnODE(currTime + timeStep,Xk4,params,k4,k4AuxOut,Ind);
-
-    // Eval Xn1
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xn1[loopB] = Xn[loopB] + (1.0/8.0)*timeStep*(k1[loopB] + 3.0 * k2[loopB] + 3.0 * k3[loopB] + k4[loopB]);
-    }
-
-    // CHECK IF SOLUTION IS VALID
-    if((stepId % 1) == 0){
-      for(int loopB=0;loopB<totalStates;loopB++){
-        isValidDouble = (Xn1[loopB] != Xn1[loopB]);
-        if(isValidDouble){
-          // cout << "FOUND SOMETHING THAT IS NOT VALID AT " << loopB << "\n";
-          return 1;
-        }
-      }
-    }
-
-    // Update Xn
-    for(int loopB=0;loopB<totalStates;loopB++){
-      Xn[loopB] = Xn1[loopB] * Ind[loopB];
-    }    
-
-    // Copy back k1AuxOut for each time step.
-    for(int loopB=0;loopB<totAuxStates;loopB++){
-      auxOutVals[loopB][stepId] = k4AuxOut[loopB];
-    }
-
-    // Copy The solution back for each time step
-    for(int loopB=0;loopB<totalStates;loopB++){
-      outVals[loopB][stepId] = Xn1[loopB];
-    }  
-
-    // Update Current Time
-    currTime += timeStep;
-  }
-  
-  // RETURN OK
-  return 0;
-}
-
-bool odeNormalAdultSimplePD::areParamsInsideLimits(stdVec params){
-  // GET LIMITS
-  int par_num = getParameterTotal();
-  double currParam = 0.0;
-  stdVec limits;
-  getParameterLimits(limits);
-  
-  bool result = true;
-  for(int loopA=0;loopA<par_num;loopA++){
-    currParam = params[loopA];
-    result = ((currParam>=limits[loopA*2 + 0]) && (currParam<=limits[loopA*2 + 1]));
-    if(!result){
-      printf("PROBLEM %d\n",loopA);
-      return result;
-    }
-  }
-
-  // Return
-  return result;
-}
-
-
-void odeNormalAdultSimplePD::writeAllDataToFile(string fileName,int totalSteps,int totalStates,stdMat outVals,int totAuxStates,stdMat auxOutVals){
-  FILE* outFile;
-  outFile = fopen(fileName.c_str(),"w");
-  for(int loopA=0;loopA<totalSteps;loopA++){
-    // Print State Variables
-    for(int loopB=0;loopB<totalStates;loopB++){
-      fprintf(outFile,"%e ",outVals[loopB][loopA]);
-    }
-    // Print Aux Variables
-    for(int loopB=0;loopB<totAuxStates;loopB++){
-      fprintf(outFile,"%e ",auxOutVals[loopB][loopA]);
-    }
-    fprintf(outFile,"\n");
-  }
-  // CLOSE THE FILE
-  fclose(outFile);
-}
-
-bool odeNormalAdultSimplePD::isParamsSignCorrect(stdVec params){
-  // GET LIMITS
-  int par_num = params.size();
-  double currParam = 0.0;
-  stdVec limits;
-  getParameterLimits(limits);
-  
-  bool result = true;
-  for(int loopA=0;loopA<par_num;loopA++){
-  	// Get Current Parameter
-    currParam = params[loopA];
-    // Check Sign w.r.t. limits
-    if(isParamPositive(loopA,limits)||isParamNegative(loopA,limits)){
-      result = result && (isParamPositive(loopA,limits) == (currParam>=0.0)) && (isParamNegative(loopA,limits) == (currParam<0.0));	
-    }    
-  }
-  // RETURN
-  return result;
-}
-
-int odeNormalAdultSimplePD::solveLPN(lpnOptions options, stdVec params, stdVec& results){
-
-  // Set Time integration quantities
-  double heartRate = params[getStateTotal()];
-  double cycleTime = 60.0/(double)heartRate;
-  int totalSteps = numCycles*totalStepsOnSingleCycle;
-  double totalTime = totalSteps*cycleTime;
-  double timeStep = cycleTime/(double)totalStepsOnSingleCycle;
-
-  // CHECK PARAMS INSIDE LIMITS
-  if(options.checkLimits){
-    if(!areParamsInsideLimits(params)){
-      printf("ERROR: VIOLATED PARAMETER LIMITS.\n");
-      return 1;
-    }
-  }
-
-  // CHECK PARAMETER SIGN
-  if(options.checkSign){
-    if(!isParamsSignCorrect(params)){
-      printf("ERROR: VIOLATED PARAMETER SIGN.\n");
-      return 1;
-    }
-  }
-
-  // TIME STEP ARRAY
-  stdVec t;
-  t.resize(totalSteps);
-  t[0] = 0.0;
-  for(int loopA=1;loopA<totalSteps;loopA++){
-    t[loopA] = t[loopA-1] + timeStep;
-  }
-
-  // GET TOTALS
-  int totalParams = getParameterTotal();
-  int totalStates = getStateTotal();
-  int totAuxStates = getAuxStateTotal();
-  int totalResults = getResultTotal();
-
-  // Separate Initial Conditions and parameters
-  // Note: the first "totalStates" parameters are initial conditions
-  stdVec iniVals;
-  iniVals.resize(totalStates);
-  stdVec trueParams;
-  trueParams.resize(totalParams-totalStates);
-  for(int loopA=0;loopA<totalParams;loopA++){
-    if(loopA<totalStates){
-      iniVals[loopA] = params[loopA];
-    }else{
-      trueParams[loopA-totalStates] = params[loopA];
-    }
-  }
-
-  // State Variables
-  // double outVals2[totalStates][totalSteps];
-  stdMat outVals;
-  outVals.resize(totalStates);
-  for(int loopA=0;loopA<totalStates;loopA++){
-    outVals[loopA].resize(totalSteps);
-  }
-
-  // Auxiliary Outputs
-  stdMat auxOutVals;
-  auxOutVals.resize(totAuxStates);
-  for(int loopA=0;loopA<totAuxStates;loopA++){
-    auxOutVals[loopA].resize(totalSteps);
-  }
-
-  // Solve In Time
-  int error = PerformRK4Steps(totalSteps,timeStep,iniVals,trueParams,outVals,auxOutVals);
-  if(error !=0 ){
-    throw cmException("RK4 Time Integration not Converged!");
-  }
-  
-  // WRITE ALL DATA FILE
-  if(options.flushData){
-    string allDataFileName("allData.dat");
-    writeAllDataToFile(allDataFileName,totalSteps,totalStates,outVals,totAuxStates,auxOutVals);    
-  }
-
-  // ===============================
-  // COMPUTE THE RESULTS OF INTEREST
-  // ===============================
-  results.clear();
+void odeNormalAdultSimplePD::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, 
+                                         const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, 
+                                         stdVec& results){
 
   // DETERMINE START AND END OF LAST HEART CYCLE
-  int startLastCycle = (numCycles-1) * totalStepsOnSingleCycle;
-  int stopLastCycle = numCycles * totalStepsOnSingleCycle;
+  double heartRate      = 60.0/(totalStepsOnSingleCycle*timeStep);
+  int    numCycles      = totalSteps/totalStepsOnSingleCycle;
+  int    startLastCycle = (numCycles-1) * totalStepsOnSingleCycle;
+  int    stopLastCycle  = numCycles * totalStepsOnSingleCycle;
   double output[totalSteps];
 
   // MIN AND MAX AO PRESSURE
@@ -1139,17 +797,12 @@ int odeNormalAdultSimplePD::solveLPN(lpnOptions options, stdVec params, stdVec& 
     results.push_back(maxPAPress); // ip_0002_pap_systolic
     results.push_back(avPCWPress); // ip_0002_wedge_pressure  
   }
-
-  // Solution Successful
-  return 0;
 }
 
-void odeNormalAdultSimplePD::setModelResults(stdVec outputs,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths){
-
-  // CHECK INSTALLED VERSION
+void odeNormalAdultSimplePD::getResultKeys(stdStringVec& keys){
+  
+  // CHECK VERSION
   if((modelVersion >= 0001)&&(modelVersion < 0002)){
-
-    // KEYS
     keys.clear();
     keys.push_back(string("HR"));
     keys.push_back(string("SBP"));
@@ -1166,52 +819,7 @@ void odeNormalAdultSimplePD::setModelResults(stdVec outputs,stdStringVec& keys,s
     keys.push_back(string("CVP"));
     keys.push_back(string("LVEF"));
     keys.push_back(string("RVEF"));
-
-    // COMPUTED VALUES
-    computedValues.clear();
-    computedValues.push_back(outputs[ip_0001_HR]);
-    computedValues.push_back(outputs[ip_0001_SBP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_DBP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_mBP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_RAP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_sPAP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_dPAP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_mPAP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_PWP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_CO]*(60.0/1000.0));
-    computedValues.push_back(outputs[ip_0001_PVR]);
-    computedValues.push_back(outputs[ip_0001_SVR]);
-    computedValues.push_back(outputs[ip_0001_CVP]/1333.22);
-    computedValues.push_back(outputs[ip_0001_LVEF]);
-    computedValues.push_back(outputs[ip_0001_RVEF]);
-
-    // STANDARD DEVIATIONS
-    stdFactors.clear();
-    stdFactors.push_back(3.0); // HR
-    stdFactors.push_back(1.5); // SBP
-    stdFactors.push_back(1.5); // DBP
-    stdFactors.push_back(1.5); // mBP
-    stdFactors.push_back(0.5); // RAP
-    stdFactors.push_back(1.0); // sPAP
-    stdFactors.push_back(1.0); // dPAP
-    stdFactors.push_back(1.0); // mPAP
-    stdFactors.push_back(1.0); // PWP
-    stdFactors.push_back(0.2); // CO
-    stdFactors.push_back(5.0); // PVR
-    stdFactors.push_back(50.0); // SVR
-    stdFactors.push_back(0.5); // CVP
-    stdFactors.push_back(2.0); // LVEF 
-    stdFactors.push_back(2.0); // RVEF
-  
-    // WEIGHTS
-    weigths.clear();
-    for(int loopA=0;loopA<computedValues.size();loopA++){
-      weigths.push_back(1.0);
-    }
-
   }else if(modelVersion >= 0002){
-
-    // KEYS
     keys.clear();
     keys.push_back(string("heart_rate2"));
     keys.push_back(string("systolic_bp_2"));
@@ -1240,111 +848,155 @@ void odeNormalAdultSimplePD::setModelResults(stdVec outputs,stdStringVec& keys,s
     keys.push_back(string("pap_diastolic"));
     keys.push_back(string("pap_systolic"));
     keys.push_back(string("wedge_pressure"));
+  }
+}
 
-    // COMPUTED VALUES
-    computedValues.clear();
-    computedValues.push_back(outputs[ip_0002_heart_rate2]);
-    computedValues.push_back(outputs[ip_0002_systolic_bp_2]/1333.22);
-    computedValues.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);    
-    computedValues.push_back(outputs[ip_0002_cardiac_output]*(60.0/1000.0));
-    computedValues.push_back(outputs[ip_0002_systemic_vascular_resistan]);
-    computedValues.push_back(outputs[ip_0002_pulmonary_vascular_resista]);
-    computedValues.push_back(outputs[ip_0002_cvp]/1333.22);
-    computedValues.push_back(outputs[ip_0002_right_ventricle_diastole]/1333.22);
-    computedValues.push_back(outputs[ip_0002_right_ventricle_systole]/1333.22);
-    computedValues.push_back(outputs[ip_0002_rvedp]/1333.22);
-    computedValues.push_back(outputs[ip_0002_aov_mean_pg]/1333.22);
-    computedValues.push_back(outputs[ip_0002_aov_peak_pg]/1333.22);
-    computedValues.push_back(outputs[ip_0002_mv_decel_time]);
-    computedValues.push_back(outputs[ip_0002_mv_e_a_ratio]);
-    computedValues.push_back(outputs[ip_0002_pv_at]);
-    computedValues.push_back(outputs[ip_0002_pv_max_pg]/1333.22);
-    computedValues.push_back(outputs[ip_0002_ra_pressure]/1333.22);
-    computedValues.push_back(outputs[ip_0002_ra_vol_a4c]);
-    computedValues.push_back(outputs[ip_0002_la_vol_a4c]);
-    computedValues.push_back(outputs[ip_0002_lv_esv]);
-    computedValues.push_back(outputs[ip_0002_lv_vol]);
-    computedValues.push_back(outputs[ip_0002_lvef]);
-    computedValues.push_back(outputs[ip_0002_lvot_max_flow]);
+void odeNormalAdultSimplePD::getFinalOutputs(const stdVec& outputs, stdVec& outs){
+  if((modelVersion >= 0001)&&(modelVersion < 0002)){
+    outs.clear();
+    outs.push_back(outputs[ip_0001_HR]);
+    outs.push_back(outputs[ip_0001_SBP]/1333.22);
+    outs.push_back(outputs[ip_0001_DBP]/1333.22);
+    outs.push_back(outputs[ip_0001_mBP]/1333.22);
+    outs.push_back(outputs[ip_0001_RAP]/1333.22);
+    outs.push_back(outputs[ip_0001_sPAP]/1333.22);
+    outs.push_back(outputs[ip_0001_dPAP]/1333.22);
+    outs.push_back(outputs[ip_0001_mPAP]/1333.22);
+    outs.push_back(outputs[ip_0001_PWP]/1333.22);
+    outs.push_back(outputs[ip_0001_CO]*(60.0/1000.0));
+    outs.push_back(outputs[ip_0001_PVR]);
+    outs.push_back(outputs[ip_0001_SVR]);
+    outs.push_back(outputs[ip_0001_CVP]/1333.22);
+    outs.push_back(outputs[ip_0001_LVEF]);
+    outs.push_back(outputs[ip_0001_RVEF]);
+  }else if(modelVersion >= 0002){
+    outs.clear();
+    outs.push_back(outputs[ip_0002_heart_rate2]);
+    outs.push_back(outputs[ip_0002_systolic_bp_2]/1333.22);
+    outs.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);    
+    outs.push_back(outputs[ip_0002_cardiac_output]*(60.0/1000.0));
+    outs.push_back(outputs[ip_0002_systemic_vascular_resistan]);
+    outs.push_back(outputs[ip_0002_pulmonary_vascular_resista]);
+    outs.push_back(outputs[ip_0002_cvp]/1333.22);
+    outs.push_back(outputs[ip_0002_right_ventricle_diastole]/1333.22);
+    outs.push_back(outputs[ip_0002_right_ventricle_systole]/1333.22);
+    outs.push_back(outputs[ip_0002_rvedp]/1333.22);
+    outs.push_back(outputs[ip_0002_aov_mean_pg]/1333.22);
+    outs.push_back(outputs[ip_0002_aov_peak_pg]/1333.22);
+    outs.push_back(outputs[ip_0002_mv_decel_time]);
+    outs.push_back(outputs[ip_0002_mv_e_a_ratio]);
+    outs.push_back(outputs[ip_0002_pv_at]);
+    outs.push_back(outputs[ip_0002_pv_max_pg]/1333.22);
+    outs.push_back(outputs[ip_0002_ra_pressure]/1333.22);
+    outs.push_back(outputs[ip_0002_ra_vol_a4c]);
+    outs.push_back(outputs[ip_0002_la_vol_a4c]);
+    outs.push_back(outputs[ip_0002_lv_esv]);
+    outs.push_back(outputs[ip_0002_lv_vol]);
+    outs.push_back(outputs[ip_0002_lvef]);
+    outs.push_back(outputs[ip_0002_lvot_max_flow]);
     // Pulmonary Qtys
-    computedValues.push_back(outputs[ip_0002_pap_diastolic]/1333.22);
-    computedValues.push_back(outputs[ip_0002_pap_systolic]/1333.22);
-    computedValues.push_back(outputs[ip_0002_wedge_pressure]/1333.22);
+    outs.push_back(outputs[ip_0002_pap_diastolic]/1333.22);
+    outs.push_back(outputs[ip_0002_pap_systolic]/1333.22);
+    outs.push_back(outputs[ip_0002_wedge_pressure]/1333.22);
+  }
+}
 
-    // STANDARD DEVIATIONS
-    stdFactors.clear();
-    stdFactors.push_back(3.0); // heart_rate2
-    stdFactors.push_back(1.5); // systolic_bp_2
-    stdFactors.push_back(1.5); // diastolic_bp_2    
-    stdFactors.push_back(0.2); // cardiac_output
-    stdFactors.push_back(50.0); // systemic_vascular_resistan
-    stdFactors.push_back(5.0); // pulmonary_vascular_resista
-    stdFactors.push_back(0.5); // cvp
-    stdFactors.push_back(1.0); // right_ventricle_diastole
-    stdFactors.push_back(1.0); // right_ventricle_systole
-    stdFactors.push_back(1.0); // rvedp
-    stdFactors.push_back(0.5); // aov_mean_pg
-    stdFactors.push_back(0.5); // aov_peak_pg
-    stdFactors.push_back(6.0); // mv_decel_time
-    stdFactors.push_back(0.2); // mv_e_a_ratio
-    stdFactors.push_back(6.0); // pv_at
-    stdFactors.push_back(0.5); // pv_max_pg
-    stdFactors.push_back(0.5); // ra_pressure
-    stdFactors.push_back(3.0); // ra_vol_a4c
-    stdFactors.push_back(3.0); // la_vol_a4c
-    stdFactors.push_back(10.0); // lv_esv
-    stdFactors.push_back(20.0); // lv_vol_a4c
-    stdFactors.push_back(2.0); // lvef
-    stdFactors.push_back(1.0); // lvot_max_flow
+void odeNormalAdultSimplePD::getDataSTD(stdVec& stds){
+  if((modelVersion >= 0001)&&(modelVersion < 0002)){
+    stds.clear();
+    stds.push_back(3.0); // HR
+    stds.push_back(1.5); // SBP
+    stds.push_back(1.5); // DBP
+    stds.push_back(1.5); // mBP
+    stds.push_back(0.5); // RAP
+    stds.push_back(1.0); // sPAP
+    stds.push_back(1.0); // dPAP
+    stds.push_back(1.0); // mPAP
+    stds.push_back(1.0); // PWP
+    stds.push_back(0.2); // CO
+    stds.push_back(5.0); // PVR
+    stds.push_back(50.0); // SVR
+    stds.push_back(0.5); // CVP
+    stds.push_back(2.0); // LVEF 
+    stds.push_back(2.0); // RVEF
+  }else if(modelVersion >= 0002){
+    stds.clear();
+    stds.push_back(3.0); // heart_rate2
+    stds.push_back(1.5); // systolic_bp_2
+    stds.push_back(1.5); // diastolic_bp_2    
+    stds.push_back(0.2); // cardiac_output
+    stds.push_back(50.0); // systemic_vascular_resistan
+    stds.push_back(5.0); // pulmonary_vascular_resista
+    stds.push_back(0.5); // cvp
+    stds.push_back(1.0); // right_ventricle_diastole
+    stds.push_back(1.0); // right_ventricle_systole
+    stds.push_back(1.0); // rvedp
+    stds.push_back(0.5); // aov_mean_pg
+    stds.push_back(0.5); // aov_peak_pg
+    stds.push_back(6.0); // mv_decel_time
+    stds.push_back(0.2); // mv_e_a_ratio
+    stds.push_back(6.0); // pv_at
+    stds.push_back(0.5); // pv_max_pg
+    stds.push_back(0.5); // ra_pressure
+    stds.push_back(3.0); // ra_vol_a4c
+    stds.push_back(3.0); // la_vol_a4c
+    stds.push_back(10.0); // lv_esv
+    stds.push_back(20.0); // lv_vol_a4c
+    stds.push_back(2.0); // lvef
+    stds.push_back(1.0); // lvot_max_flow
     // Pulmonary
-    stdFactors.push_back(1.0); // pap_diastolic
-    stdFactors.push_back(1.0); // pap_systolic
-    stdFactors.push_back(1.0); // wedge_pressure
-  
-    // WEIGHTS
-    weigths.clear();
-    for(int loopA=0;loopA<computedValues.size();loopA++){
-      weigths.push_back(1.0);
-    }
+    stds.push_back(1.0); // pap_diastolic
+    stds.push_back(1.0); // pap_systolic
+    stds.push_back(1.0); // wedge_pressure
   }
 }
 
-double odeNormalAdultSimplePD::evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode) {
-  
-  // Set Options
-  lpnOptions options;
-  options.writeDebugData = false;
-  options.flushData = false;
-  options.checkLimits = false;
-  options.checkSign = false;
-
-  // Solve LPN Model
-  int locErrorCode = solveLPN(options,inputs,outputs);
-
-  // Store Error Code
-  errorCode.push_back(locErrorCode); 
-
-  // SET RESULTS FOR VARIOUS VERSIONS
-  stdStringVec keys;
-  stdVec computedValues;
-  stdVec stdFactors;
-  stdVec weigths;
-  setModelResults(outputs,keys,computedValues,stdFactors,weigths);
- 
-  // Print and compare
-  double result = 0.0;
-  if(data != NULL){
-    
-    // Print Info
-    if(options.flushData){
-      data->printAndCompare(datasetColumn,keys,computedValues,weigths);  
-    }
-  
-    // Evaluate Objective Function
-    result = data->evalLogLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
-    // result = data->evalOBJ(datasetColumn,keys,computedValues,weigths);
+void odeNormalAdultSimplePD::getResultWeigths(stdVec& weights){
+  if((modelVersion >= 0001)&&(modelVersion < 0002)){  
+    weights.clear();
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+  }else if(modelVersion >= 0002){
+    weights.clear();
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
+    weights.push_back(1.0);
   }
-
-  // Return 
-  return result;
 }
+

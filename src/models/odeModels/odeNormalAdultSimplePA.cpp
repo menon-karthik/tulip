@@ -2,7 +2,9 @@
 
 using namespace std;
 
-odeNormalAdultSimplePA::odeNormalAdultSimplePA(){
+odeNormalAdultSimplePA::odeNormalAdultSimplePA(int modelVersion,int targetConfigMode){
+  this->modelVersion = modelVersion;
+  this->targetConfigMode = targetConfigMode;
 }
 
 odeNormalAdultSimplePA::~odeNormalAdultSimplePA(){
@@ -287,19 +289,6 @@ void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){
   limits[84] = 100.0e-6; limits[85] = 0.05;   // C_sys - Systemic capacitance
   limits[86] = 100.0;    limits[87] = 800.0;  // R_sys_a - Systemic Resistance - Arteries
   limits[88] = 500.0;    limits[89] = 2500.0; // R_sys_v - Systemic Resistance - Veins
-}
-
-void odeNormalAdultSimplePA::getParameterLimits(stdVec& limits){
-  // Get Default Parameters
-  getDefaultParameterLimits(limits);
-  // Change the limits bases on the Fixed Parameter List
-  int currParam = 0;
-  for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
-    currParam = frozenParamIDX[loopA];
-    // Assign the new lower and upper bounds to the center
-    limits[currParam*2]     = frozenParamVAL[loopA];
-    limits[currParam*2 + 1] = frozenParamVAL[loopA];
-  }
 }
 
 void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
