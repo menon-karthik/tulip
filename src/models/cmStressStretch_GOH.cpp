@@ -123,7 +123,7 @@ void cmStressStretch_GOH::setModelResults(const stdVec& outputs,double dataStd,s
   }
 }
 
-double cmStressStretch_GOH::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+double cmStressStretch_GOH::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
 // ===========================================================================
 //  NOTE: the parameters are collected in x_GOH vector in the following order
 //    x_GOH(1) = ce       Neo-Hookean (Ground Substance) stress-like parameter

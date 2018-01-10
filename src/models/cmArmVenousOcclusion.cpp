@@ -246,7 +246,7 @@ void cmArmVenousOcclusion::getPriorMapping(int priorModelType,int* prPtr){
 // ==========
 // EVAL MODEL
 // ==========
-double cmArmVenousOcclusion::evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCodes){
+double cmArmVenousOcclusion::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCodes){
 
   // Copy Parameters
   // External Cuff Pressure
@@ -364,11 +364,4 @@ double cmArmVenousOcclusion::evalModelError(stdVec inputs, stdVec& outputs, stdI
 
   // Return likelihood or posterior
   return 0.0;
-}
-
-// ===========================
-// EVAL MODEL: MULTIPLE INPUTS
-// ===========================
-stdVec cmArmVenousOcclusion::evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCodes){
-    throw cmException("ERROR: evalModelError not implemented.\n");
 }

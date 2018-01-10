@@ -20,6 +20,9 @@ class cmStressStretch_SHRA: public cmModel{
     //! Virtual destructor
     virtual ~cmStressStretch_SHRA();
 
+    // Non virtual methods
+    void setModelResults(stdVec outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);    
+
     // Virtual Functions
     virtual int getParameterTotal();
     virtual int getStateTotal();
@@ -29,9 +32,7 @@ class cmStressStretch_SHRA: public cmModel{
     virtual void getPriorMapping(int priorModelType,int* prPtr);
     virtual string getParamName(int parID);
     virtual string getResultName(int resID);
-    virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
-
-    void setModelResults(stdVec outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);
+    virtual double evalModelError(const stdVec& inputs,stdVec& outputs, stdIntVec& errorCode);
 };
 
 #endif //CMSTRESSSTRETCH_SHRA_H

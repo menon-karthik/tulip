@@ -124,7 +124,7 @@ void cmStressStretch_SHRA::setModelResults(stdVec outputs,double dataStd,stdStri
   }
 }
 
-double cmStressStretch_SHRA::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+double cmStressStretch_SHRA::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
 // =====================================================================================
 // NOTE: the parameters are collected in x_SHR_a in the following order for SHR_a SEF
 //   inputs[0] = (1-phi)*mu         Ground state shear modulus of ligament/tendon matrix

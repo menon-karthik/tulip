@@ -59,7 +59,7 @@ void cmTutorial::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: Not Implemented.");
 }
 
-double cmTutorial::evalModelError(stdVec inputs,stdVec& outputs,stdIntVec& errorCode){
+double cmTutorial::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
   
   double startPos = inputs[0];
   double iniVel   = inputs[1];

@@ -36,10 +36,7 @@ class cm3DPQSurrogateModel: public cmModel{
     virtual int getResultTotal();
     virtual string getResultName(int resID);
   	virtual void getPriorMapping(int priorModelType,int* prPtr);
-
-    // EVAL MODEL 
-    virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCodes);
-    virtual stdVec evalModelError(stdMat inputs,stdMat& outputs, stdIntVec& errorCodes);
+    virtual double evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCodes);
 };
 
 #endif //CM3DPQSURROGATEMODEL_H

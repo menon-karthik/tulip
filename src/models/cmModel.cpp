@@ -13,7 +13,7 @@ void cmModel::setData(daData* locData){
   data = locData;
 }
 
-stdVec cmModel::evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode){
+stdVec cmModel::evalModelError(const stdMat& inputs,stdMat& outputs,stdIntVec &errorCode){
   // NEED TO IMPLENT SOME KIND OF PARALLEL EXECUTION !!!
   stdVec result;
   stdVec simOutputs;
@@ -31,7 +31,7 @@ stdVec cmModel::evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCo
   return result;
 }
 
-void cmModel::freezeModelParameters(stdIntVec localParamIDX,stdVec localParamVal){
+void cmModel::freezeModelParameters(const stdIntVec& localParamIDX,const stdVec& localParamVal){
   printf("\n");
   printf("FREEZING MODEL PARAMETERS\n");
   int size = localParamIDX.size();

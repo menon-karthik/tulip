@@ -45,7 +45,7 @@ void cmSimpleNonLin::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: Not Implemented.\n");
 }
 
-double cmSimpleNonLin::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+double cmSimpleNonLin::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
   double theta = inputs[0];
   double average = 1.0;
   double sigma = 0.1;

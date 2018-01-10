@@ -27,7 +27,7 @@ void cmPDFKnownPDF::getParameterLimits(stdVec& limits){
   limits[0] = -10.0; limits[1] = 10.0;
 }
 
-double cmPDFKnownPDF::evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode){
+double cmPDFKnownPDF::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
 
   // Get input values
   double currParam = inputs[0];

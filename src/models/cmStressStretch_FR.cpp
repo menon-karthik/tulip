@@ -62,7 +62,7 @@ string cmStressStretch_FR::getResultName(int resID){
   return res;
 }
 
-double cmStressStretch_FR::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+double cmStressStretch_FR::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
 // ==========================================================================================
 //  NOTE: the parameters are collected in x_GOH vector in the following order
 //    x_FR(1) = Ec    (>Ee) is the elastic modulus of the linear region

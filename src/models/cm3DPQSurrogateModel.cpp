@@ -80,7 +80,7 @@ string cm3DPQSurrogateModel::getResultName(int resID){
 }
 
 // EVAL MODEL 
-double cm3DPQSurrogateModel::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCodes){
+double cm3DPQSurrogateModel::evalModelError(const stdVec& inputs,stdVec& outputs, stdIntVec& errorCodes){
 
   // Normalize to [-1,1]
   stdVec normInputs;
@@ -116,9 +116,4 @@ double cm3DPQSurrogateModel::evalModelError(stdVec inputs,stdVec& outputs, stdIn
   // Return
   errorCodes.push_back(0);
   return 0.0;
-}
-
-// EVAL MODEL: MULTIPLE OUTPUTS
-stdVec cm3DPQSurrogateModel::evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCodes){
-  throw cmException("ERROR: evalModelError not implemented.\n");
 }

@@ -47,14 +47,13 @@ class cmPDFKnownPDF: public cmModel{
     virtual int    getParameterTotal();
     virtual int    getResultTotal();
     virtual void   getDefaultParams(stdVec& params);
-    virtual void   getParameterLimits(stdVec& limits);
-    virtual double evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode);
-    // Not Used
+    virtual void   getParameterLimits(stdVec& limits);    
     virtual string getParamName(int parID){return string("");}
     virtual string getResultName(int resID){return string("");}
     virtual int    getStateTotal(){return 0;}
     virtual int    getAuxStateTotal(){return 0;}
     virtual void   getPriorMapping(int priorModelType,int* prPtr){}
+    virtual double evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode);
     
 };
 

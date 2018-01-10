@@ -53,7 +53,8 @@ void writeAllDataToFile(string fileName,int totalSteps,const stdMat& outVals,con
   // CLOSE THE FILE
   fclose(outFile);
 }
-double cmLPNModel::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+
+double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
   // Get Heart Rate from inputs
   double HR = inputs[integrator->ode->getHRIndex()];
   // Get Number of states from ode model

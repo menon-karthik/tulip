@@ -158,7 +158,7 @@ void Solve_KO_RK4(double dt, stdVec rho_0, stdVec& rho_1){
 // ================================
 // EVAL MODEL: ONE MODEL EVALUATION
 // ================================
-double cmKraichnanOrszagModel::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+double cmKraichnanOrszagModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
   
   // Init Time
   double currentTime = 0.0;

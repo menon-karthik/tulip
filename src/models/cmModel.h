@@ -191,16 +191,16 @@ class cmModel{
     \param[out] errorCode the ID of the result of interest.
     \return 
     */
-    virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode) = 0;
+    virtual double evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode) = 0;
 
     // SET DATA OBJECT
     void setData(daData* locData);
 
     // EVAL MULTIPLE MODELS
-    stdVec evalModelError(stdMat inputs,stdMat& outputs, stdIntVec &errorCode);
+    stdVec evalModelError(const stdMat& inputs,stdMat& outputs, stdIntVec &errorCode);
 
     // FREEZE MODEL PARAMETERS
-    void freezeModelParameters(stdIntVec localParamIDX,stdVec localParamVal);
+    void freezeModelParameters(const stdIntVec& localParamIDX,const stdVec& localParamVal);
 };
 
 #endif //CMMODEL_H

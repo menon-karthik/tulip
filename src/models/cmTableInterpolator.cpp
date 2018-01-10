@@ -277,7 +277,7 @@ int cmTableInterpolator::getCloserPointId(stdVec inputs){
 // ================
 // EVAL MODEL ERROR
 // ================
-double cmTableInterpolator::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+double cmTableInterpolator::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
 
   // Init Error
   errorCode.clear();

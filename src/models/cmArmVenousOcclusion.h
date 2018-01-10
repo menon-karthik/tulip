@@ -30,10 +30,7 @@ class cmArmVenousOcclusion: public cmModel{
   	virtual void   getParameterLimits(stdVec& limits);
   	virtual void   getDefaultParams(stdVec& params);
   	virtual void   getPriorMapping(int priorModelType,int* prPtr);
-
-    // EVAL MODEL 
-    virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCodes);
-    virtual stdVec evalModelError(stdMat inputs,stdMat& outputs, stdIntVec& errorCodes);
+    virtual double evalModelError(const stdVec& inputs,stdVec& outputs, stdIntVec& errorCodes);
 
 };
 

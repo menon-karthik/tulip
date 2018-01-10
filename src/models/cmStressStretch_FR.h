@@ -30,7 +30,7 @@ class cmStressStretch_FR: public cmModel{
     virtual void getPriorMapping(int priorModelType,int* prPtr);
     virtual string getParamName(int parID);
     virtual string getResultName(int resID);
-    virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
+    virtual double evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode);
 };
 
 #endif // CMSTRESSSTRETCH_FR

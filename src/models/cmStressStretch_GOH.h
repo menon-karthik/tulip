@@ -12,7 +12,6 @@ using namespace std;
 
 // GENERIC CLASS FOR MODELS
 class cmStressStretch_GOH: public cmModel{
-    
   public:
     // Experimental Stretches
     stdVec lambdaZ;
@@ -23,6 +22,10 @@ class cmStressStretch_GOH: public cmModel{
     //! Virtual destructor
     virtual ~cmStressStretch_GOH();
 
+    // Non virtual methods
+    void setModelResults(const stdVec& outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);
+  
+    // Virtual methods
     virtual int getParameterTotal();
     virtual int getStateTotal();
     virtual int getResultTotal();
@@ -31,9 +34,7 @@ class cmStressStretch_GOH: public cmModel{
     virtual void getPriorMapping(int priorModelType,int* prPtr);
     virtual string getParamName(int parID);
     virtual string getResultName(int resID);
-    virtual double evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode);
-
-    void setModelResults(const stdVec& outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths);
+    virtual double evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode);
 };
 
 #endif // CMSTRESSSTRETCH_GOH

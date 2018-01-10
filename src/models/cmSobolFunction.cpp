@@ -53,7 +53,7 @@ string cmSobolFunction::getResultName(int resID){
   }
 }
 
-double cmSobolFunction::evalModelError(stdVec inputs,stdVec& outputs, stdIntVec& errorCode){
+double cmSobolFunction::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
   stdVec params;
   params.push_back(1.0);
   params.push_back(2.0);

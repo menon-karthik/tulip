@@ -134,7 +134,7 @@ void cmAnalyticalExpressionModel::getPriorMapping(int priorModelType,int* prPtr)
 }
     
 // Evaluate Model
-double cmAnalyticalExpressionModel::evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode){
+double cmAnalyticalExpressionModel::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode){
   outputs.clear();
   errorCode.clear();
   if(modelType == kAnalyticalModelUnity2D){
