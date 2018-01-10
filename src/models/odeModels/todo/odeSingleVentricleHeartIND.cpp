@@ -1,22 +1,15 @@
-# include "odeSingleVentricleHeartIND.hpp"
+# include "odeSingleVentricleHeartIND.h"
 
 using namespace std;
 
-
-
-
-  virtual int    getAuxStateTotal() = 0;
-
-  
-  
-  
-  
-  virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
-  virtual void   getResultKeys(stdStringVec& keys) = 0;
-  virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs) = 0;
-  virtual void   getDataSTD(stdVec& stds) = 0;
-  virtual void   getResultWeigths(stdVec& weights) = 0;    
-  virtual int    getHRIndex() = 0;
+// TO COMPLETE !!!
+//  virtual int    getAuxStateTotal() = 0;
+//  virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
+//  virtual void   getResultKeys(stdStringVec& keys) = 0;
+//  virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs) = 0;
+//  virtual void   getDataSTD(stdVec& stds) = 0;
+//  virtual void   getResultWeigths(stdVec& weights) = 0;    
+//  virtual int    getHRIndex() = 0;
 
 
 // ========================

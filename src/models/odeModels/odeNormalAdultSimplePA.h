@@ -59,8 +59,9 @@ const int ip_0002_pap_systolic               = 24;
 const int ip_0002_wedge_pressure             = 25;
 
 // Types of target configuration
-const int ipTargetConfig_ExcludePAP = 0;
-const int ipTargetConfig_HRBPCVP    = 1;
+const int ipTargetConfig_IncludeAll = 0;
+const int ipTargetConfig_ExcludePAP = 1;
+const int ipTargetConfig_HRBPCVP    = 2;
 
 // GENERIC CLASS FOR SAMPLES
 class odeNormalAdultSimplePA: public odeModel{

@@ -44,7 +44,7 @@ int main(int argc, char* argv[]){
     data->readFromFile(currPatientFile);
 
     // Create a ODE Model
-    odeModel* ode = new odeNormalAdultSimplePA();
+    odeModel* ode = new odeNormalAdultSimplePA(0001,ipTargetConfig_IncludeAll);
 
     // Create a ODE Model Integrator
     double timeStep = 0.01;
