@@ -5,7 +5,7 @@ IF(SWIG_FOUND)
   
   INCLUDE(UseSWIG)
 
-  FIND_PACKAGE(PythonLibs 2.7)
+  FIND_PACKAGE(PythonLibs 3)
 
   MESSAGE(STATUS "Python Library Version: ${PYTHONLIBS_VERSION_STRING}")
 

@@ -18,7 +18,10 @@ const int kAnalyticalConstant          = 5;
 const int kAnalyticalLinear            = 6;
 const int kAnalyticalQuadratic         = 7;
 const int kIdentity                    = 8;
-const int kTransformedGaussian         = 12;
+const int kTransformedGaussian         = 9;
+const int kPointAndCircle              = 10;
+const int kAlphaCurve                  = 11;
+const int kKuramoto                    = 12;
 
 // GENERIC CLASS FOR SAMPLES
 class cmAnalyticalExpressionModel: public cmModel{

@@ -37,6 +37,15 @@ int cmAnalyticalExpressionModel::getParameterTotal(){
     case kAnalyticalLinear:
       result = -1;
       break;
+    case kPointAndCircle:
+      result = 2;
+      break;
+    case kAlphaCurve:
+      result = 2;
+      break;
+    case kKuramoto:
+      result = 2;
+      break;
   }
   // Return
   return result;
@@ -75,6 +84,15 @@ void cmAnalyticalExpressionModel::getParameterLimits(stdVec& limits){
     limits[2] = 0.0; limits[3] = 1.0;
   }else if(modelType == kAnalyticalPiecewiseLinear1D){
     limits[0] = 0.0; limits[1] = 1.0;
+  }else if(modelType == kPointAndCircle){
+    limits[0] = -3.0; limits[1] = 3.0;
+    limits[2] = -3.0; limits[3] = 3.0;
+  }else if(modelType == kAlphaCurve){
+    limits[0] = -3.0; limits[1] = 3.0;
+    limits[2] = -3.0; limits[3] = 3.0;
+  }else if(modelType == kKuramoto){
+    limits[0] = 0.0; limits[1] = 2.0*M_PI;
+    limits[2] = 0.0; limits[3] = 2.0*M_PI;
   }else{
     throw new cmException("Error: Invalid Model Type");
   }
@@ -97,6 +115,15 @@ void cmAnalyticalExpressionModel::getDefaultParams(stdVec& params){
     params[1] = 0.5;    
   }else if(modelType == kAnalyticalPiecewiseLinear1D){
     params[0] = 0.5;
+  }else if(modelType == kPointAndCircle){
+    params[0] = 0.0;
+    params[1] = 0.0;    
+  }else if(modelType == kAlphaCurve){
+    params[0] = 0.0;
+    params[1] = 0.0;    
+  }else if(modelType == kKuramoto){
+    params[0] = M_PI;
+    params[1] = M_PI;
   }else{
     throw new cmException("Error: Invalid Model Type");
   }
@@ -131,6 +158,7 @@ double NormalCDFInverse(double p){
 
 // Get prior mapping
 void cmAnalyticalExpressionModel::getPriorMapping(int priorModelType,int* prPtr){
+  throw new cmException("Error: getPriorMapping not Implemented!");
 }
     
 // Evaluate Model
@@ -226,10 +254,24 @@ double cmAnalyticalExpressionModel::evalModelError(const stdVec& inputs, stdVec&
       }
     }
     return 0.0;    
+  }else if(modelType == kPointAndCircle){
+    double res = pow(fabs(inputs[1]*inputs[1] + inputs[0]*inputs[0]*(inputs[0]-1.0)*(inputs[0]-2.0)),5.0);
+    outputs.push_back(res);
+    errorCode.push_back(0);
+    return res;
+  }else if(modelType == kAlphaCurve){
+    double res = pow(fabs(inputs[1]*inputs[1] - inputs[0]*inputs[0]*(inputs[0]+1.0)),5.0);
+    outputs.push_back(res);
+    errorCode.push_back(0);
+    return res;
+  }else if(modelType == kKuramoto){
+    double res = pow(fabs(1.0/12.0 - 1.0/3.0*(sin(inputs[0]-inputs[1])+sin(inputs[0]-0.0))) + 
+                     fabs(-1.0/12.0-1.0/3.0*(sin(inputs[1]-inputs[0])+sin(inputs[1]-0.0))),5.0);
+    outputs.push_back(res);
+    errorCode.push_back(0);
   }else{
     throw new cmException("Error: Invalid Model Type");
   }
-
 }
 
 // Get Name of result quantity
