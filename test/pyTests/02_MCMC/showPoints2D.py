@@ -9,17 +9,17 @@ def plotGraphs():
   levels = np.array([0.0,0.01,0.2,0.4,0.6])
 
   # Read MCMC Sample Data
-  data1 = np.loadtxt('paramTraces_01.txt',skiprows=1)
+  data1 = np.loadtxt('paramTraces_10.txt',skiprows=1)
   data1 = data1[:totSamples,2:]
-  data2 = np.loadtxt('paramTraces_02.txt',skiprows=1)
+  data2 = np.loadtxt('paramTraces_11.txt',skiprows=1)
   data2 = data2[:totSamples,2:]
-  data3 = np.loadtxt('paramTraces_03.txt',skiprows=1)
+  data3 = np.loadtxt('paramTraces_12.txt',skiprows=1)
   data3 = data3[:totSamples,2:]
 
   #  Read Optimal Points
-  opt1 = np.loadtxt('OptimalPoints_01.txt')
-  opt2 = np.loadtxt('OptimalPoints_02.txt')
-  opt3 = np.loadtxt('OptimalPoints_03.txt')
+  opt1 = np.loadtxt('OptimalPoints_10.txt')
+  opt2 = np.loadtxt('OptimalPoints_11.txt')
+  opt3 = np.loadtxt('OptimalPoints_12.txt')
 
   # Create Exact Surfaces
   delta = 0.025

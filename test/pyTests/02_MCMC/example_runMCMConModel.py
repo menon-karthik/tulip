@@ -14,7 +14,6 @@ import tulipAC as ac
 import scipy.io
 import numpy as np
 from mpi4py import MPI
-from constants import *
 
 # MAIN FUNCTION
 def main(modelType,comm):
@@ -24,15 +23,7 @@ def main(modelType,comm):
   size = comm.Get_size()
 
   # Set Model
-  if(modelType == kPointAndCircle):
-    model = cm.cmAnalyticalExpressionModel(cm.kPointAndCircle)
-  elif(modelType == kAlphaCurve):
-    model = cm.cmAnalyticalExpressionModel(cm.kAlphaCurve)
-  elif(modelType == kKuramoto):
-    model = cm.cmAnalyticalExpressionModel(cm.kKuramoto)    
-  else:
-    print('Error: Invalid Model.')
-    sys.exit(-1)
+  model = cm.cmAnalyticalExpressionModel(modelType)
 
   # Set DREAM Parameters
   totChains         = size
@@ -91,15 +82,7 @@ def main(modelType,comm):
     dream.postProcess(debugMode,burnInPercent);
 
     # Rename File
-    if(modelType == kPointAndCircle):
-      os.rename('paramTraces.txt','paramTraces_01.txt')
-    elif(modelType == kAlphaCurve):
-      os.rename('paramTraces.txt','paramTraces_02.txt')
-    elif(modelType == kKuramoto):
-      os.rename('paramTraces.txt','paramTraces_03.txt')
-    else:
-      print('Error: Invalid Model.')
-      sys.exit(-1)
+    os.rename('paramTraces.txt','paramTraces_' + str(modelType) + '.txt')
 
 # ====
 # MAIN

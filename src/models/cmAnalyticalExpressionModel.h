@@ -22,6 +22,10 @@ const int kTransformedGaussian         = 9;
 const int kPointAndCircle              = 10;
 const int kAlphaCurve                  = 11;
 const int kKuramoto                    = 12;
+const int kWhitneyUmbrella             = 13;
+const int kPosDimSystem                = 14;
+const int kSeilerSystem                = 15;
+const int kEnergyLandscape             = 16;
 
 // GENERIC CLASS FOR SAMPLES
 class cmAnalyticalExpressionModel: public cmModel{

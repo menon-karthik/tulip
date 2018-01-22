@@ -12,21 +12,12 @@ import tulipAC as ac
 # Import numpy and matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import *
 
 # MAIN FUNCTION
 def main(modelType):
 
   # Set Model
-  if(modelType == kPointAndCircle):
-    model = cm.cmAnalyticalExpressionModel(cm.kPointAndCircle)
-  elif(modelType == kAlphaCurve):
-    model = cm.cmAnalyticalExpressionModel(cm.kAlphaCurve)
-  elif(modelType == kKuramoto):
-    model = cm.cmAnalyticalExpressionModel(cm.kKuramoto)
-  else:
-    print('Error: Invalid Model.')
-    sys.exit(-1)
+  model = cm.cmAnalyticalExpressionModel(modelType)
 
   # Set Optimizer Parameters
   # Convergence Tolerance
@@ -47,15 +38,7 @@ def main(modelType):
   totRestarts     = 20
 
   # Read MCMC Samples and sub-samples using totInitialGuess
-  if(modelType == kPointAndCircle):
-    data = np.loadtxt('paramTraces_01.txt',skiprows=1)
-  elif(modelType == kAlphaCurve):
-    data = np.loadtxt('paramTraces_02.txt',skiprows=1)
-  elif(modelType == kKuramoto):
-    data = np.loadtxt('paramTraces_03.txt',skiprows=1)
-  else:
-    print('Error: Invalid Model.')
-    sys.exit(-1)
+  data = np.loadtxt('paramTraces_' + str(modelType) + '.txt',skiprows=1)
 
   # SubSample
   print(np.random.choice(data.shape[0], totInitialGuess))
@@ -87,15 +70,7 @@ def main(modelType):
     results[loopA,:] = np.loadtxt('optParams.txt')
 
   # Save Final Result
-  if(modelType == kPointAndCircle):
-    np.savetxt('OptimalPoints_01.txt',results)    
-  elif(modelType == kAlphaCurve):
-    np.savetxt('OptimalPoints_02.txt',results)    
-  elif(modelType == kKuramoto):
-    np.savetxt('OptimalPoints_03.txt',results)
-  else:
-    print('Error: Invalid Model.')
-    sys.exit(-1)
+  np.savetxt('OptimalPoints_' + str(modelType)+ '.txt',results)    
 
 # ====
 # MAIN
