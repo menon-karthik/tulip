@@ -76,6 +76,7 @@ double cmSobolFunction::evalModelError(const stdVec& inputs,stdVec& outputs,stdI
   outputs.push_back(res);
   errorCode.clear();
   errorCode.push_back(0);
+  return 0.0;
 }
 
 

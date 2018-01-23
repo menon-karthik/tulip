@@ -6,7 +6,12 @@ using namespace std;
 odeIntegratorRK4::odeIntegratorRK4(odeModel* odeModel, double timeStep, int totalCycles)
 :odeIntegrator(odeModel,timeStep,totalCycles){
 }
+// Constructor to handle forcing
+odeIntegratorRK4::odeIntegratorRK4(odeModel* odeModel, double timeStep, int totalCycles, stdMat forcing)
+:odeIntegrator(odeModel,timeStep,totalCycles, forcing){
+}
 
+// DESTRUCTOR
 odeIntegratorRK4::~odeIntegratorRK4(){
 }
 

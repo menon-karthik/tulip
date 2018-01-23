@@ -15,6 +15,9 @@ double getMax(int start, int stop, double* vector){
   return maxVal;
 }
 
+double getMax(int start, int stop, stdVec vector){
+  return getMax(start,stop,(double*)vector.data()); // vector.data() gives you a primative 8bit uint array, (double*) casts that array as a double array, so turns vector into a double array and calls function above
+}
 
 double getMin(int start, int stop, double* vector){
   double minVal = std::numeric_limits<double>::max();
@@ -27,6 +30,9 @@ double getMin(int start, int stop, double* vector){
   }
   return minVal;
 }
+double getMin(int start, int stop, stdVec vector){
+  return getMin(start, stop, (double*)vector.data()); // vector.data() gives you a primative 8bit unit array, (double*) casts that array as a double array, so turns vector into a double array and calls function above
+}
 
 double getMean(int start, int stop, double* vector){
   double result = 0.0;
@@ -35,6 +41,9 @@ double getMean(int start, int stop, double* vector){
   }
   return result/(double)(stop - start);
 }
+double getMean(int start, int stop, stdVec vector){
+  return getMean(start, stop, (double*)vector.data()); //(double*)vector.data() changes vector from stdVec to double*
+}
 
 double getSum(int start, int stop, double* vector){
   double result = 0.0;
@@ -42,6 +51,10 @@ double getSum(int start, int stop, double* vector){
      result += vector[loopA];
   }
   return result;
+}
+
+double getSum(int start, int stop, stdVec vector){
+  return getSum(start, stop, (double*)vector.data());
 }
 
 int getMaxLoc(int start, int stop, double* vector){

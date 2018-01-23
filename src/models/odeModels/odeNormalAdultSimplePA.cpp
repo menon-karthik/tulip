@@ -20,143 +20,145 @@ int odeNormalAdultSimplePA::getHRIndex(){
 }
 
 string odeNormalAdultSimplePA::getParamName(int index){
+  string returnString;
   switch(index){
     case 0:
-      return string("V_ra_ini");
+      returnString = string("V_ra_ini");
       break;
     case 1:
-      return string("V_la_ini");
+      returnString = string("V_la_ini");
       break;
     case 2:
-      return string("V_rv_ini");
+      returnString = string("V_rv_ini");
       break;
     case 3:
-      return string("V_lv_ini");
+      returnString = string("V_lv_ini");
       break;
     case 4:
-      return string("Q_ra_rv_ini");
+      returnString = string("Q_ra_rv_ini");
       break;
     case 5:
-      return string("P_pa_ini");
+      returnString = string("P_pa_ini");
       break;
     case 6:
-      return string("Q_rv_pa_ini");
+      returnString = string("Q_rv_pa_ini");
       break;
     case 7:
-      return string("Q_la_lv_ini");
+      returnString = string("Q_la_lv_ini");
       break;
     case 8:
-      return string("P_ao_ini");
+      returnString = string("P_ao_ini");
       break;
     case 9:
-      return string("Q_lv_ao_ini");
+      returnString = string("Q_lv_ao_ini");
       break;
     case 10:
-      return string("P_sys_ini");
+      returnString = string("P_sys_ini");
       break;
     case 11:
-      return string("HR");
+      returnString = string("HR");
       break;
     case 12:
-      return string("tsas");
+      returnString = string("tsas");
       break;
     case 13:
-      return string("tpws");
+      returnString = string("tpws");
       break;
     case 14:
-      return string("tsvs");
+      returnString = string("tsvs");
       break;
     case 15:
-      return string("K_pas_ra_1");
+      returnString = string("K_pas_ra_1");
       break;
     case 16:
-      return string("K_pas_ra_2");
+      returnString = string("K_pas_ra_2");
       break;
     case 17:
-      return string("Emax_ra");
+      returnString = string("Emax_ra");
       break;
     case 18:
-      return string("Vra0");
+      returnString = string("Vra0");
       break;
     case 19:
-      return string("K_pas_la_1");
+      returnString = string("K_pas_la_1");
       break;
     case 20:
-      return string("K_pas_la_2");
+      returnString = string("K_pas_la_2");
       break;
     case 21:
-      return string("Emax_la");
+      returnString = string("Emax_la");
       break;
     case 22:
-      return string("Vla0");
+      returnString = string("Vla0");
       break;
     case 23:
-      return string("K_pas_rv_1");
+      returnString = string("K_pas_rv_1");
       break;
     case 24:
-      return string("K_pas_rv_2");
+      returnString = string("K_pas_rv_2");
       break;
     case 25:
-      return string("Emax_rv");
+      returnString = string("Emax_rv");
       break;
     case 26:
-      return string("Vrv0");
+      returnString = string("Vrv0");
       break;
     case 27:
-      return string("K_pas_lv_1");
+      returnString = string("K_pas_lv_1");
       break;
     case 28:
-      return string("K_pas_lv_2");
+      returnString = string("K_pas_lv_2");
       break;
     case 29:
-      return string("Emax_lv");
+      returnString = string("Emax_lv");
       break;
     case 30:
-      return string("Vlv0");
+      returnString = string("Vlv0");
       break;
     case 31:
-      return string("L_ra_rv");
+      returnString = string("L_ra_rv");
       break;
     case 32:
-      return string("R_ra_rv");
+      returnString = string("R_ra_rv");
       break;
     case 33:
-      return string("L_rv_pa");
+      returnString = string("L_rv_pa");
       break;
     case 34:
-      return string("R_rv_pa");
+      returnString = string("R_rv_pa");
       break;
     case 35:
-      return string("L_la_lv");
+      returnString = string("L_la_lv");
       break;
     case 36:
-      return string("R_la_lv");
+      returnString = string("R_la_lv");
       break;
     case 37:
-      return string("L_lv_ao");
+      returnString = string("L_lv_ao");
       break;
     case 38:
-      return string("R_lv_ao");
+      returnString = string("R_lv_ao");
       break;
     case 39:
-      return string("C_ao");
+      returnString = string("C_ao");
       break;
     case 40:
-      return string("C_pa");
+      returnString = string("C_pa");
       break;
     case 41:
-      return string("R_pa");
+      returnString = string("R_pa");
       break;
     case 42:
-      return string("C_sys");
+      returnString = string("C_sys");
       break;
     case 43:
-      return string("R_sys_a");
+      returnString = string("R_sys_a");
       break;
     case 44:
-      return string("R_sys_v");
+      returnString = string("R_sys_v");
       break;
   }
+  return returnString;
 }
 
 int odeNormalAdultSimplePA::getStateTotal(){
@@ -172,53 +174,55 @@ int odeNormalAdultSimplePA::getAuxStateTotal(){
 }
 
 string odeNormalAdultSimplePA::getResultName(int index){
+  string returnString;
   switch(index){
     case 0:
-      return string("HR");
+      returnString = string("HR");
       break;
     case 1:
-      return string("SBP");
+      returnString = string("SBP");
       break;
     case 2:
-      return string("DBP");
+      returnString = string("DBP");
       break;
     case 3:
-      return string("mBP");
+      returnString = string("mBP");
       break;
     case 4:
-      return string("RAP");
+      returnString = string("RAP");
       break;
     case 5:
-      return string("sPAP");
+      returnString = string("sPAP");
       break;
     case 6:
-      return string("dPAP");
+      returnString = string("dPAP");
       break;
     case 7:
-      return string("mPAP");
+      returnString = string("mPAP");
       break;
     case 8:
-      return string("PWP");
+      returnString = string("PWP");
       break;
     case 9:
-      return string("CO");
+      returnString = string("CO");
       break;
     case 10:
-      return string("PVR");
+      returnString = string("PVR");
       break;
     case 11:
-      return string("SVR");
+      returnString = string("SVR");
       break;
     case 12:
-      return string("CVP");
+      returnString = string("CVP");
       break;
     case 13:
-      return string("LVEF");
+      returnString = string("LVEF");
       break;
     case 14:
-      return string("RVEF");
+      returnString = string("RVEF");
       break;
   }
+  return returnString;
 }
 
 void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){

@@ -20,6 +20,8 @@ class odeIntegrator{
 
     // Constructor
     odeIntegrator(odeModel* odeModel, double timeStep, int totalCycles);
+    // Overloaded Constructor
+    odeIntegrator(odeModel* odeModel, double timeStep, int totalCycles, const stdMat& forcing);
 
     // Destructor
     virtual ~odeIntegrator();

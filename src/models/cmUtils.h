@@ -163,6 +163,7 @@ No Reference
 return Maximum value in the array in the index interval [start,stop]
 */
 double getMax(int start, int stop, double* vector);
+double getMax(int start, int stop, stdVec vector); // added so that it can take vector in standard vector form
 
 /*! 
 \verbatim embed:rst
@@ -187,6 +188,8 @@ No Reference
 return Minimum value in the array in the index interval [start,stop]
 */
 double getMin(int start, int stop, double* vector);
+double getMin(int start, int stop, stdVec vector); // added so that it can take vector in standard vector form
+
 
 /*! 
 \verbatim embed:rst
@@ -211,6 +214,7 @@ No Reference
 return Average value in the array in the index interval [start,stop]
 */
 double getMean(int start, int stop, double* vector);
+double getMean(int start, int stop, stdVec vector);
 
 /*! 
 \verbatim embed:rst
@@ -235,6 +239,7 @@ No Reference
 return Sum of array components in the index interval [start,stop]
 */
 double getSum(int start, int stop, double* vector);
+double getSum(int start, int stop, stdVec vector);
 
 /*! 
 \verbatim embed:rst

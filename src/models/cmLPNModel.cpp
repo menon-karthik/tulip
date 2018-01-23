@@ -105,6 +105,7 @@ double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec
       
     // Evaluate Objective Function
     result = data->evalLogLikelihood(keys,outs,stds,weights);
+    data->printAndCompare(keys,outs,weights);
     //result = data->evalOBJ(keys,computedValues,weigths);
   }
   // Return 

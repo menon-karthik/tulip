@@ -10,6 +10,8 @@ class odeIntegratorRK4: public odeIntegrator{
 
     // Constructor
     odeIntegratorRK4(odeModel* odeModel, double timeStep, int totalCycles);
+    // Constructor to handle forcing
+    odeIntegratorRK4(odeModel* odeModel, double timeStep, int totalCycles, stdMat forcing);
 
     // Destructor
     virtual ~odeIntegratorRK4();

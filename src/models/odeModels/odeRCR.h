@@ -1,44 +1,52 @@
-#ifndef ODERCR_H
-#define ODERCR_H
+#ifndef odeRCR_KKH_H
+#define odeRCR_KKH_H
 
+# include <stdio.h>
+# include <string>
+# include "stdlib.h"
+# include "math.h"
+# include "uqTypes.h"
 # include "odeModel.h"
+# include "cmModel.h"
+# include "cmConstants.h"
 # include "cmUtils.h"
+# include "cmException.h"
 
-// Constants
-const int ipP0 = 0;
-const int ipP1 = 1;
-const int ipP2 = 2;
-const int ipQ1 = 3;
-const int ipQ2 = 4;
+// Constants for Result Quantities
+const int ip_min_P_0   = 0;
+const int ip_max_P_0  = 1;
+const int ip_av_P_0  = 2;
 
-using namespace std;
 
 // GENERIC CLASS FOR SAMPLES
 class odeRCR: public odeModel{
-  
   protected:
-    // Data Members
-    double proxResistance;
-    double capacitance;
-    double distResistance;
-    double iniPressure;
-    // Distal Pressure time history
-    stdMat distPressure;  
-  
-  public:
-  	// CONSTRUCTOR
-  	odeRCR(double r1, double c, double r2, stdMat p);
+    void getDefaultParameterLimits(stdVec& limits);
 
-    // FUNCTIONS THAT MUST BE IMPLEMENTED BY THE SUB CLASSES
+  public:
+    
+    // CONSTRUCTOR
+    odeRCR();
+
+    // DESTRUCTOR
+    virtual ~odeRCR();
+
+    // VIRTUAL FUNCTIONS TO IMPLEMENT
     virtual int    getParameterTotal();
     virtual string getParamName(int parID);
     virtual int    getStateTotal();
     virtual int    getResultTotal();
+    virtual int    getAuxStateTotal();
     virtual string getResultName(int resID);
-  	virtual void   getParameterLimits(stdVec& limits);
-  	virtual void   getDefaultParams(stdVec& params);
-    virtual void   eval(double t,const stdVec& Xk,const stdVec& params,stdVec& DXk,stdVec& auxOut);
-    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
+    virtual void   getParameterLimits(stdVec& limits);
+    virtual void   getDefaultParams(stdVec& params);
+    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind);
+    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
+    virtual void   getResultKeys(stdStringVec& keys);
+    virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs);
+    virtual void   getDataSTD(stdVec& stds);
+    virtual void   getResultWeigths(stdVec& weights);
+    virtual int    getHRIndex();
 };
 
-#endif // ODERCR_H
+#endif // odeRCR_KKH_H
