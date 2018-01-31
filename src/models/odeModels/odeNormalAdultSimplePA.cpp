@@ -8,7 +8,7 @@ odeNormalAdultSimplePA::odeNormalAdultSimplePA(int modelVersion,int targetConfig
 }
 
 odeNormalAdultSimplePA::~odeNormalAdultSimplePA(){
-
+  
 }
 
 int odeNormalAdultSimplePA::getParameterTotal(){
@@ -16,7 +16,7 @@ int odeNormalAdultSimplePA::getParameterTotal(){
 }
 
 int odeNormalAdultSimplePA::getHRIndex(){
- return 11; 
+  return 11;
 }
 
 string odeNormalAdultSimplePA::getParamName(int index){
@@ -162,15 +162,15 @@ string odeNormalAdultSimplePA::getParamName(int index){
 }
 
 int odeNormalAdultSimplePA::getStateTotal(){
-  return 11; 
+  return 11;
 }
 
 int odeNormalAdultSimplePA::getResultTotal(){
-  return 15;  
+  return 19;
 }
 
 int odeNormalAdultSimplePA::getAuxStateTotal(){
-  return 16;  
+  return 16;
 }
 
 string odeNormalAdultSimplePA::getResultName(int index){
@@ -221,12 +221,24 @@ string odeNormalAdultSimplePA::getResultName(int index){
     case 14:
       returnString = string("RVEF");
       break;
+    case 15:
+      returnString = string("sRV");
+      break;
+    case 16:
+      returnString = string("dRV");
+      break;
+    case 17:
+      returnString = string("sLV");
+      break;
+    case 18:
+      returnString = string("dLV");
+      break;
   }
   return returnString;
 }
 
 void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){
-
+  
   limits.resize(2*getParameterTotal());
   
   // --- Initial conditions
@@ -243,10 +255,10 @@ void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){
   limits[16] = 50.0 * convertmmHgToBarye; limits[17] = 150.0 * convertmmHgToBarye; // P_ao
   limits[18] = 0.0;                       limits[19] = 0.0; // Q_lv_ao
   limits[20] = 50.0 * convertmmHgToBarye; limits[21] = 50.0 * convertmmHgToBarye; // P_sys
-
+  
   // --- Heart Cycle Parameters
   limits[22] = 40.0; limits[23] = 100.0;  // HR - Heart Rate
-
+  
   // --- Atrial and ventricular activation duration and shift
   limits[24] = 0.05; limits[25] = 0.4;  // tsas - Atrial relative activation duration
   limits[26] = 5.0;  limits[27] = 10.0; // tpws - Atrial relative activation time shift
@@ -261,7 +273,7 @@ void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){
   limits[40] = 0.0001; limits[41] = 0.06; // K_pas_la_2 - Atrial passive curve exponent factor, left atrium
   limits[42] = 0.05;    limits[43] = 5.0;  // Emax_la - Atrial active curve slope, left atrium
   limits[44] = 0.0;    limits[45] = 50.0; // Vla0 - Unstressed left atrial volume
-
+  
   // --- Ventricular Model Parameters
   limits[46] = 0.1;    limits[47] = 20.0; // K_pas_rv_1 - Ventricular passive curve slope, right ventricle
   limits[48] = 0.0001; limits[49] = 0.01; // K_pas_rv_2 - Ventricular passive curve exponent factor, right ventricle
@@ -271,24 +283,24 @@ void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){
   limits[56] = 0.0001; limits[57] = 0.01; // K_pas_lv_2 - Ventricular passive curve exponent factor, left ventricle
   limits[58] = 1.0;    limits[59] = 5.0;  // Emax_lv - Ventricular active curve slope, left ventricle
   limits[60] = 0.0;    limits[61] = 50.0;  // Vlv0 - Unstressed left atrial volume
-
+  
   // --- Atrial and Ventricular Inductances and Resistances
   limits[62] = 0.1; limits[63] = 0.1;  // L_ra_rv - Inductance of right atrium
   limits[64] = 10.0;  limits[65] = 10.0; // R_ra_rv - Resistance of right atrium
   limits[66] = 0.1; limits[67] = 0.1;  // L_rv_pa - Inductance of right ventricle
   limits[68] = 15.0; limits[69] = 15.0; // R_rv_pa - Resistance of right ventricle
   limits[70] = 0.1; limits[71] = 0.1;  // L_la_lv - Inductance of left atrium
-  limits[72] = 8.0;  limits[73] = 8.0; // R_la_lv - Resistance of left atrium  
+  limits[72] = 8.0;  limits[73] = 8.0; // R_la_lv - Resistance of left atrium
   limits[74] = 0.1; limits[75] = 0.1;  // L_lv_ao - Inductance of left ventricle
   limits[76] = 25.0; limits[77] = 25.0; // R_lv_ao - Resistance of left ventricle
   
   // --- Aortic Arch
   limits[78] = 1.0e-5; limits[79] = 0.001; // C_ao - Aortic capacitance
-
+  
   // --- Pulmonary Resistance and Capacitance
   limits[80] = 100.0e-6; limits[81] = 0.01;  // C_pa - Pulmonary capacitance
   limits[82] = 1.0;      limits[83] = 500.0; // R_pa - Pulmonary resistance
-
+  
   // --- Systemic Resistance and Capacitance
   limits[84] = 100.0e-6; limits[85] = 0.05;   // C_sys - Systemic capacitance
   limits[86] = 100.0;    limits[87] = 800.0;  // R_sys_a - Systemic Resistance - Arteries
@@ -296,12 +308,12 @@ void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){
 }
 
 void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
-
+  
   // Resize Parameter Array
   params.resize(getParameterTotal());
-
+  
   // NOTE: CGS Units: Pressures in Barye, Flowrates in mL/s
-
+  
   // --- Initial State Values
   params[0] = 0.0; // V_ra
   params[1] = 0.0; // V_la
@@ -314,15 +326,15 @@ void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
   params[8] = 100.0 * convertmmHgToBarye; // P_ao
   params[9] = 0.0; // Q_lv_ao
   params[10] = 50.0 * convertmmHgToBarye; // P_sys
-
+  
   // --- Heart Cycle Parameters
   params[11+0] = 78.0; // HR - Heart Rate (beats per minute)
-
+  
   // --- Atrial and ventricular activation duration
   params[11+1] = 0.2; // tsas - Atrial relative activation duration
   params[11+2] = 9.5; // tpws - Atrial relative activation time shift
   params[11+3] = 0.4; // tsvs - Ventricular relative activation duration
-
+  
   // --- Atrial model parameters
   params[11+4] = 5.0; // K_pas_ra_1 - Atrial passive curve slope, right atrium
   params[11+5] = 0.006; // K_pas_ra_2 - Atrial passive curve exponent factor, right atrium
@@ -332,7 +344,7 @@ void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
   params[11+9] = 0.0065; // K_pas_la_2 - Atrial passive curve exponent factor, left atrium
   params[11+10] = 0.2; // Emax_la - Atrial active curve slope, left atrium
   params[11+11] = 0.0; // Vla0 - Unstressed left atrial volume
-
+  
   // --- Ventricular Model Parameters
   params[11+12] = 5.0; // K_pas_rv_1 - Ventricular passive curve slope, right atrium
   params[11+13] = 0.003; // K_pas_rv_2 - Ventricular passive curve exponent factor, right atrium
@@ -342,7 +354,7 @@ void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
   params[11+17] = 0.003; // K_pas_lv_2 - Ventricular passive curve exponent factor, left atrium
   params[11+18] = 4.0; // Emax_lv - Ventricular active curve slope, left atrium
   params[11+19] = 20.0; // Vlv0 - Unstressed left atrial volume
-
+  
   // --- Atrial and Ventricular Inductances and Resistances
   params[11+20] = 0.1;   // L_ra_rv - Inductance of right atrium
   params[11+21] = 10.0;  // R_ra_rv - Resistance of right atrium
@@ -352,14 +364,14 @@ void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
   params[11+25] = 30.0;  // R_la_lv - Resistance of left atrium
   params[11+26] = 0.1;   // L_lv_ao - Inductance of left ventricle
   params[11+27] = 30.0; // R_lv_ao - Resistance of left ventricle
-
+  
   // --- Aortic Arch
   params[11+28] = 1000.0e-6; // C_ao - Aortic capacitance
-
+  
   // --- Pulmonary Resistance and Capacitance
   params[11+29] = 4000.0e-6; // C_pa - Pulmonary capacitance
-  params[11+30] = 130.0; // R_pa - Pulmonary resistance  
-
+  params[11+30] = 130.0; // R_pa - Pulmonary resistance
+  
   // --- Systemic Resistance and Capacitance
   params[11+31] = 400.0e-6; // C_sys - Systemic Capacitance
   params[11+32] = 400.0; // R_sys_a - Systemic Resistance - Arteries
@@ -367,7 +379,7 @@ void odeNormalAdultSimplePA::getDefaultParams(stdVec& params){
 }
 
 void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind){
-
+  
   // Assign the Parameters
   double HR         = params[0]; // Heart Rate
   // Atrial and ventricular duration and shift
@@ -387,7 +399,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   double K_pas_rv_1 = params[12];
   double K_pas_rv_2 = params[13];
   double Emax_rv    = params[14];
-  double Vrv0       = params[15];  
+  double Vrv0       = params[15];
   double K_pas_lv_1 = params[16];
   double K_pas_lv_2 = params[17];
   double Emax_lv    = params[18];
@@ -405,12 +417,12 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   double C_ao       = params[28];
   // Pulmonary Resistance and Capacitance
   double C_pa       = params[29];
-  double R_pa       = params[30];  
+  double R_pa       = params[30];
   // Systemic Resistance and Capacitance
   double C_sys      = params[31];
   double R_sys_a    = params[32];
   double R_sys_v    = params[33];
-
+  
   // Assign state variables
   double V_ra    = Xk[0];
   double V_la    = Xk[1];
@@ -423,22 +435,22 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   double P_ao    = Xk[8];
   double Q_lv_ao = Xk[9];
   double P_sys   = Xk[10];
-
+  
   // SET OPTIONS
   bool printMessages = false;
   int totalStates = Xk.size();
-
+  
   // Set Time integration parameters
   double tc = 60.0/HR;
   double tsa = tc * tsas;
   double tsv = tc * tsvs;
   double tpw = tc/(double)tpws;
   double tcr = fmod(t,tc);
-
+  
   // ====================================================
   // PART I - ATRIAL ACTIVATION AND VENTRICULAR ELASTANCE
   // ====================================================
-
+  
   // Heart function
   double tmv = tcr; // Ventricle time
   double tma = fmod(t+tsa-tpw,tc); // Atrium time
@@ -454,11 +466,11 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   // Atrium activation
   double fAA = 0.0;
   if(tma<tsas){
-    fAA = (1.0-cos(2.0*M_PI*tma/(double)tsas))/2.0; 
+    fAA = (1.0-cos(2.0*M_PI*tma/(double)tsas))/2.0;
   }else{
     fAA = 0.0;
   }
-
+  
   // ATRIA
   // Compute exponential atrial passive pressures curves
   double P_pas_ra = K_pas_ra_1*(exp((V_ra-Vra0)*K_pas_ra_2)-1.0);
@@ -469,7 +481,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   // Blend with activation function
   double P_ra = (P_pas_ra + fAA * (P_act_ra - P_pas_ra)) * convertmmHgToBarye;
   double P_la = (P_pas_la + fAA * (P_act_la - P_pas_la)) * convertmmHgToBarye;
-
+  
   // VENTRICLES
   // Passive Curve - Exponential
   double P_pas_rv = K_pas_rv_1*(exp((V_rv-Vrv0)*K_pas_rv_2)-1.0);
@@ -480,36 +492,36 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   // Use Activation to blend between active and passive Curves
   double P_rv = (P_pas_rv + fAV * (P_act_rv - P_pas_rv)) * convertmmHgToBarye;
   double P_lv = (P_pas_lv + fAV * (P_act_lv - P_pas_lv)) * convertmmHgToBarye;
-
+  
   // ========================
   // PART II - HEART CHAMBERS
   // ========================
-
-  // Initialize variables for valves 
+  
+  // Initialize variables for valves
   // 1.0 - Valve Open; 0.0 - Valve Closed
   for(int loopA=0;loopA<totalStates;loopA++){
     Ind[loopA] = 1.0;
   }
-
+  
   // Check if RA-RV Valve is open
   if((P_rv >= P_ra)||(Q_ra_rv < 0.0)){
     Ind[4]=0.0;
   }
-
+  
   // Right Atrium Equation
   double Q_ra_rv_p = 0.0;
   if(Ind[4]>0.0){
-    Q_ra_rv_p = (1.0/L_ra_rv)*(P_ra - P_rv - R_ra_rv * Q_ra_rv);  
+    Q_ra_rv_p = (1.0/L_ra_rv)*(P_ra - P_rv - R_ra_rv * Q_ra_rv);
   }
   if(printMessages){
     printf("Q_ra_rv_p: %f\n",Q_ra_rv_p);
   }
-
+  
   // Check if RV-PA Valve is open
   if((P_pa >= P_rv)||(Q_rv_pa < 0.0)){
     Ind[6]=0.0;
   }
-
+  
   // Right Ventricle
   double Q_rv_pa_p = 0.0;
   if(Ind[6]>0.0){
@@ -518,7 +530,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   if(printMessages){
     printf("Q_rv_pa_p: %f\n",Q_rv_pa_p);
   }
-
+  
   // Pulmonary Circulation: Only Capacitance Equation
   double Q_pul = (P_pa - P_la)/R_pa;
   double P_pa_p = ( 1.0 / C_pa )*( Q_rv_pa * Ind[6] - Q_pul );
@@ -526,12 +538,12 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
     printf("Q_pul: %f\n",Q_pul);
     printf("P_pa_p: %f\n",P_pa_p);
   }
-
+  
   // Check if LA-LV Valve is open
   if((P_lv >= P_la)||(Q_la_lv < 0.0)){
     Ind[7]=0.0;
   }
-
+  
   // Left Atrium
   double Q_la_lv_p = 0.0;
   if(Ind[7]>0.0){
@@ -540,12 +552,12 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   if(printMessages){
     printf("Q_la_lv_p: %f\n",Q_la_lv_p);
   }
-
+  
   // Check if LV-AO Valve is open
   if((P_ao >= P_lv)||(Q_lv_ao < 0.0)){
     Ind[9]=0.0;
   }
-
+  
   // Left Ventricle
   double Q_lv_ao_p = 0.0;
   if(Ind[9]>0.0){
@@ -554,22 +566,22 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   if(printMessages){
     printf("Q_lv_ao_p: %f\n",Q_lv_ao_p);
   }
-
+  
   // Flow in VEINS
   double Q_sys_a = ( P_ao - P_sys ) / R_sys_a;
   if(printMessages){
     printf("Q_sys_a: %f\n",Q_sys_a);
   }
-
+  
   // ====================================================
   // COMPUTE THE VARIATION IN VOLUME FOR ALL THE CHAMBERS
   // ====================================================
-
+  
   double V_ra_p = 0.0;
   double V_la_p = 0.0;
   double V_rv_p = 0.0;
-  double V_lv_p = 0.0; 
-
+  double V_lv_p = 0.0;
+  
   // Add Systemic Resistance
   double Q_sys_v = ( P_sys - P_ra ) / R_sys_v;
   
@@ -578,7 +590,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   V_rv_p = Q_ra_rv * Ind[4] - Q_rv_pa * Ind[6];
   V_la_p = Q_pul - Q_la_lv * Ind[7];
   V_lv_p = Q_la_lv * Ind[7] - Q_lv_ao * Ind[9];
-
+  
   if(printMessages){
     printf("Q_sys_v: %f\n",Q_sys_v);
     printf("V_ra_p: %f\n",V_ra_p);
@@ -586,21 +598,21 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
     printf("V_rv_p: %f\n",V_rv_p);
     printf("V_lv_p: %f\n",V_lv_p);
   }
-
+  
   // ======================
   // PART III - AORTIC ARCH
   // ======================
-
+  
   // Aortic arch capacitance
   double P_ao_p = (1.0/C_ao) * ( Q_lv_ao - Q_sys_a );
-
+  
   if(printMessages){
     printf("P_ao_p: %f\n",P_ao_p);
   }
-
+  
   // Systemic Capacitance
-  double P_sys_p = (1.0/C_sys) * ( Q_sys_a - Q_sys_v );  
-
+  double P_sys_p = (1.0/C_sys) * ( Q_sys_a - Q_sys_v );
+  
   // Store the derivatives
   DXk[0] = V_ra_p;
   DXk[1] = V_la_p;
@@ -613,7 +625,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   DXk[8] = P_ao_p;
   DXk[9] = Q_lv_ao_p;
   DXk[10] = P_sys_p;
-
+  
   // Get Auxiliary Results
   auxOut[0]  = t;       // Current Time
   auxOut[1]  = tcr;     // Relative Cycle Time
@@ -631,11 +643,11 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   auxOut[13] = Ind[6];  // RV-PA valve status
   auxOut[14] = Ind[7];  // LA-LV valve status
   auxOut[15] = Ind[9];  // LV-AO valve status
-
+  
 }
 
 void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params,const stdMat& outVals,const stdMat& auxOutVals, stdVec& results){
-
+  
   // DETERMINE START AND END OF LAST HEART CYCLE
   double heartRate = 60.0/(totalStepsOnSingleCycle * timeStep);
   int numCycles = totalSteps/totalStepsOnSingleCycle;
@@ -643,7 +655,7 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   int stopLastCycle = numCycles * totalStepsOnSingleCycle;
   double output[totalSteps];
   double valveOpening[totalSteps];
-
+  
   // SYSTOLIC, DIASTOLIC AND AVERAGE BLOOD PRESSURES
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[8][loopA];
@@ -651,7 +663,7 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   double maxAOPress  = getMax(startLastCycle, stopLastCycle, output);
   double minAOPress  = getMin(startLastCycle, stopLastCycle, output);
   double avAOPress   = getMean(startLastCycle, stopLastCycle, output);
-
+  
   // RA PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[5][loopA];
@@ -659,7 +671,7 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   double minRAPress  = getMin(startLastCycle, stopLastCycle, output);
   double maxRAPress  = getMax(startLastCycle, stopLastCycle, output);
   double avRAPress   = getMean(startLastCycle, stopLastCycle, output);
-
+  
   // RV PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[7][loopA];
@@ -667,8 +679,12 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   double minRVPress  = getMin(startLastCycle, stopLastCycle, output);
   double maxRVPress  = getMax(startLastCycle, stopLastCycle, output);
   double avRVPress   = getMean(startLastCycle, stopLastCycle, output);
-
-
+  
+  // dRV and sRV
+  double sRV = maxRVPress;
+  double dRV = minRVPress;
+  
+  
   // SYSTOLIC, DIASTOLIC AND AVERAGE PA PRESSURES
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[5][loopA];
@@ -676,14 +692,14 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   double maxPAPress  = getMax(startLastCycle, stopLastCycle, output);
   double minPAPress  = getMin(startLastCycle, stopLastCycle, output);
   double avPAPress  = getMean(startLastCycle, stopLastCycle, output);
-
+  
   // PWD OR AVERAGE LEFT ATRIAL PRESSURE
   // AVERAGE PCWP PRESSURE - INDIRECT MEASURE OF LEFT ATRIAL PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[6][loopA];
   }
   double avPCWPress = getMean(startLastCycle, stopLastCycle, output);
-
+  
   // LEFT VENTRICULAR PRESSURES
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[8][loopA];
@@ -691,13 +707,17 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   double minLVPress  = getMin(startLastCycle, stopLastCycle, output);
   double maxLVPress  = getMax(startLastCycle, stopLastCycle, output);
   double avgLVPress  = getMean(startLastCycle, stopLastCycle, output);
-
-  // CARDIAC OUTPUT  
+  
+  // dLV and sLV
+  double sLV = maxLVPress;
+  double dLV = minLVPress;
+  
+  // CARDIAC OUTPUT
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[9][loopA];
   }
   double CO = getMean(startLastCycle, stopLastCycle, output);
-
+  
   // LEFT AND RIGHT VENTRICULAR VOLUMES
   double minRVVolume = outVals[2][startLastCycle];
   double maxRVVolume = outVals[2][startLastCycle];
@@ -717,86 +737,86 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
       maxLVVolume = outVals[3][loopA];
     }
   }
-
+  
   // END SYSTOLIC RIGHT ATRIAL VOLUME
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[0][loopA];
   }
   double minRAVolume = getMin(startLastCycle, stopLastCycle, output);
-
+  
   // END SYSTOLIC LEFT ATRIAL VOLUME
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[1][loopA];
   }
   double minLAVolume = getMin(startLastCycle, stopLastCycle, output);
-
+  
   // EJECTION FRACTION
   double LVEF = ((maxLVVolume - minLVVolume)/maxLVVolume)*100.0;
   double RVEF = ((maxRVVolume - minRVVolume)/maxRVVolume)*100.0;
-
+  
   // RIGHT VENTRICULAR VOLUME AT BEGINNING OF SYSTOLE
   double RVEDP = auxOutVals[7][startLastCycle];
-
+  
   // PRESSURE GRADIENT ACROSS AORTIC VALVE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = fabs(outVals[8][loopA] - auxOutVals[8][loopA]) * auxOutVals[15][loopA]; // fabs(aortic - LV) * IND(AOV)
   }
   double meanAOVPG = getMean(startLastCycle, stopLastCycle, output);
   double maxAOVPG  = getMax (startLastCycle, stopLastCycle, output);
-
+  
   // PRESSURE GRADIENT ACROSS PULMONARY VALVE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = fabs(outVals[5][loopA] - auxOutVals[7][loopA]) * auxOutVals[13][loopA]; // fabs(pulmonary - RV) * IND(PV)
   }
   double meanPVPG = getMean(startLastCycle, stopLastCycle, output);
   double maxPVPG  = getMax (startLastCycle, stopLastCycle, output);
-
+  
   // MITRAL VALVE DECELERATION TIME
   for(int loopA=startLastCycle;loopA<stopLastCycle;loopA++){
     output[loopA-startLastCycle] = outVals[7][loopA];
     valveOpening[loopA-startLastCycle] = auxOutVals[14][loopA];
   }
-  zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening);  
+  zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening);
   double mvDecelTime = 0.0;
   bool isDecelTimeOK = getDecelerationTime(0, stopLastCycle - startLastCycle, timeStep, output, mvDecelTime);
   
   // MITRAL VALVE E/A RATIO
   double mvEARatio = 0.0;
-  bool isMVEARatioOK = getEARatio(0, stopLastCycle - startLastCycle, output, mvEARatio);  
-
+  bool isMVEARatioOK = getEARatio(0, stopLastCycle - startLastCycle, output, mvEARatio);
+  
   // PULMONARY VALVE ACCELERATION TIME
   for(int loopA=startLastCycle;loopA<stopLastCycle;loopA++){
     output[loopA-startLastCycle] = outVals[6][loopA];
     valveOpening[loopA-startLastCycle] = auxOutVals[13][loopA];
   }
   // SHIFT CURVE WITH BEGINNING AT VALVE OPENING
-  zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening);  
+  zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening);
   double pvAccelTime = 0.0;
   bool isPVAccelTimeOK = getAccelerationTime(0, stopLastCycle - startLastCycle, timeStep, output, pvAccelTime);
-
+  
   //printf("mvDecelTime: %f\n",mvDecelTime);
   //printf("mvEARatio: %f\n",mvEARatio);
   //printf("pvAccelTime: %f\n",pvAccelTime);
-
+  
   // Assign Results Based on Model Version
-  results.clear(); 
+  results.clear();
   if((modelVersion >= 0001)&&(modelVersion < 0002)){
     // HEART RATE
     results.push_back(heartRate);
     // SYSTOLIC, DIASTOLIC AND AVERAGE BLOOD PRESSURES
     results.push_back(maxAOPress);
-    results.push_back(minAOPress);  
-    results.push_back(avAOPress);  
+    results.push_back(minAOPress);
+    results.push_back(avAOPress);
     // AVERAGE RA PRESSURE
     results.push_back(avRAPress);
     // SYSTOLIC, DIASTOLIC AND AVERAGE PA PRESSURES
     results.push_back(maxPAPress);
-    results.push_back(minPAPress); 
-    results.push_back(avPAPress); 
+    results.push_back(minPAPress);
+    results.push_back(avPAPress);
     // PWD OR AVERAGE LEFT ATRIAL PRESSURE
     // AVERAGE PCWP PRESSURE - INDIRECT MEASURE OF LEFT ATRIAL PRESSURE
     results.push_back(avPCWPress);
-    // CARDIAC OUTPUT  
+    // CARDIAC OUTPUT
     results.push_back(CO);
     // PVR AND SVR
     results.push_back(params[41]);
@@ -804,11 +824,15 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
     // CENTRAL VENOUS PRESSURE: USE RIGHT ATRIAL PRESSURE
     results.push_back(avRAPress);
     // EJECTION FRACTIONS
-    results.push_back(LVEF);  
+    results.push_back(LVEF);
     results.push_back(RVEF);
-
+    results.push_back(sRV);
+    results.push_back(dRV);
+    results.push_back(sLV);
+    results.push_back(dLV);
+    
   }else if(modelVersion >= 0002){
-
+    
     results.push_back(heartRate); // ip_0002_heart_rate2
     results.push_back(maxAOPress); // ip_0002_systolic_bp_2
     results.push_back(minAOPress); // ip_0002_diastolic_bp_2
@@ -819,7 +843,7 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
     results.push_back(minRVPress); // ip_0002_right_ventricle_diastole
     results.push_back(maxRVPress); // ip_0002_right_ventricle_systole
     // Right ventricular volume at beginning of systole
-    results.push_back(RVEDP); // ip_0002_rvedp    
+    results.push_back(RVEDP); // ip_0002_rvedp
     results.push_back(meanAOVPG); // ip_0002_aov_mean_pg
     results.push_back(maxAOVPG); // ip_0002_aov_peak_pg
     results.push_back(mvDecelTime); // ip_0002_mv_decel_time
@@ -837,15 +861,15 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
     results.push_back(0.0); // ip_0002_lvot_max_flow
     results.push_back(minPAPress); // ip_0002_pap_diastolic
     results.push_back(maxPAPress); // ip_0002_pap_systolic
-    results.push_back(avPCWPress); // ip_0002_wedge_pressure  
+    results.push_back(avPCWPress); // ip_0002_wedge_pressure
   }
 }
 
 void odeNormalAdultSimplePA::getResultKeys(stdStringVec& keys){
-
+  
   // CHECK INSTALLED VERSION
   if((modelVersion >= 0001)&&(modelVersion < 0002)){
-
+    
     // KEYS
     keys.clear();
     keys.push_back(string("HR"));
@@ -863,16 +887,20 @@ void odeNormalAdultSimplePA::getResultKeys(stdStringVec& keys){
     keys.push_back(string("CVP"));
     keys.push_back(string("LVEF"));
     keys.push_back(string("RVEF"));
-
+    keys.push_back(string("sRV"));
+    keys.push_back(string("dRV"));
+    keys.push_back(string("sLV"));
+    keys.push_back(string("dLV"));
+    
   }else if(modelVersion >= 0002){
-
+    
     // Select various target settings - DES APR 2016
     if(targetConfigMode == ipTargetConfig_ExcludePAP){
       // Exclude Pulmonary Pressures
       keys.clear();
       keys.push_back(string("heart_rate2"));
       keys.push_back(string("systolic_bp_2"));
-      keys.push_back(string("diastolic_bp_2"));    
+      keys.push_back(string("diastolic_bp_2"));
       keys.push_back(string("cardiac_output"));
       keys.push_back(string("systemic_vascular_resistan"));
       keys.push_back(string("pulmonary_vascular_resista"));
@@ -893,23 +921,23 @@ void odeNormalAdultSimplePA::getResultKeys(stdStringVec& keys){
       keys.push_back(string("lv_vol_a4c"));
       keys.push_back(string("lvef"));
       keys.push_back(string("lvot_max_flow"));
-
+      
     }else if(targetConfigMode == ipTargetConfig_HRBPCVP){
       // Include only HR BP and CVP targets
       keys.clear();
       keys.push_back(string("heart_rate2"));
       keys.push_back(string("systolic_bp_2"));
-      keys.push_back(string("diastolic_bp_2"));    
+      keys.push_back(string("diastolic_bp_2"));
       keys.push_back(string("cvp"));
       keys.push_back(string("rvedp"));
       keys.push_back(string("ra_pressure"));
-
+      
     }else{
       // Include all targets
       keys.clear();
       keys.push_back(string("heart_rate2"));
       keys.push_back(string("systolic_bp_2"));
-      keys.push_back(string("diastolic_bp_2"));    
+      keys.push_back(string("diastolic_bp_2"));
       keys.push_back(string("cardiac_output"));
       keys.push_back(string("systemic_vascular_resistan"));
       keys.push_back(string("pulmonary_vascular_resista"));
@@ -938,10 +966,10 @@ void odeNormalAdultSimplePA::getResultKeys(stdStringVec& keys){
 }
 
 void odeNormalAdultSimplePA::getFinalOutputs(const stdVec& outputs,stdVec& outs){
-
+  
   // CHECK INSTALLED VERSION
   if((modelVersion >= 0001)&&(modelVersion < 0002)){
-
+    
     // COMPUTED VALUES
     outs.clear();
     outs.push_back(outputs[ip_0001_HR]);
@@ -959,14 +987,18 @@ void odeNormalAdultSimplePA::getFinalOutputs(const stdVec& outputs,stdVec& outs)
     outs.push_back(outputs[ip_0001_CVP]/1333.22);
     outs.push_back(outputs[ip_0001_LVEF]);
     outs.push_back(outputs[ip_0001_RVEF]);
-
+    outs.push_back(outputs[ip_0001_sRV]/1333.22);
+    outs.push_back(outputs[ip_0001_dRV]/1333.22);
+    outs.push_back(outputs[ip_0001_sLV]/1333.22);
+    outs.push_back(outputs[ip_0001_dLV]/1333.22);
+    
   }else if(modelVersion >= 0002){
-
+    
     if(targetConfigMode == ipTargetConfig_ExcludePAP){
       outs.clear();
       outs.push_back(outputs[ip_0002_heart_rate2]);
       outs.push_back(outputs[ip_0002_systolic_bp_2]/1333.22);
-      outs.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);    
+      outs.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);
       outs.push_back(outputs[ip_0002_cardiac_output]*(60.0/1000.0));
       outs.push_back(outputs[ip_0002_systemic_vascular_resistan]);
       outs.push_back(outputs[ip_0002_pulmonary_vascular_resista]);
@@ -986,13 +1018,13 @@ void odeNormalAdultSimplePA::getFinalOutputs(const stdVec& outputs,stdVec& outs)
       outs.push_back(outputs[ip_0002_lv_esv]);
       outs.push_back(outputs[ip_0002_lv_vol]);
       outs.push_back(outputs[ip_0002_lvef]);
-      outs.push_back(outputs[ip_0002_lvot_max_flow]);      
-
+      outs.push_back(outputs[ip_0002_lvot_max_flow]);
+      
     }else if(targetConfigMode == ipTargetConfig_HRBPCVP){
       outs.clear();
       outs.push_back(outputs[ip_0002_heart_rate2]);
       outs.push_back(outputs[ip_0002_systolic_bp_2]/1333.22);
-      outs.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);    
+      outs.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);
       outs.push_back(outputs[ip_0002_cvp]/1333.22);
       outs.push_back(outputs[ip_0002_rvedp]/1333.22);
       outs.push_back(outputs[ip_0002_ra_pressure]/1333.22);
@@ -1000,7 +1032,7 @@ void odeNormalAdultSimplePA::getFinalOutputs(const stdVec& outputs,stdVec& outs)
       outs.clear();
       outs.push_back(outputs[ip_0002_heart_rate2]);
       outs.push_back(outputs[ip_0002_systolic_bp_2]/1333.22);
-      outs.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);    
+      outs.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);
       outs.push_back(outputs[ip_0002_cardiac_output]*(60.0/1000.0));
       outs.push_back(outputs[ip_0002_systemic_vascular_resistan]);
       outs.push_back(outputs[ip_0002_pulmonary_vascular_resista]);
@@ -1029,10 +1061,10 @@ void odeNormalAdultSimplePA::getFinalOutputs(const stdVec& outputs,stdVec& outs)
 }
 
 void odeNormalAdultSimplePA::getDataSTD(stdVec& stds){
-
+  
   // CHECK INSTALLED VERSION
   if((modelVersion >= 0001)&&(modelVersion < 0002)){
-
+    
     // STANDARD DEVIATIONS
     stds.clear();
     stds.push_back(3.0); // HR
@@ -1048,16 +1080,20 @@ void odeNormalAdultSimplePA::getDataSTD(stdVec& stds){
     stds.push_back(5.0); // PVR
     stds.push_back(50.0); // SVR
     stds.push_back(0.5); // CVP
-    stds.push_back(2.0); // LVEF 
+    stds.push_back(2.0); // LVEF
     stds.push_back(2.0); // RVEF
-  
+    stds.push_back(1.0); // sRV
+    stds.push_back(1.0); // dRV
+    stds.push_back(1.5); // sLV, similar to SBP
+    stds.push_back(2.0); // dLV
+    
   }else if(modelVersion >= 0002){
-
+    
     if(targetConfigMode == ipTargetConfig_ExcludePAP){
       stds.clear();
       stds.push_back(3.0); // heart_rate2
       stds.push_back(1.5); // systolic_bp_2
-      stds.push_back(1.5); // diastolic_bp_2    
+      stds.push_back(1.5); // diastolic_bp_2
       stds.push_back(0.2); // cardiac_output
       stds.push_back(50.0); // systemic_vascular_resistan
       stds.push_back(5.0); // pulmonary_vascular_resista
@@ -1078,21 +1114,21 @@ void odeNormalAdultSimplePA::getDataSTD(stdVec& stds){
       stds.push_back(20.0); // lv_vol_a4c
       stds.push_back(2.0); // lvef
       stds.push_back(1.0); // lvot_max_flow
-
+      
     }else if(targetConfigMode == ipTargetConfig_HRBPCVP){
       stds.clear();
       stds.push_back(3.0); // heart_rate2
       stds.push_back(1.5); // systolic_bp_2
-      stds.push_back(1.5); // diastolic_bp_2    
+      stds.push_back(1.5); // diastolic_bp_2
       stds.push_back(0.5); // cvp
       stds.push_back(1.0); // rvedp
       stds.push_back(0.5); // ra_pressure
-
+      
     }else{
       stds.clear();
       stds.push_back(3.0); // heart_rate2
       stds.push_back(1.5); // systolic_bp_2
-      stds.push_back(1.5); // diastolic_bp_2    
+      stds.push_back(1.5); // diastolic_bp_2
       stds.push_back(0.2); // cardiac_output
       stds.push_back(50.0); // systemic_vascular_resistan
       stds.push_back(5.0); // pulmonary_vascular_resista
@@ -1121,10 +1157,10 @@ void odeNormalAdultSimplePA::getDataSTD(stdVec& stds){
 }
 
 void odeNormalAdultSimplePA::getResultWeigths(stdVec& weights){
-
+  
   // CHECK INSTALLED VERSION
   if((modelVersion >= 0001)&&(modelVersion < 0002)){
-
+    
     // STANDARD DEVIATIONS
     weights.clear();
     weights.push_back(1.0); // HR
@@ -1140,16 +1176,20 @@ void odeNormalAdultSimplePA::getResultWeigths(stdVec& weights){
     weights.push_back(1.0); // PVR
     weights.push_back(1.0); // SVR
     weights.push_back(1.0); // CVP
-    weights.push_back(1.0); // LVEF 
+    weights.push_back(1.0); // LVEF
     weights.push_back(1.0); // RVEF
-  
+    weights.push_back(1.0); // sRV
+    weights.push_back(1.0); // dRV
+    weights.push_back(1.0); // sLV
+    weights.push_back(1.0); // dLV
+    
   }else if(modelVersion >= 0002){
-
+    
     if(targetConfigMode == ipTargetConfig_ExcludePAP){
       weights.clear();
       weights.push_back(1.0); // heart_rate2
       weights.push_back(1.0); // systolic_bp_2
-      weights.push_back(1.0); // diastolic_bp_2    
+      weights.push_back(1.0); // diastolic_bp_2
       weights.push_back(1.0); // cardiac_output
       weights.push_back(1.0); // systemic_vascular_resistan
       weights.push_back(1.0); // pulmonary_vascular_resista
@@ -1170,21 +1210,21 @@ void odeNormalAdultSimplePA::getResultWeigths(stdVec& weights){
       weights.push_back(1.0); // lv_vol_a4c
       weights.push_back(1.0); // lvef
       weights.push_back(1.0); // lvot_max_flow
-
+      
     }else if(targetConfigMode == ipTargetConfig_HRBPCVP){
       weights.clear();
       weights.push_back(1.0); // heart_rate2
       weights.push_back(1.0); // systolic_bp_2
-      weights.push_back(1.0); // diastolic_bp_2    
+      weights.push_back(1.0); // diastolic_bp_2
       weights.push_back(1.0); // cvp
       weights.push_back(1.0); // rvedp
       weights.push_back(1.0); // ra_pressure
-
+      
     }else{
       weights.clear();
       weights.push_back(1.0); // heart_rate2
       weights.push_back(1.0); // systolic_bp_2
-      weights.push_back(1.0); // diastolic_bp_2    
+      weights.push_back(1.0); // diastolic_bp_2
       weights.push_back(1.0); // cardiac_output
       weights.push_back(1.0); // systemic_vascular_resistan
       weights.push_back(1.0); // pulmonary_vascular_resista

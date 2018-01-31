@@ -29,6 +29,10 @@ const int ip_0001_SVR  = 11;
 const int ip_0001_CVP  = 12;
 const int ip_0001_LVEF = 13;
 const int ip_0001_RVEF = 14;
+const int ip_0001_sRV = 15;
+const int ip_0001_dRV = 16;
+const int ip_0001_sLV = 17;
+const int ip_0001_dLV = 18;
 
 // Results v-0002
 const int ip_0002_heart_rate2                = 0;
@@ -66,35 +70,35 @@ const int ipTargetConfig_HRBPCVP    = 2;
 // GENERIC CLASS FOR SAMPLES
 class odeNormalAdultSimplePA: public odeModel{
   private:
-    // Types of result configuration
-    int modelVersion;
-    // Set Target Configuration Mode
-    int targetConfigMode;
-
+  // Types of result configuration
+  int modelVersion;
+  // Set Target Configuration Mode
+  int targetConfigMode;
+  
   public:
-    
-    // CONSTRUCTOR
-    odeNormalAdultSimplePA(int modelVersion,int targetConfigMode);
-
-    // DESTRUCTOR
-    virtual ~odeNormalAdultSimplePA();
-
-    // VIRTUAL FUNCTIONS TO IMPLEMENT
-    virtual int    getParameterTotal();
-    virtual string getParamName(int parID);
-    virtual int    getStateTotal();
-    virtual int    getResultTotal();
-    virtual int    getAuxStateTotal();
-    virtual string getResultName(int resID);
-    virtual void   getDefaultParameterLimits(stdVec& limits);
-    virtual void   getDefaultParams(stdVec& params);
-    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind);
-    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
-    virtual void   getResultKeys(stdStringVec& keys);
-    virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs);
-    virtual void   getDataSTD(stdVec& stds);
-    virtual void   getResultWeigths(stdVec& weights);
-    virtual int    getHRIndex();
+  
+  // CONSTRUCTOR
+  odeNormalAdultSimplePA(int modelVersion,int targetConfigMode);
+  
+  // DESTRUCTOR
+  virtual ~odeNormalAdultSimplePA();
+  
+  // VIRTUAL FUNCTIONS TO IMPLEMENT
+  virtual int    getParameterTotal();
+  virtual string getParamName(int parID);
+  virtual int    getStateTotal();
+  virtual int    getResultTotal();
+  virtual int    getAuxStateTotal();
+  virtual string getResultName(int resID);
+  virtual void   getDefaultParameterLimits(stdVec& limits);
+  virtual void   getDefaultParams(stdVec& params);
+  virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind);
+  virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
+  virtual void   getResultKeys(stdStringVec& keys);
+  virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs);
+  virtual void   getDataSTD(stdVec& stds);
+  virtual void   getResultWeigths(stdVec& weights);
+  virtual int    getHRIndex();
 };
 
 #endif // ODENORMALADULTSIMPLEPA_H
