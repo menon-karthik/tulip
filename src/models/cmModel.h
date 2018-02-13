@@ -17,6 +17,8 @@ class cmModel{
     stdIntVec frozenParamIDX;
     //! List of frozen parameters values
     stdVec    frozenParamVAL;
+    //! Level of printing for model debug information
+    int printLevel;
 
   	//! Default constructor
   	cmModel();

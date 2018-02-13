@@ -3,7 +3,7 @@
 using namespace std;
 
 // Constructor
-cmLPNModel::cmLPNModel(odeIntegrator* integrator){
+cmLPNModel::cmLPNModel(odeIntegrator* integrator): cmModel(){
   this->integrator = integrator;
 }
 // Distuctor
@@ -86,8 +86,10 @@ double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec
   integrator->run(totalSteps,iniVals,params,outVals,auxOutVals);
   integrator->ode->postProcess(integrator->timeStep,totalStepsOnSingleCycle,totalSteps,inputs,outVals,auxOutVals,outputs);
   // Write Results to File
-  string outFile("allData.dat");
-  writeAllDataToFile(outFile,totalSteps,outVals,auxOutVals);
+  if(printLevel > 0){
+    string outFile("allData.dat");
+    writeAllDataToFile(outFile,totalSteps,outVals,auxOutVals);
+  }
   // Recover Keys,outs,stds and weights
   stdStringVec keys;
   stdVec outs;
@@ -100,12 +102,13 @@ double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec
   // Need to evaluate log-likelihood/posterior and return
   double result = 0.0;
   if(data != NULL){
-    // Print Info
-    data->printAndCompare(keys,outs,weights); 
-      
+    if(printLevel > 0){
+      // Print Info
+      data->printAndCompare(keys,outs,weights); 
+    }
+
     // Evaluate Objective Function
     result = data->evalLogLikelihood(keys,outs,stds,weights);
-    data->printAndCompare(keys,outs,weights);
     //result = data->evalOBJ(keys,computedValues,weigths);
   }
   // Return 

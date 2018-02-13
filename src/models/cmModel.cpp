@@ -4,6 +4,7 @@ using namespace std;
 
 cmModel::cmModel(){
   data = NULL;
+  printLevel = 0;
 }
 
 cmModel::~cmModel(){

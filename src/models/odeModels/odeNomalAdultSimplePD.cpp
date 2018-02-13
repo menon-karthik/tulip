@@ -232,6 +232,7 @@ string odeNormalAdultSimplePD::getResultName(int index){
       res = string("RVEF");
       break;
   }
+  return res;
 }
 
 void odeNormalAdultSimplePD::getDefaultParams(stdVec& params){
