@@ -133,7 +133,7 @@ void daData_single_GPatient::printAndCompare(stdStringVec keys,stdVec values,std
   //  printf("Key %s, Value %f\n",iterator->first.c_str(),iterator->second[1]);
   //}
 
-  if(dict.begin()->second.size() < 0){
+  if(dict.begin()->second.size() == 0){
     throw daException("Error in evalOBJ invalid data index.\n");
   }
   
