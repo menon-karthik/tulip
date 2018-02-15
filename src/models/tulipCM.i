@@ -25,6 +25,7 @@
 #include "odeModel.h"
 #include "odeNormalAdultSimplePA.h"
 #include "uqTypes.h"
+#include "cmBertiniSolverModel.h"
 %}
 
 /* Parse the header file to generate wrappers */
@@ -60,6 +61,7 @@
 %include "odeModel.h"
 %include "odeNormalAdultSimplePA.h"
 %include "uqTypes.h"
+%include "cmBertiniSolverModel.h"
 
 namespace std {
   typedef std::string String;
