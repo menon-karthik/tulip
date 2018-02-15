@@ -4,64 +4,12 @@
 # include <string>
 
 # include "cmException.h"
+# include "cmUtils.h"
 # include "exprtk.h"
 
 using namespace std;
 
-// Extract dimensions and number of equations from file
-void extractDimensions(string inputFile,long& dims,long& numEq){
-
-  string currExpression("");
-  string line;
-  size_t foundDim;
-  size_t foundEqu;
-  ifstream f(inputFile);
-  if(f.is_open()){
-    while(getline(f,line)){
-      foundDim  = line.find("dims");
-      foundEqu  = line.find("numEq");
-      if((foundDim!=string::npos||foundEqu!=string::npos)){
-        currExpression += line + " ";
-      }
-    }
-    f.close();
-  }
-
-  printf("Current Expr: %s\n",currExpression.c_str());
-
-  // Add the variables
-  exprtk::parser_error::type   error_t;  
-  exprtk::expression<double>   expression_t;
-  exprtk::parser<double>       parser_t;    
-  exprtk::symbol_table<double> symbol_table_t;
-
-  double dimsTmp;
-  double numEqTmp;
-
-  if(!symbol_table_t.add_variable("dims",dimsTmp)){
-    printf("dims not added\n");
-  }
-  if(!symbol_table_t.add_variable("numEq",numEqTmp)){
-    printf("numEq not added\n");
-  }
-
-  // Register Symbol Table
-  expression_t.register_symbol_table(symbol_table_t);
-
-  // Compile Expression From File
-  parser_t.compile(currExpression,expression_t);
-
-  // Collect the inputs 
-  expression_t.value();
-
-  // Print the two values
-  printf("Number of Dimensions: %d\n",int(dimsTmp));
-  printf("Number of Equations: %d\n",int(numEqTmp));
-}
-
-// Extract Parameter Limits
-void extractLimits(string inputFile,stdVec& limits){
-  
+string extractSubExprFromFile(string inputFile,string key){
   string currExpression("");
   string line;
   size_t found;
@@ -70,20 +18,111 @@ void extractLimits(string inputFile,stdVec& limits){
     while(getline(f,line)){
       line = trim(line);
       // Check if the string is a comment
-      if(line[0] == "#"){
-
-      }else{
-
-      }
-      found = line.find("limits");
-      if(found!=string::npos){
-        currExpression += line + " ";
+      if(line[0] != '#'){
+        found = line.find(key);
+        if(found!=string::npos){
+          currExpression += line + " ";
+        }
       }
     }
     f.close();
+  }  
+  return currExpression;
+}
+
+// Extract dimensions and number of equations from file
+void extractNumDimensions(string inputFile,double& dims){
+
+  string key("dims");
+  string currExpression = extractSubExprFromFile(inputFile,key);
+
+  // Add the variables
+  exprtk::parser_error::type   error_t;  
+  exprtk::expression<double>   expression_t;
+  exprtk::parser<double>       parser_t;    
+  exprtk::symbol_table<double> symbol_table_t;
+
+  if(!symbol_table_t.add_variable("dims",dims)){
+    printf("dims not added\n");
+  }
+  // Register Symbol Table
+  expression_t.register_symbol_table(symbol_table_t);
+
+  // Compile Expression From File
+  if(!parser_t.compile(currExpression,expression_t)){
+    printf("Error: %s\n Input file: %s\n",parser_t.error().c_str(),currExpression.c_str());
+    printf("\n");
+
+    for (size_t i=0;i<parser_t.error_count();++i){
+      // Include the specific nature of each error
+      // and its position in the expression string.
+
+      error_t = parser_t.get_error(i);
+
+      printf("Error: %02d Position: %02d\n Type: [%s]\n Message: %s\n",
+             static_cast<int>(i),
+             static_cast<int>(error_t.token.position),
+             exprtk::parser_error::to_str(error_t.mode).c_str(),
+             error_t.diagnostic.c_str());
+    }
+    throw cmException("ERROR: Invalid input file.\n");
   }
 
-  printf("Current Expr: %s\n",currExpression.c_str());
+
+
+  // Collect the inputs 
+  expression_t.value();
+}
+
+// Extract dimensions and number of equations from file
+void extractNumEquations(string inputFile,double& numEq){
+
+  string key("numEq");
+  string currExpression = extractSubExprFromFile(inputFile,key);
+
+  // Add the variables
+  exprtk::parser_error::type   error_t;  
+  exprtk::expression<double>   expression_t;
+  exprtk::parser<double>       parser_t;    
+  exprtk::symbol_table<double> symbol_table_t;
+
+  if(!symbol_table_t.add_variable("numEq",numEq)){
+    printf("numEq not added\n");
+  }
+
+  // Register Symbol Table
+  expression_t.register_symbol_table(symbol_table_t);
+
+  // Compile Expression From File
+  if(!parser_t.compile(currExpression,expression_t)){
+    printf("Error: %s\n Input file: %s\n",parser_t.error().c_str(),currExpression.c_str());
+    printf("\n");
+
+    for (size_t i=0;i<parser_t.error_count();++i){
+      // Include the specific nature of each error
+      // and its position in the expression string.
+
+      error_t = parser_t.get_error(i);
+
+      printf("Error: %02d Position: %02d\n Type: [%s]\n Message: %s\n",
+             static_cast<int>(i),
+             static_cast<int>(error_t.token.position),
+             exprtk::parser_error::to_str(error_t.mode).c_str(),
+             error_t.diagnostic.c_str());
+    }
+    throw cmException("ERROR: Invalid input file.\n");
+  }
+
+
+  // Collect the inputs 
+  expression_t.value();
+}
+
+// Extract Parameter Limits
+void extractLimits(string inputFile,stdVec& limits){
+  
+  string key("limits");
+  string currExpression = extractSubExprFromFile(inputFile,key);
 
   // Add the variables
   exprtk::parser_error::type   error_t;  
@@ -99,88 +138,100 @@ void extractLimits(string inputFile,stdVec& limits){
   expression_t.register_symbol_table(symbol_table_t);
 
   // Compile Expression From File
-  parser_t.compile(currExpression,expression_t);
+  if(!parser_t.compile(currExpression,expression_t)){
+    printf("Error: %s\n Input file: %s\n",parser_t.error().c_str(),currExpression.c_str());
+    printf("\n");
+
+    for (size_t i=0;i<parser_t.error_count();++i){
+      // Include the specific nature of each error
+      // and its position in the expression string.
+
+      error_t = parser_t.get_error(i);
+
+      printf("Error: %02d Position: %02d\n Type: [%s]\n Message: %s\n",
+             static_cast<int>(i),
+             static_cast<int>(error_t.token.position),
+             exprtk::parser_error::to_str(error_t.mode).c_str(),
+             error_t.diagnostic.c_str());
+    }
+    throw cmException("ERROR: Invalid input file.\n");
+  }
+
 
   // Collect the inputs 
   long res = expression_t.value();
+}
 
-  // Print the two values
-  for(int loopA=0;loopA<limits.size()/2;loopA++){
-    printf("Min: %f, Max: %f\n",limits[2*loopA + 0],limits[2*loopA + 1]);
+// Extract Initial Point From File
+void extractInitPoint(string inputFile,stdVec& initPoint){
+  
+  string key("initPoint");
+  string currExpression = extractSubExprFromFile(inputFile,key);
+
+  // Add the variables
+  exprtk::parser_error::type   error_t;  
+  exprtk::expression<double>   expression_t;
+  exprtk::parser<double>       parser_t;    
+  exprtk::symbol_table<double> symbol_table_t;
+
+  if(!symbol_table_t.add_vector("initPoint",initPoint)){
+    printf("limits vector not added\n");
   }
 
+  // Register Symbol Table
+  expression_t.register_symbol_table(symbol_table_t);
+
+  // Compile Expression From File
+  if(!parser_t.compile(currExpression,expression_t)){
+    printf("Error: %s\n Input file: %s\n",parser_t.error().c_str(),currExpression.c_str());
+    printf("\n");
+
+    for (size_t i=0;i<parser_t.error_count();++i){
+      // Include the specific nature of each error
+      // and its position in the expression string.
+
+      error_t = parser_t.get_error(i);
+
+      printf("Error: %02d Position: %02d\n Type: [%s]\n Message: %s\n",
+             static_cast<int>(i),
+             static_cast<int>(error_t.token.position),
+             exprtk::parser_error::to_str(error_t.mode).c_str(),
+             error_t.diagnostic.c_str());
+    }
+    throw cmException("ERROR: Invalid input file.\n");
+  }
+
+
+  // Collect the inputs 
+  long res = expression_t.value();
 }
 
 cmBertiniSolverModel::cmBertiniSolverModel(string inputFile){
 
+  // Store Current input file
+  this->inputFile = inputFile;
+
   // First Extract the number of dimensions and equations
-  long dims = 0;
-  long numEq = 0;
-  extractDimensions(inputFile,dims,numEq);
+  double dims = 0;
+  double numEq = 0;
+  extractNumDimensions(inputFile,dims);
+  extractNumEquations(inputFile,numEq);
 
   // Assign Dimensions and number of equations
-  this->dims = dims;
-  this->numEq = numEq;
+  this->dims = long(dims);
+  this->numEq = long(numEq);
 
   // Extract Parameter Limits
-  stdVec limits(2*this->dims,0.0);
+  limits.resize(2*this->dims,0.0);
   extractLimits(inputFile,limits);
 
-  // // Init Error Type
-  // exprtk::parser_error::type error;
+  // Extract Initial Point
+  initPoint.resize(this->dims,0.0);
+  extractInitPoint(inputFile,initPoint);
 
-  // // Read an input non linear system from a text file
-  // ifstream f(inputFile);
-  // stringstream buffer;
-  // buffer << f.rdbuf();
-  // string fileContent = buffer.str();
-
-  // // Add Symbols
-  // x.resize(1);
-  // eq.resize(1);
-  // if(!symbol_table.add_vector("x",x)){
-  //   printf("x not added\n");
-  // }
-  // if(!symbol_table.add_vector("eq",eq)){
-  //   printf("eq not added\n");
-  // }
-  // if(!symbol_table.add_variable("dims",dims)){
-  //   printf("dims not added\n");
-  // }
-  // if(!symbol_table.add_variable("numEq",numEq)){
-  //   printf("numEq not added\n");
-  // }
-
-  // // Register Symbol Table
-  // expression.register_symbol_table(symbol_table);
-
-  // // Compile Expression From File
-  // if(!parser.compile(fileContent,expression)){
-  //   printf("Error: %s\n Input file: %s\n",parser.error().c_str(),fileContent.c_str());
-  //   printf("\n");
-
-  //   for (size_t i=0;i<parser.error_count();++i){
-  //     // Include the specific nature of each error
-  //     // and its position in the expression string.
-
-  //     error = parser.get_error(i);
-
-  //     printf("Error: %02d Position: %02d\n Type: [%s]\n Message: %s\n",
-  //            static_cast<int>(i),
-  //            static_cast<int>(error.token.position),
-  //            exprtk::parser_error::to_str(error.mode).c_str(),
-  //            error.diagnostic.c_str());
-  //   }
-  // 	throw cmException("ERROR: Invalid input file.\n");
-  // }else{
-  // 	printf("Input file successfully compiled.\n");
-  // }
-
-  // // Collect the inputs 
-  // double res = expression.value();
-
-  // printf("dims: %f\n",dims);
-  // printf("numEq: %f\n",numEq);
+  // Extract Current Expression
+  string key("eq");
+  evalExpression = extractSubExprFromFile(inputFile,key);
 
 }
 
@@ -190,45 +241,89 @@ cmBertiniSolverModel::~cmBertiniSolverModel(){
 int cmBertiniSolverModel::getParameterTotal(){
   return dims;
 }
+
 int cmBertiniSolverModel::getStateTotal(){
   return 0;
 }
+
 int cmBertiniSolverModel::getResultTotal(){
   return 1;
 }
+
 void cmBertiniSolverModel::getParameterLimits(stdVec& limits){
-
+  limits = this->limits;
 }
+
 void cmBertiniSolverModel::getDefaultParams(stdVec& params){
-
+  params = this->initPoint;
 }
+
 void cmBertiniSolverModel::getPriorMapping(int priorModelType,int* prPtr){
-
+  throw cmException("ERROR: getPriorMapping not implemented.\n");
 }
+
 string cmBertiniSolverModel::getParamName(int parID){
-
+  return string("x[" + to_string(parID) + "]");
 }
+
 string cmBertiniSolverModel::getResultName(int resID){
   string res;
   if(resID == 0){
     res = string("result");
+  }else{
+    throw cmException("ERROR: result id does not exists.\n");   
   }
   return res;
 }
+
 double cmBertiniSolverModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
 
-  double res = 0.0;
-  // Add res to the outputs
-  outputs.clear();
-  outputs.push_back(res);
-  // No Error
-  errorCode.clear();
-  errorCode.push_back(0);
-  // Return 
-  return res;
+  // Add the variables
+  exprtk::parser_error::type   error_t;  
+  exprtk::expression<double>   expression_t;
+  exprtk::parser<double>       parser_t;    
+  exprtk::symbol_table<double> symbol_table_t;
 
+  // Add Inputs to x
+  stdVec x(inputs);
+  if(!symbol_table_t.add_vector("x",x)){
+    printf("x not added\n");
+  }
 
+  // Add the Equation vector
+  stdVec eq(this->numEq,0.0);
+  if(!symbol_table_t.add_vector("eq",eq)){
+    printf("eq not added\n");
+  }
+
+  // Register Symbol Table
+  expression_t.register_symbol_table(symbol_table_t);
+
+  // Compile Expression From File
+  if(!parser_t.compile(evalExpression,expression_t)){
+    printf("Error: %s\n Input file: %s\n",parser_t.error().c_str(),evalExpression.c_str());
+    printf("\n");
+
+    for (size_t i=0;i<parser_t.error_count();++i){
+      // Include the specific nature of each error
+      // and its position in the expression string.
+
+      error_t = parser_t.get_error(i);
+
+      printf("Error: %02d Position: %02d\n Type: [%s]\n Message: %s\n",
+             static_cast<int>(i),
+             static_cast<int>(error_t.token.position),
+             exprtk::parser_error::to_str(error_t.mode).c_str(),
+             error_t.diagnostic.c_str());
+    }
+    throw cmException("ERROR: Invalid input file.\n");
+  }
+
+  // Collect the inputs 
+  return expression_t.value();
 }
+
+
 
 
 

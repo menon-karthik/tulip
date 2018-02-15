@@ -1,15 +1,15 @@
-// Carefull: variable names are case sensitive \n
+# Carefull: variable names are case sensitive
 
-// Dimensionality and Number of Equations \n
-// The problem dimensionality is specified through the variable "dims" \n
-// this is the size of the parameter vector "x"\n
-// The number of equations is specified through the variable "numEq" \n
+# Dimensionality and Number of Equations
+# The problem dimensionality is specified through the variable "dims"
+# this is the size of the parameter vector "x"
+# The number of equations is specified through the variable "numEq"
 
 dims := 6;
 numEq := 9;
 
-// The vector "limits" of size equal to 2*dims is used \n
-// to specify the ranges of the parameter "x" \n
+# The vector "limits" of size equal to 2*dims is used
+# to specify the ranges of the parameter "x"
 
 limits[0] := 0.0; limits[1] := 0.1;
 limits[2] := 0.1; limits[3] := 0.2;
@@ -18,18 +18,18 @@ limits[6] := 0.3; limits[7] := 0.4;
 limits[8] := 0.4; limits[9] := 0.5;
 limits[10] := 0.5; limits[11] := 0.6;
 
-// The vector "initPoint" of size equal to dims is used \n
-// to specify the defult parameter values\n
+# The vector "initPoint" of size equal to dims is used
+# to specify the defult parameter values
 
 initPoint[0] := 0.1;
-initPoint[1] := 0.1;
-initPoint[2] := 0.1;
-initPoint[3] := 0.1;
-initPoint[4] := 0.1;
-initPoint[5] := 0.1;
+initPoint[1] := 0.2;
+initPoint[2] := 0.3;
+initPoint[3] := 0.4;
+initPoint[4] := 0.5;
+initPoint[5] := 0.6;
 
-// The non linear system of equations is specified by \n
-// entering the parameter vector "x" and the equation vector "eq"\n
+  # The non linear system of equations is specified by
+  # entering the parameter vector "x" and the equation vector "eq"
 
 eq[0] := x[0]*x[1] + x[4]*x[5];
 eq[1] := x[3]^2 + x[1]^3;
@@ -40,3 +40,5 @@ eq[5] := 0.0;
 eq[6] := 0.0;
 eq[7] := 0.0;
 eq[8] := 0.0;
+
+eq[0]^2 + eq[1]^2 + eq[2]^2 + eq[3]^2 + eq[4]^2 + eq[5]^2 + eq[6]^2 + eq[7]^2 + eq[8]^2;

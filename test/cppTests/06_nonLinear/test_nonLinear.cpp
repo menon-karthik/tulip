@@ -24,9 +24,6 @@ int main(int argc, char* argv[]){
     string fileName("input.txt");
     cmModel* model = new cmBertiniSolverModel(fileName);
 
-    // Get Total Parameters
-    printf("Total params: %d\n",model->getParameterTotal());
-
     // Get Default parameter set
     stdVec inputs;
     model->getDefaultParams(inputs);

@@ -11,18 +11,14 @@ using namespace std;
 
 // GENERIC CLASS FOR MODELS
 class cmBertiniSolverModel: public cmModel{
-  private:
-    //exprtk::parser_error::type error;  
-    //exprtk::expression<long> expression;
-    //exprtk::parser<long> parser;    
-    //exprtk::symbol_table<long> symbol_table;
-    
-    double dims;
-    double numEq;
-    vector<double> x;
-    vector<double> eq;
-
   public:
+
+    string inputFile;
+    long dims;
+    long numEq;
+    stdVec limits;
+    stdVec initPoint;
+    string evalExpression;
 
   	cmBertiniSolverModel(string inputFile);
     virtual ~cmBertiniSolverModel();
