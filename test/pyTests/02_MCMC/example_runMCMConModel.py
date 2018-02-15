@@ -16,14 +16,14 @@ import numpy as np
 from mpi4py import MPI
 
 # MAIN FUNCTION
-def main(modelType,comm):
+def main(fileName,comm):
   
   # MPI Init
   rank = comm.Get_rank()
   size = comm.Get_size()
 
   # Set Model
-  model = cm.cmAnalyticalExpressionModel(modelType)
+  model = cm.cmBertiniSolverModel(fileName)
 
   # Set DREAM Parameters
   totChains         = size
@@ -82,7 +82,7 @@ def main(modelType,comm):
     dream.postProcess(debugMode,burnInPercent);
 
     # Rename File
-    os.rename('paramTraces.txt','paramTraces_' + str(modelType) + '.txt')
+    # os.rename('paramTraces.txt','paramTraces_' + str(modelType) + '.txt')
 
 # ====
 # MAIN
@@ -95,5 +95,5 @@ if __name__ == "__main__":
   size = comm.Get_size()
 
   # Run Main Function
-  main(int(sys.argv[1]),comm)
+  main(sys.argv[1],comm)
 

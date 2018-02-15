@@ -14,10 +14,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # MAIN FUNCTION
-def main(modelType):
+def main(fileName):
 
   # Set Model
-  model = cm.cmAnalyticalExpressionModel(modelType)
+  model = cm.cmBertiniSolverModel(fileName)
 
   # Set Optimizer Parameters
   # Convergence Tolerance
@@ -77,4 +77,4 @@ def main(modelType):
 # ====
 if __name__ == "__main__":
 	
-  main(int(sys.argv[1]))
+  main(sys.argv[1])

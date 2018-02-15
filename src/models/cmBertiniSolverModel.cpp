@@ -319,6 +319,10 @@ double cmBertiniSolverModel::evalModelError(const stdVec& inputs,stdVec& outputs
     throw cmException("ERROR: Invalid input file.\n");
   }
 
+  // Add the errorcode
+  errorCode.clear();
+  errorCode.push_back(0);
+
   // Collect the inputs 
   return expression_t.value();
 }

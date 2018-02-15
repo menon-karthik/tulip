@@ -718,8 +718,6 @@ void acActionOPT_NM::LPN_opt (){
     ynewlo = 10000.0;
   }
 
-  printf("ECCOLO 2\n");
-
   // PRINT FUNCTION VALUE FOR INITIAL POINT
   if(doPrintMessages){
     cout << "\n";
