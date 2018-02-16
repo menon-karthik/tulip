@@ -32,7 +32,7 @@ int cmTutorial::getResultTotal(){
   return 3;
 }
 
-void cmTutorial::getParameterLimits(stdVec& limits){
+void cmTutorial::getDefaultParameterLimits(stdVec& limits){
   limits.resize(6);
   // Starting Position [m]
   limits[0] = 0.0;

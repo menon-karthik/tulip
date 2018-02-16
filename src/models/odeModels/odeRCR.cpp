@@ -79,19 +79,6 @@ void odeRCR::getDefaultParameterLimits(stdVec& limits){
   limits[8] = 60/1.09; limits[9] = 60/1.09; // HR
 }
 
-void odeRCR::getParameterLimits(stdVec& limits){
-  // Get Default Parameters
-  getDefaultParameterLimits(limits);
-  // Change the limits bases on the Fixed Parameter List
-  int currParam = 0;
-  for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
-    currParam = frozenParamIDX[loopA];
-    // Assign the new lower and upper bounds to the center
-    limits[currParam*2]     = frozenParamVAL[loopA];
-    limits[currParam*2 + 1] = frozenParamVAL[loopA];
-  }
-}
-
 void odeRCR::getDefaultParams(stdVec& params){ // Question: what do I set these to initially? A: assigned to mean of range
 
   // Resize Parameter Array

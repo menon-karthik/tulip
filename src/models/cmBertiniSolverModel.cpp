@@ -206,6 +206,11 @@ void extractInitPoint(string inputFile,stdVec& initPoint){
   long res = expression_t.value();
 }
 
+// Set Exponent
+void cmBertiniSolverModel::setExponent(double exp){
+  this->exponent = exp;
+}
+
 cmBertiniSolverModel::cmBertiniSolverModel(string inputFile){
 
   // Store Current input file
@@ -233,6 +238,9 @@ cmBertiniSolverModel::cmBertiniSolverModel(string inputFile){
   string key("eq");
   evalExpression = extractSubExprFromFile(inputFile,key);
 
+  // Set Default Exponent to 1.0
+  this->exponent = 1.0;
+
 }
 
 cmBertiniSolverModel::~cmBertiniSolverModel(){
@@ -250,7 +258,7 @@ int cmBertiniSolverModel::getResultTotal(){
   return 1;
 }
 
-void cmBertiniSolverModel::getParameterLimits(stdVec& limits){
+void cmBertiniSolverModel::getDefaultParameterLimits(stdVec& limits){
   limits = this->limits;
 }
 
@@ -323,13 +331,26 @@ double cmBertiniSolverModel::evalModelError(const stdVec& inputs,stdVec& outputs
   errorCode.clear();
   errorCode.push_back(0);
 
+  // Eval Denominator with deflated solutions
+  double den = 1.0;
+  double currNorm = 0.0;
+  for(int loopA=0;loopA<deflationPoints.size();loopA++){
+    currNorm = 0.0;
+    for(int loopB=0;loopB<deflationPoints[loopA].size();loopB++){
+      currNorm += (inputs[loopB] - deflationPoints[loopA][loopB])*(inputs[loopB] - deflationPoints[loopA][loopB]);
+    }
+    den *= sqrt(currNorm);
+  }
+
   // Collect the inputs 
-  return expression_t.value();
+  return pow(expression_t.value()/den,this->exponent);
 }
 
-
-
-
-
-
-
+void cmBertiniSolverModel::addSolution(const stdVec& solution){
+  // Check the dimensionality
+  if(solution.size() != getParameterTotal()){
+    throw cmException("ERROR: Invalid number of parameters in solution vector: addSolution.\n");
+  }else{
+    deflationPoints.push_back(solution);
+  }
+}

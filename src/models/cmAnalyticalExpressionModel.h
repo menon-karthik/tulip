@@ -43,7 +43,7 @@ class cmAnalyticalExpressionModel: public cmModel{
     virtual int    getStateTotal();
     virtual int    getResultTotal();
     virtual string getResultName(int resID);
-  	virtual void   getParameterLimits(stdVec& limits);
+  	virtual void   getDefaultParameterLimits(stdVec& limits);
   	virtual void   getDefaultParams(stdVec& params);
   	virtual void   getPriorMapping(int priorModelType,int* prPtr);
     virtual double evalModelError(const stdVec& inputs,stdVec& outputs, stdIntVec& errorCode);

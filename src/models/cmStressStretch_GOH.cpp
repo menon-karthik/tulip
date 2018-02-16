@@ -22,7 +22,7 @@ int cmStressStretch_GOH::getStateTotal(){
 int cmStressStretch_GOH::getResultTotal(){
   return lambdaZ.size();
 }
-void cmStressStretch_GOH::getParameterLimits(stdVec& limits){
+void cmStressStretch_GOH::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
   limits[0] = 0.0; limits[1] = 1.0e8;
   limits[2] = 0.0; limits[3] = 1.0e8;

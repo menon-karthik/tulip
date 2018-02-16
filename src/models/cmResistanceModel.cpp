@@ -41,7 +41,7 @@ string cmResistanceModel::getResultName(int resID){
   throw cmException("ERROR: cmResistanceModel::getResultName not implemented.\n");
 }
 
-void cmResistanceModel::getParameterLimits(stdVec& limits){
+void cmResistanceModel::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2);
   limits[0] = 0.0;
   limits[0] = 2.0;

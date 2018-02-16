@@ -22,7 +22,7 @@ void cmPDFKnownPDF::getDefaultParams(stdVec& params){
   params[0] = 0.0;
 }
 
-void cmPDFKnownPDF::getParameterLimits(stdVec& limits){
+void cmPDFKnownPDF::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
   limits[0] = -10.0; limits[1] = 10.0;
 }

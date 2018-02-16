@@ -206,7 +206,7 @@ string cmTableInterpolator::getResultName(int resID){
 }
 
 // GET PARAMETER LIMITS FROM TABLE
-void cmTableInterpolator::getParameterLimits(stdVec& limits){
+void cmTableInterpolator::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2 * getParameterTotal());
   // Return maximum and minimum values from table
   double currValue = 0.0;

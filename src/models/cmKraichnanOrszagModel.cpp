@@ -51,7 +51,7 @@ int cmKraichnanOrszagModel::getResultTotal(){
 }
 
 // GET LIMITS FOR INITIAL CONDITIONS
-void cmKraichnanOrszagModel::getParameterLimits(stdVec& limits){
+void cmKraichnanOrszagModel::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
   if(dims == 1){
     limits[0] = -0.1; limits[1] = 0.1;

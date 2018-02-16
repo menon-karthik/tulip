@@ -18,8 +18,8 @@ int cmLPNModel::getStateTotal(){
 int cmLPNModel::getResultTotal(){
   return this->integrator->ode->getResultTotal();
 }
-void cmLPNModel::getParameterLimits(stdVec& limits){
-  this->integrator->ode->getParameterLimits(limits);
+void cmLPNModel::getDefaultParameterLimits(stdVec& limits){
+  this->integrator->ode->getDefaultParameterLimits(limits);
 }
 void cmLPNModel::getDefaultParams(stdVec& params){
   this->integrator->ode->getDefaultParams(params);

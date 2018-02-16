@@ -22,7 +22,7 @@ int cmStressStretch_FR::getStateTotal(){
 int cmStressStretch_FR::getResultTotal(){
   return lambdaZ.size();
 }
-void cmStressStretch_FR::getParameterLimits(stdVec& limits){
+void cmStressStretch_FR::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
   limits[0] = 0.001;  limits[1] = 1.0e8;
   limits[2] = 0.001;  limits[3] = 1.0e8;

@@ -200,7 +200,7 @@ string cmArmVenousOcclusion::getResultName(int resID){
 // =====================
 // GET PARAMETERS LIMITS
 // =====================
-void cmArmVenousOcclusion::getParameterLimits(stdVec& limits){
+void cmArmVenousOcclusion::getDefaultParameterLimits(stdVec& limits){
   limits.resize(18);
   limits[2*0 + 0] = 0.0;  limits[2*0 + 1] = 50.0;
   limits[2*1 + 0] = 5.0;  limits[2*1 + 1] = 20.0;

@@ -79,25 +79,6 @@ class cmModel{
     /*! 
     \verbatim embed:rst
     **Purpose**
-    Returns an array with the parameter upper and lower bounds
-    
-    **Discussion**
-    None
-    
-    **Modified**
-    2015 - DES
-    
-    **Reference**
-    No Reference
-    \endverbatim
-    \param[out] limits std vector of size 2*getParameterTotal() with the upper and lower bounds.
-    The parameter with ID i has lower bound equal to limits[2*i] and upper bound equal to limits[2*i+1]
-    */
-  	virtual void getParameterLimits(stdVec& limits) = 0;
-
-    /*! 
-    \verbatim embed:rst
-    **Purpose**
     Gather the default model parameters
     
     **Discussion**
@@ -112,6 +93,24 @@ class cmModel{
     \param[out] params std vector of size getParameterTotal() containing the default model parameters
     */
   	virtual void getDefaultParams(stdVec& params) = 0;
+
+    /*! 
+    \verbatim embed:rst
+    **Purpose**
+    Gather the default parameter limits
+    
+    **Discussion**
+    None
+    
+    **Modified**
+    2015 - DES
+    
+    **Reference**
+    No Reference
+    \endverbatim
+    \param[out] params std vector of size 2*getParameterTotal() containing the default parameter limits
+    */
+    virtual void getDefaultParameterLimits(stdVec& limits) = 0;
 
     /*! 
     \verbatim embed:rst
@@ -203,6 +202,9 @@ class cmModel{
 
     // FREEZE MODEL PARAMETERS
     void freezeModelParameters(const stdIntVec& localParamIDX,const stdVec& localParamVal);
+
+    // GET PARAMETER LIMITS
+    void getParameterLimits(stdVec& limits);
 };
 
 #endif //CMMODEL_H
