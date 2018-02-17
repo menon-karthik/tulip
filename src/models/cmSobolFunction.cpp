@@ -21,7 +21,7 @@ int cmSobolFunction::getStateTotal(){
 int cmSobolFunction::getResultTotal(){
   return 1;
 }
-void cmSobolFunction::getParameterLimits(stdVec& limits){
+void cmSobolFunction::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
   limits[0]=0.0; limits[1]=1.0;
   limits[2]=0.0; limits[3]=1.0;

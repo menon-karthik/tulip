@@ -19,6 +19,8 @@ class cmBertiniSolverModel: public cmModel{
     stdVec limits;
     stdVec initPoint;
     string evalExpression;
+    double exponent;
+    stdMat deflationPoints;
 
   	cmBertiniSolverModel(string inputFile);
     virtual ~cmBertiniSolverModel();
@@ -26,12 +28,16 @@ class cmBertiniSolverModel: public cmModel{
     virtual int getParameterTotal();
     virtual int getStateTotal();
     virtual int getResultTotal();
-  	virtual void getParameterLimits(stdVec& limits);
+  	virtual void getDefaultParameterLimits(stdVec& limits);
   	virtual void getDefaultParams(stdVec& params);
   	virtual void getPriorMapping(int priorModelType,int* prPtr);
     virtual string getParamName(int parID);
     virtual string getResultName(int resID);
     virtual double evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode);
+
+    // Non Virtual Functions
+    void setExponent(double exp);
+    void addSolution(const stdVec& solution);
 };
 
 #endif // CMBERTINISOLVERMODEL_H

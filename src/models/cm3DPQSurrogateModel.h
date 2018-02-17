@@ -30,7 +30,7 @@ class cm3DPQSurrogateModel: public cmModel{
     // FUNCTIONS THAT MUST BE IMPLEMENTED BY THE SUB CLASSES
     virtual int getParameterTotal();
     virtual string getParamName(int parID);
-    virtual void getParameterLimits(stdVec& limits);
+    virtual void getDefaultParameterLimits(stdVec& limits);
     virtual void getDefaultParams(stdVec& params);
     virtual int getStateTotal();
     virtual int getResultTotal();

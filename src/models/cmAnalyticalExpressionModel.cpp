@@ -86,7 +86,7 @@ int cmAnalyticalExpressionModel::getResultTotal(){
 }
 
 // Get parameter Limits
-void cmAnalyticalExpressionModel::getParameterLimits(stdVec& limits){
+void cmAnalyticalExpressionModel::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
   if(modelType == kAnalyticalModelUnity2D){
     limits[0] = 0.0; limits[1] = 1.0;

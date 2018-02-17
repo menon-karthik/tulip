@@ -81,9 +81,6 @@ def main(fileName,comm):
     burnInPercent = 0.1
     dream.postProcess(debugMode,burnInPercent);
 
-    # Rename File
-    # os.rename('paramTraces.txt','paramTraces_' + str(modelType) + '.txt')
-
 # ====
 # MAIN
 # ====

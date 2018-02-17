@@ -32,7 +32,7 @@ string cmSimpleNonLin::getResultName(int resID){
   return string("noName");
 }
 
-void cmSimpleNonLin::getParameterLimits(stdVec& limits){
+void cmSimpleNonLin::getDefaultParameterLimits(stdVec& limits){
   limits[0] = 0.0;
   limits[1] = 2.0;
 }

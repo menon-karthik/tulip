@@ -11,22 +11,11 @@ using namespace std;
 // GENERIC CLASS FOR MODELS
 class odeModel{
   public:
-    //! Data Object containing patient data
-    daData* data;
-    //! dataset column identifying the specific patient for multiple patients datasets
-    int datasetColumn;
-    //! List of frozen parameters IDs
-    stdIntVec frozenParamIDX;
-    //! List of frozen parameters values
-    stdVec    frozenParamVAL;
 
     //! Default constructor
     odeModel();
     //! Virtual destructor
     virtual ~odeModel();
-
-    // Implemented Functions
-    void getParameterLimits(stdVec& limits);
 
     // Virtual functions to be implemented by child classes
     virtual int    getParameterTotal() = 0;

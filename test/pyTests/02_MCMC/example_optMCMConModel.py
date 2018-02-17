@@ -38,7 +38,7 @@ def main(fileName):
   totRestarts     = 20
 
   # Read MCMC Samples and sub-samples using totInitialGuess
-  data = np.loadtxt('paramTraces_' + str(modelType) + '.txt',skiprows=1)
+  data = np.loadtxt('paramTraces.txt',skiprows=1)
 
   # SubSample
   print(np.random.choice(data.shape[0], totInitialGuess))
@@ -70,7 +70,7 @@ def main(fileName):
     results[loopA,:] = np.loadtxt('optParams.txt')
 
   # Save Final Result
-  np.savetxt('OptimalPoints_' + str(modelType)+ '.txt',results)    
+  np.savetxt('OptimalPoints.txt',results)    
 
 # ====
 # MAIN

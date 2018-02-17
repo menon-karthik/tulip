@@ -13,16 +13,12 @@
 # include "cmException.h"
 
 // Constants for Result Quantities
-const int ip_min_P_0   = 0;
-const int ip_max_P_0  = 1;
+const int ip_min_P_0 = 0;
+const int ip_max_P_0 = 1;
 const int ip_av_P_0  = 2;
-
 
 // GENERIC CLASS FOR SAMPLES
 class odeRCR: public odeModel{
-  protected:
-    void getDefaultParameterLimits(stdVec& limits);
-
   public:
     
     // CONSTRUCTOR
@@ -38,7 +34,7 @@ class odeRCR: public odeModel{
     virtual int    getResultTotal();
     virtual int    getAuxStateTotal();
     virtual string getResultName(int resID);
-    virtual void   getParameterLimits(stdVec& limits);
+    virtual void   getDefaultParameterLimits(stdVec& limits);
     virtual void   getDefaultParams(stdVec& params);
     virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind);
     virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);

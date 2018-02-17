@@ -47,7 +47,7 @@ class cmPDFKnownPDF: public cmModel{
     virtual int    getParameterTotal();
     virtual int    getResultTotal();
     virtual void   getDefaultParams(stdVec& params);
-    virtual void   getParameterLimits(stdVec& limits);    
+    virtual void   getDefaultParameterLimits(stdVec& limits);    
     virtual string getParamName(int parID){return string("");}
     virtual string getResultName(int resID){return string("");}
     virtual int    getStateTotal(){return 0;}

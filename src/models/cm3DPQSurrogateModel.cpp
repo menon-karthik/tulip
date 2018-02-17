@@ -54,7 +54,7 @@ int cm3DPQSurrogateModel::getResultTotal(){
   return totDims;
 }
 
-void cm3DPQSurrogateModel::getParameterLimits(stdVec& limits){
+void cm3DPQSurrogateModel::getDefaultParameterLimits(stdVec& limits){
   // Resize Limit Array
   limits.resize(2*totDims);
   // Fill Limits

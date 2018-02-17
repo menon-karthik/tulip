@@ -18,7 +18,7 @@ class cmSimpleNonLin: public cmModel{
     virtual int getParameterTotal();
     virtual int getStateTotal();
     virtual int getResultTotal();
-    virtual void getParameterLimits(stdVec& limits);
+    virtual void getDefaultParameterLimits(stdVec& limits);
     virtual void getDefaultParams(stdVec& params);
     virtual void getPriorMapping(int priorModelType,int* prPtr);
     virtual string getParamName(int parID);
