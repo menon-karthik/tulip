@@ -389,7 +389,7 @@ double cmAnalyticalExpressionModel::evalModelError(const stdVec& inputs, stdVec&
     outputs.push_back(res);
     errorCode.push_back(0);
     return res;
-}else if(modelType == kPosdim){
+  }else if(modelType == kPosdim){
     double res = pow(50*(fabs(inputs[0]*inputs[1]*inputs[2])+
                      fabs(inputs[2]*(inputs[2]*inputs[2]+inputs[1]*inputs[1]+inputs[0]*inputs[0]+inputs[1])) + 
                      fabs(inputs[1]*(inputs[1]+inputs[2]))),3.0);
@@ -400,7 +400,7 @@ double cmAnalyticalExpressionModel::evalModelError(const stdVec& inputs, stdVec&
     outputs.push_back(res);
     errorCode.push_back(0);
     return res;
-}else if(modelType == kSeller){
+  }else if(modelType == kSeller){
     double res = pow(50*(fabs(inputs[2]*inputs[2]+inputs[1]*inputs[1]-inputs[0]*inputs[0])+
                      fabs(inputs[0]*inputs[2]+inputs[0]*inputs[1]-inputs[2])+
                      fabs(inputs[1]*inputs[2]+inputs[1]*inputs[1]+inputs[0]*inputs[0]-inputs[0])),3.0);
@@ -411,7 +411,7 @@ double cmAnalyticalExpressionModel::evalModelError(const stdVec& inputs, stdVec&
     outputs.push_back(res);
     errorCode.push_back(0);
     return res;
-}else if(modelType == kEnergyLandscape){
+  }else if(modelType == kEnergyLandscape){
     double res = pow(50*(fabs(inputs[0]*inputs[0]*inputs[0]/10.0+2.0*inputs[0]-inputs[1]-inputs[2]-inputs[3]-inputs[6])+
                      fabs(inputs[1]*inputs[1]*inputs[1]/10.0+2.0*inputs[1]-inputs[0]-inputs[2]-inputs[4]-inputs[7])+
                      fabs(inputs[2]*inputs[2]*inputs[2]/10.0+2.0*inputs[2]-inputs[0]-inputs[1]-inputs[5]-inputs[8])+
@@ -425,7 +425,7 @@ double cmAnalyticalExpressionModel::evalModelError(const stdVec& inputs, stdVec&
     outputs.push_back(res);
     errorCode.push_back(0);
     return res;
-}else if(modelType == kEnergyLandscapeopt){
+  }else if(modelType == kEnergyLandscapeopt){
     double res = pow(50*(fabs(inputs[0]*inputs[0]*inputs[0]/10.0+2.0*inputs[0]-inputs[1]-inputs[2]-inputs[3]-inputs[6])+
                      fabs(inputs[1]*inputs[1]*inputs[1]/10.0+2.0*inputs[1]-inputs[0]-inputs[2]-inputs[4]-inputs[7])+
                      fabs(inputs[2]*inputs[2]*inputs[2]/10.0+2.0*inputs[2]-inputs[0]-inputs[1]-inputs[5]-inputs[8])+
@@ -439,7 +439,7 @@ double cmAnalyticalExpressionModel::evalModelError(const stdVec& inputs, stdVec&
     outputs.push_back(res);
     errorCode.push_back(0);
     return res;
-}else if(modelType == kKuramotoReform){
+  }else if(modelType == kKuramotoReform){
     double res = (pow(100*fabs(1.0/12.0-1.0/3.0*(inputs[0]*inputs[3]-inputs[1]*inputs[2]+inputs[0]))+
                      100*fabs(-1.0/12.0-1.0/3.0*(inputs[1]*inputs[2]-inputs[0]*inputs[3]+inputs[1]))+
                      100*fabs(1-inputs[0]*inputs[0]-inputs[2]*inputs[2])+
@@ -447,10 +447,10 @@ double cmAnalyticalExpressionModel::evalModelError(const stdVec& inputs, stdVec&
                      100*fabs(1-inputs[1]*inputs[1]-inputs[3]*inputs[3]),3));
     outputs.push_back(res);
     errorCode.push_back(0);
-}
-    else{
+  }else{
     throw new cmException("Error: Invalid Model Type");
   }
+  return 0.0;
 }
 
 // Get Name of result quantity
