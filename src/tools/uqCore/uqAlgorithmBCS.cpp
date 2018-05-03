@@ -27,7 +27,7 @@ uqAlgorithmBCS::uqAlgorithmBCS(){
 // ===================================
 // PRINT UTILITY FOR COVARIANCE MATRIX
 // ===================================
-void printCovariance(int size, stdMat mat){
+void printCovariance(int size, const stdMat &mat){
   printf("Covariance Matrix, size %d\n",size);
   for(int loopA=0;loopA<size;loopA++){
     printf("%d ",loopA);
@@ -42,7 +42,7 @@ void printCovariance(int size, stdMat mat){
 // ================================
 // PRINT UTILITY FOR AVERAGE VECTOR
 // ================================
-void printAverageCoeff(int size, stdVec vec){
+void printAverageCoeff(int size, const stdVec &vec){
   printf("Average Coefficient Vector, size %d\n",size);
   for(int loopA=0;loopA<size;loopA++){
     printf("%d %.7f\n",loopA,vec[loopA]);
@@ -53,7 +53,10 @@ void printAverageCoeff(int size, stdVec vec){
 // ==========================
 // MATRIX UTILITIES - PRODUCT
 // ==========================
-void matMatProd(int dim1,int dim2,int dim3,stdMat mat1,stdMat mat2,stdMat &resMat){
+void matMatProd(int dim1,int dim2,int dim3,
+                const stdMat &mat1,const stdMat &mat2,
+                stdMat &resMat){
+
   // Allocate Result
   resMat.resize(dim1);
   for(int loopA=0;loopA<dim1;loopA++){
@@ -74,7 +77,9 @@ void matMatProd(int dim1,int dim2,int dim3,stdMat mat1,stdMat mat2,stdMat &resMa
 // ========================================
 // MATRIX UTILITIES - MATRIX-VECTOR PRODUCT
 // ========================================
-void matVecProd(int dim1,int dim2,stdMat mat,stdVec vec,stdVec &res){
+void matVecProd(int dim1,int dim2,
+                const stdMat &mat,const stdVec &vec,
+                stdVec &res){
   // Allocate Result
   double prodValue = 0.0;
   res.resize(dim1);
@@ -90,7 +95,8 @@ void matVecProd(int dim1,int dim2,stdMat mat,stdVec vec,stdVec &res){
 // ======================================================
 // MATRIX UTILITIES - PRODUCE A RANK 1 MATRIX FROM VECTOR
 // ======================================================
-void vecVecTProd(int dim,stdVec vec,stdMat &resMat){
+void vecVecTProd(int dim,const stdVec &vec,
+                 stdMat &resMat){
   // Allocate
   resMat.resize(dim);
   for(int loopA=0;loopA<dim;loopA++){
@@ -100,23 +106,6 @@ void vecVecTProd(int dim,stdVec vec,stdMat &resMat){
   for(int loopA=0;loopA<dim;loopA++){
     for(int loopB=0;loopB<dim;loopB++){
       resMat[loopA][loopB] = vec[loopA]*vec[loopB];
-    }
-  }
-}
-
-// =============================
-// ERASE ELEMENT FROM DBL VECTOR
-// =============================
-void eraseElementFromDblVector(int value,stdVec &vec){
-  bool found = false;
-  int count = 0;
-  while(!found){
-    found = (vec[count] == value);
-    if(found){
-      vec.erase(vec.begin()+count);
-      return;
-    }else{
-      count++;
     }
   }
 }
@@ -155,40 +144,10 @@ void eraseElementFromIntVector(int value,stdIntVec &vec){
   }
 }
 
-// ======================================
-// MATRIX UTILITIES - PRODUCT WITH SCALAR
-// ======================================
-void matrixScalarMult(int dim1,int dim2,double scalar,stdMat mat){
-  // Multiply
-  for(int loopA=0;loopA<dim1;loopA++){
-  	for(int loopB=0;loopB<dim2;loopB++){
-      mat[loopA][loopB] = mat[loopA][loopB]*scalar;
-  	}
-  }
-}
-
-// ===========================
-// MATRIX UTILITIES - ADDITION
-// ===========================
-void matrixAdd(int dim1,int dim2,stdMat mat1,stdMat mat2,stdMat &resMat){
-  // Allocate Result
-  resMat.resize(dim1);
-  for(int loopA=0;loopA<dim1;loopA++){
-    resMat[loopA].resize(dim2);
-  }	
-  // Add Matrices
-  for(int loopA=0;loopA<dim1;loopA++){
-  	for(int loopB=0;loopB<dim2;loopB++){
-      resMat[loopA][loopB] = mat1[loopA][loopB] + mat2[loopA][loopB];
-  	}
-  }
-}
-
-
 // ==========================
 // INITIALIZE NOISE PARAMETER
 // ==========================
-double initNoiseParam(stdVec yValues){
+double initNoiseParam(const stdVec &yValues){
   double factor = 0.1;
   double sum = 0.0;
   double sumSquared = 0.0;
@@ -207,7 +166,8 @@ double initNoiseParam(stdVec yValues){
 // =========================
 // GET MOST CORRELATED BASIS
 // =========================
-void getFirstBasisIndex(stdVec yValues,stdMat basisMat,double beta,int &maxCorrelatedBasis,double &alpha){
+void getFirstBasisIndex(const stdVec &yValues,const stdMat &basisMat,double beta,
+                        int &maxCorrelatedBasis,double &alpha){
   // Get Matrix Size
   int totSamples = yValues.size();
   int totBasis = basisMat[0].size();
@@ -248,7 +208,7 @@ double evalInitialCovariance(double alpha,double beta){
 // ====================
 double evalInitialAverage(double beta,
 	                        double SigmaCoeff, int basisID, 
-	                        stdMat &basisMat,stdVec &yValues){
+	                        const stdMat &basisMat,const stdVec &yValues){
 
   double currValue = 0.0;
   // Eval Correlation of basis and measurements  
@@ -281,7 +241,7 @@ void initAverageVector(double initialAverage,stdVec &nuVector){
 // INITIALIZE S VECTOR
 // ===================
 void initS(int currBaseIdx,double currAlpha,double beta,
-           stdMat SigmaMat,stdMat basisMat,
+           const stdMat &SigmaMat,const stdMat &basisMat,
            stdVec &S_in,stdVec &S_out){
   // Get Totals
   int totSamples = basisMat.size();
@@ -316,8 +276,9 @@ void initS(int currBaseIdx,double currAlpha,double beta,
 // ===================
 // INITIALIZE Q VECTOR
 // ===================
-void initQ(int currBaseIdx,double currAlpha,double beta,stdVec yValues, 
-           stdMat SigmaMat,stdMat basisMat,stdVec S_in,
+void initQ(int currBaseIdx,double currAlpha,double beta,
+           const stdVec &yValues,const stdMat &SigmaMat,
+           const stdMat &basisMat,const stdVec &S_in,
            stdVec &Q_in,stdVec &Q_out){
   // Get Totals
   int totSamples = basisMat.size();
@@ -362,7 +323,7 @@ void initQ(int currBaseIdx,double currAlpha,double beta,stdVec yValues,
 void addBasisToModel(rvmOptionRecord opts,
                      int totSamples,int totBasis,int totBasisInModel,
                      int currBasisID,double beta,double newAlpha,
-                     stdIntVec basisInModel,stdMat basisMat,
+                     const stdIntVec &basisInModel,const stdMat &basisMat,
                      stdVec &alphaVector,
                      stdVec &S_in,stdVec &Q_in,
                      stdVec &muVector, stdMat &sigmaMat){
@@ -512,8 +473,8 @@ void addBasisToModel(rvmOptionRecord opts,
 void reEstimateBasis(rvmOptionRecord opts,
                      int totSamples,int totBasis,int totBasisInModel,
                      int currBasisID,double beta, double newAlpha,
-                     stdIntVec globalToLocalMap,
-                     stdIntVec basisInModel,stdMat basisMat,
+                     const stdIntVec &globalToLocalMap,
+                     const stdIntVec &basisInModel,const stdMat &basisMat,
                      stdVec &alphaVector,
                      stdVec &S_in,stdVec &Q_in,
                      stdVec &muVector, stdMat &sigmaMat){
@@ -615,8 +576,8 @@ void reEstimateBasis(rvmOptionRecord opts,
 void deleteBasisFromModel(rvmOptionRecord opts,
                           int totSamples,int totBasis,int totBasisInModel,
                           int currBasisID,double beta,
-                          stdIntVec globalToLocalMap,
-                          stdIntVec basisInModel,stdMat basisMat,
+                          const stdIntVec &globalToLocalMap,
+                          const stdIntVec &basisInModel,const stdMat &basisMat,
                           stdVec &alphaVector,
                           stdVec &S_in,stdVec &Q_in,
                           stdVec &muVector, stdMat &sigmaMat){
@@ -699,10 +660,10 @@ void deleteBasisFromModel(rvmOptionRecord opts,
 // ================================
 double updateNoiseVariance(int totSamples,int totBasis,int totBasisInModel,
                            double oldBeta,
-                           stdBoolVec isInModel,stdIntVec globalToLocalMap,
-                           stdMat basisMat,stdVec yValues,
-                           stdVec muVector,stdMat sigmaMat,
-                           stdVec alphaVector,
+                           const stdBoolVec &isInModel,const stdIntVec &globalToLocalMap,
+                           const stdMat &basisMat,const stdVec &yValues,
+                           const stdVec &muVector,const stdMat &sigmaMat,
+                           const stdVec &alphaVector,
                            double &deltaLogBeta){
 
 
@@ -754,11 +715,9 @@ double updateNoiseVariance(int totSamples,int totBasis,int totBasisInModel,
 // UPDATE THE VARIANCE OF THE NOISE
 // ================================
 double evalResidualNorm(int totSamples,int totBasis,
-                        stdMat basisMat,stdVec yValues,
-                        stdBoolVec isInModel,stdIntVec globalToLocalMap,
-                        stdVec muVector,
-                        stdVec basisScales){
-
+                        const stdMat &basisMat,const stdVec &yValues,
+                        const stdBoolVec &isInModel,const stdIntVec &globalToLocalMap,
+                        const stdVec &muVector,const stdVec &basisScales){
 
   // Crate Coefficient Vector
   stdVec scaledCoeffs;
@@ -814,7 +773,7 @@ void normalizeBasis(int totSamples, int totBasis, stdVec &basisScales, stdMat &b
 // ALGORITHM INITIALIZATION
 // ========================
 void Initialize_BayeCS(rvmOptionRecord opts,
-                       int totBasis,stdVec yValues,stdMat &basisMat,
+                       int totBasis,const stdVec &yValues,stdMat &basisMat,
                        stdIntVec &basisInModel,stdBoolVec &isAligned,
                        stdMat &sigmaMat,stdVec &muVector,
                        stdIntVec &globalToLocalMap,stdBoolVec &isInModel,
@@ -957,10 +916,10 @@ string getActionString(int action){
 // PERFORM DECISION ABOUT THE THREE POSSIBLE ACTIONS
 // =================================================
 void computeDecisionVectors(rvmOptionRecord opts,
-                            int totBasis,stdIntVec globalToLocalMap,
-                            stdVec Theta,stdBoolVec isInModel,stdBoolVec isBasisAligned,
-                            stdVec S_in,stdVec S_out,stdVec Q_in,stdVec Q_out,
-                            stdVec alphaVector,
+                            int totBasis,const stdIntVec &globalToLocalMap,
+                            const stdVec &Theta,const stdBoolVec &isInModel,const stdBoolVec &isBasisAligned,
+                            const stdVec &S_in,const stdVec &S_out,const stdVec &Q_in,const stdVec &Q_out,
+                            const stdVec &alphaVector,
                             int &maxLikeBasis,double &maxLikeChange,double &newAlpha,int &currAction){
 
   // Initialize DeltaLikelihood Vector
@@ -1093,7 +1052,8 @@ void computeDecisionVectors(rvmOptionRecord opts,
 // ========================================
 // CHECK ADDITION CANDIDATE BASIS ALIGNMENT
 // ========================================
-void checkBasisAlignment(int currBasisID,int totSamples,int totBasis,stdMat basisMat,stdBoolVec isInModel,
+void checkBasisAlignment(int currBasisID,int totSamples,int totBasis,
+                         const stdMat &basisMat,const stdBoolVec &isInModel,
                          bool printDBGMessages,
                          int &currAction,stdIntMat areAlignedTo){
 
@@ -1148,14 +1108,13 @@ void checkBasisAlignment(int currBasisID,int totSamples,int totBasis,stdMat basi
   }
 }
 
-
 // =================
 // UPDATE STATISTICS
 // =================
 void updateStatistics(rvmOptionRecord opts, int totBasis, 
-                      stdVec S_in,stdVec Q_in,
-                      stdBoolVec isInModel,stdIntVec globalToLocalMap,
-                      stdVec alphaVector,
+                      const stdVec &S_in,const stdVec &Q_in,
+                      const stdBoolVec &isInModel,const stdIntVec &globalToLocalMap,
+                      const stdVec &alphaVector,
                       stdVec &S_out,stdVec &Q_out,
                       stdVec &Theta){
   // Copy S and Q
@@ -1184,7 +1143,6 @@ void updateStatistics(rvmOptionRecord opts, int totBasis,
       printf("%15.3f %15.3f %15.3f %15.3f\n",Q_in[loopA],Q_out[loopA],S_in[loopA],S_out[loopA]);
     }
   }
-
 }
 
 // ===============================================
@@ -1192,10 +1150,10 @@ void updateStatistics(rvmOptionRecord opts, int totBasis,
 // ===============================================
 void updateQtyForBetaChange(int totSamples, int totBasis, int totBasisInModel,
                             double beta,
-                            stdIntVec basisInModel,
-                            stdMat basisMat,
-                            stdVec alphaVector,
-                            stdVec yValues,
+                            const stdIntVec &basisInModel,
+                            const stdMat &basisMat,
+                            const stdVec &alphaVector,
+                            const stdVec &yValues,
                             stdMat &sigmaMat,stdVec &muVector,
                             stdVec &S_in,stdVec &Q_in,
                             stdVec &S_out,stdVec &Q_out,
@@ -1324,7 +1282,9 @@ void resetAlignmentConditions(int CurrentBasisID,bool printDBGMessages,stdIntMat
 // ============================
 // INVERT THE COVARIANCE MATRIX
 // ============================
-void computeCoefficientsCovariance(bool print, int size,stdMat invMat,stdMat &coeffCov){
+void computeCoefficientsCovariance(bool print, int size,
+                                   const stdMat &invMat,
+                                   stdMat &coeffCov){
   // Write Message
   if(print){
     printf("\n");

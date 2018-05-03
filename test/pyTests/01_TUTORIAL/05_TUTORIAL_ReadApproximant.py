@@ -1,6 +1,6 @@
 # Imports
 import sys
-sys.path.insert(0, '../../py')
+sys.path.insert(0, '../../../py')
 
 import tulipUQ as uq
 import numpy as np
@@ -18,7 +18,7 @@ if __name__ == "__main__":
   marginalFile = 'marginal_0.txt'
   error = currApprox.importFromTextFile(marginalFile)
   if(error != 0):
-    print 'ERROR: Cannot Read Approximant From File.'
+    print('ERROR: Cannot Read Approximant From File.')
     sys.exit(-1)
 
   # Evaluate Extremes
@@ -37,9 +37,9 @@ if __name__ == "__main__":
 
   # Write Vectors to Screen
   npX = np.array(xVals)
-  print 'npX: ',npX
+  print('npX: ',npX)
   npY = np.array(yVals)
-  print 'npY: ',npY
+  print('npY: ',npY)
 
   
   

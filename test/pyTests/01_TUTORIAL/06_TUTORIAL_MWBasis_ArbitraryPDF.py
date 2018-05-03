@@ -1,6 +1,6 @@
 # Imports
 import sys
-sys.path.insert(0, '../../py')
+sys.path.insert(0, '../../../py')
 
 import tulipUQ as uq
 import numpy as np
@@ -22,18 +22,18 @@ def performMWOrthogonalityTest(grid,mwMat,measure):
   intWeigth   = 0.0;
   currIDX     = 0;
   testIDX     = 0;
-  print ''
-  print 'MW ORTHOGONALITY TEST'
-  print 'Number of Basis: %d' % (mwMat.getColCount())
-  print 'Number of Samples: %d' % (mwMat.getRowCount())
-  print ''
+  print()
+  print('MW ORTHOGONALITY TEST')
+  print('Number of Basis: %d' % (mwMat.getColCount()))
+  print('Number of Samples: %d' % (mwMat.getRowCount()))
+  print()
   
-  for loopA in xrange(mwMat.getColCount()):
+  for loopA in range(mwMat.getColCount()):
     
-    for loopB in xrange(mwMat.getColCount()):
+    for loopB in range(mwMat.getColCount()):
       
       integral = 0.0
-      for loopC in xrange(mwMat.getRowCount()):
+      for loopC in range(mwMat.getRowCount()):
         
         firstBasis  = mwMat.getMatrixAt(loopC,loopA)
         secondBasis = mwMat.getMatrixAt(loopC,loopB)
@@ -41,18 +41,16 @@ def performMWOrthogonalityTest(grid,mwMat,measure):
         currMeasure = 1.0
         currIDX = loopC
         
-        for loopD in xrange(grid.getTotDims()):
+        for loopD in range(grid.getTotDims()):
           testIDX = currIDX % grid.getTotSamples()
           currMeasure *= measure[loopD][testIDX]
           currIDX = currIDX / grid.getTotSamples()
 
         integral += firstBasis * secondBasis * currMeasure * intWeigth
 
-      print '%15.6e ' % (integral),
-
-    print ''
-
-  print ''
+      print('%15.6e ' % (integral),end="")
+    print()
+  print()
 
 # ==========================
 # SCALE 1D GRID ON PARTITION
@@ -60,7 +58,7 @@ def performMWOrthogonalityTest(grid,mwMat,measure):
 def scale1DGridOnPartition(points,lb,ub,outLocs):
   sampleValue = 0.0;
   outLocs.clear();
-  for loopA in xrange(points.getTotSamples()):
+  for loopA in range(points.getTotSamples()):
     sampleValue = points.getValuesAt(loopA,0)
     outLocs.push_back(lb + sampleValue * (ub-lb))
 
@@ -100,15 +98,15 @@ if __name__ == "__main__":
   currInt = 0.0
   currLoc = 0.0
   currVal = 0.0
-  for loopA in xrange(intLocations.size()):
+  for loopA in range(intLocations.size()):
     currLoc = intLocations[loopA]
     #currVal = approx.evaluate(currLoc);
     currVal = 1.0
     currInt += currVal * measure1DGridPoints.getWeightAt(loopA,measure1DGridPoints.getMaxWeightOrder())
     tmp.push_back(currVal)
 
-  print 'CURRENT INTEGRAL: %f' % (currInt)
-  for loopA in xrange(intLocations.size()):
+  print('CURRENT INTEGRAL: %f' % (currInt))
+  for loopA in range(intLocations.size()):
     tmp[loopA] /= currInt
   measure.push_back(tmp)
 

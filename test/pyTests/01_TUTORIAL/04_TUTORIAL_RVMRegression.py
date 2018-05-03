@@ -1,6 +1,6 @@
 # Imports
 import sys
-sys.path.insert(0, '../../py')
+sys.path.insert(0, '../../../py')
 
 import tulipUQ as uq
 import numpy as np
@@ -20,10 +20,13 @@ if __name__ == "__main__":
   # Construct Polynomial Matrix on samples
   polyMat = uq.uqPolyMatrix(samples,5,uq.kPolyLegendre,uq.kMIPartialOrder)
 
+  test = np.array(polyMat.getMatrix())
+  print(np.linalg.norm(test,axis=0))
+
   # Eval functional value with simple function
   rhs = uq.stdVec()
   rhs.resize(polyMat.getRowCount());
-  for loopA in xrange(polyMat.getRowCount()):
+  for loopA in range(polyMat.getRowCount()):
     rhs[loopA] = samples.getValuesAt(loopA,0) + samples.getValuesAt(loopA,1)
 
   # Construct the regression algorithm
@@ -42,5 +45,9 @@ if __name__ == "__main__":
 
   # Print coefficients on screen
   coeffs = np.array(bcsCoeffs)
-  print 'BCS Regression Coefficients: ',coeffs
+  print('--- BCS Regression Coefficients')
+  for loopA in range(len(coeffs)):
+    print('%5d %10f' % (loopA,coeffs[loopA]))
+  print('Residual Norm: %8e' % (resNorm))
+    
 

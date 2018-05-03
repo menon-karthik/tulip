@@ -1,10 +1,15 @@
 # Imports
 import sys
-sys.path.insert(0, '../../py')
+sys.path.insert(0, '../../../py')
 import tulipUQ as uq
 import numpy as np
 
 if __name__ == "__main__":
+
+  # Write Header
+  print('--- Tulip Testing')
+  print('One Dimensional Quadrature')
+  print()
 
   # Set Quadrature Order and type of support
   quadOrder = 9
@@ -28,13 +33,22 @@ if __name__ == "__main__":
   point3  = np.array(thirdRule.getPoints());
   weight3 = np.array(thirdRule.getWeights());
 
-  print 'Point1: ',point1
-  print 'Weight1: ',weight1
+  print('Clenshaw-Curtis quadrature rule on [-1,1]')
+  for loopA in range(len(point1)):
+    print('%10f %10f' % (point1[loopA],weight1[loopA]))
+  print('Weight sum: ',np.sum(weight1))
+  print()
 
-  print 'Point2: ',point2
-  print 'Weight2: ',weight2
+  print('Double Clenshaw-Curtis quadrature rule on [-1,1]')
+  for loopA in range(len(point2)):
+    print('%10f %10f' % (point2[loopA],weight2[loopA]))
+  print('Weight sum: ',np.sum(weight2))
+  print()
 
-  print 'Point3: ',point3
-  print 'Weight3: ',weight3
+  print('Regular quadrature rule on [-1,1]')
+  for loopA in range(len(point3)):
+    print('%10f %10f' % (point3[loopA],weight3[loopA]))
+  print('Weight sum: ',np.sum(weight3))
+  print()
 
 

@@ -1,6 +1,6 @@
 # Imports
 import sys
-sys.path.insert(0, '../../py')
+sys.path.insert(0, '../../../py')
 
 import tulipUQ as uq
 import numpy as np
@@ -37,7 +37,12 @@ if __name__ == "__main__":
   cartesianGridSamples.getValues(s3);
   npS3 = np.array(s3)
 
-  plt.scatter(npS1[:,0],npS1[:,1],lw=0,alpha=0.7,c='g')
-  plt.scatter(npS2[:,0],npS2[:,1],lw=0,alpha=0.7,c='b')
-  plt.scatter(npS3[:,0],npS3[:,1],lw=0,alpha=0.7,c='k')
+  plt.figure()
+  ax = plt.subplot(3,1,1)
+  plt.scatter(npS1[:,0],npS1[:,1],lw=0,s=10,alpha=0.9,c='g')
+  ax = plt.subplot(3,1,2)
+  plt.scatter(npS2[:,0],npS2[:,1],lw=0,s=10,alpha=0.9,c='b')
+  ax = plt.subplot(3,1,3)
+  plt.scatter(npS3[:,0],npS3[:,1],lw=0,s=10,alpha=0.9,c='k')
+  plt.tight_layout()
   plt.show()
