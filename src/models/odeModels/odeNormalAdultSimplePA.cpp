@@ -776,7 +776,9 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
     output[loopA-startLastCycle] = outVals[7][loopA];
     valveOpening[loopA-startLastCycle] = auxOutVals[14][loopA];
   }
-  zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening);
+  if(!zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening)){
+    throw cmException("Error: Valve is not opening in heart cycle.\n");
+  }  
   double mvDecelTime = 0.0;
   bool isDecelTimeOK = getDecelerationTime(0, stopLastCycle - startLastCycle, timeStep, output, mvDecelTime);
   
@@ -790,7 +792,9 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
     valveOpening[loopA-startLastCycle] = auxOutVals[13][loopA];
   }
   // SHIFT CURVE WITH BEGINNING AT VALVE OPENING
-  zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening);
+  if(!zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening)){
+    throw cmException("Error: Valve is not opening in heart cycle.\n");
+  }
   double pvAccelTime = 0.0;
   bool isPVAccelTimeOK = getAccelerationTime(0, stopLastCycle - startLastCycle, timeStep, output, pvAccelTime);
   

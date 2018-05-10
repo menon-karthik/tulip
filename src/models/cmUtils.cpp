@@ -1202,7 +1202,8 @@ bool getEARatio(int start, int stop, double* vector,double& EARatio){
   return retVal;
 }
 
-void zeroAtValveOpening(int start, int stop, double* curve, double* valveIsOpen){
+bool zeroAtValveOpening(int start, int stop, double* curve, double* valveIsOpen){
+  bool result = true;
   // Determine the valve opening time
   bool foundOpeningTime = false;
   int valveOpeningIDX = 0;
@@ -1217,11 +1218,8 @@ void zeroAtValveOpening(int start, int stop, double* curve, double* valveIsOpen)
     }
   }
   if(!foundOpeningTime){
-    //printf("Error: Valve Not Opening at zeroAtValveOpening...\n");
-    //fflush(stdout);
-    //printf("Warning: Valve is not opening in heart cycle.\n");
-    // return;
-    throw cmException("Error: Valve is not opening in heart cycle.\n");
+    result = false;
+    return result;    
   }
   // Perform Circular Shift
   double* aux = new double[stop-start];
@@ -1237,6 +1235,7 @@ void zeroAtValveOpening(int start, int stop, double* curve, double* valveIsOpen)
   }
   // Deallocate
   delete [] aux;
+  return result;
 }
 
 void subSampleTableData(string currTraceFile,int& totSubSamples,int startColumn,int endColumn,stdMat& subSampleTable,stdIntVec& sampleIndexes){

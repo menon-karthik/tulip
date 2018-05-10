@@ -3462,10 +3462,10 @@ double acActionDREAM::sample_likelihood ( int par_num, double zp[] )
   double value = 0.0;
   int error = 0;
   double begin_ll,end_ll;
-  begin_ll = MPI_Wtime(); 
+  begin_ll = MPI_Wtime();
   try{
     value = -model->evalModelError(inputs,outputs,errors);  
-  }catch(...){
+  }catch(exception &e){
     value = -10000.0;
   }  
   end_ll = MPI_Wtime(); 

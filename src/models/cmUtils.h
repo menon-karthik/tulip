@@ -947,7 +947,7 @@ No Reference
 \param[in] input curve to process.
 \param[in] array with valve status (0 - closed, 1 - open).
 */
-void zeroAtValveOpening(int start, int stop, double* curve, double* valveIsOpen);
+bool zeroAtValveOpening(int start, int stop, double* curve, double* valveIsOpen);
 
 /*! 
 \verbatim embed:rst

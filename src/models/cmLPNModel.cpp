@@ -83,8 +83,13 @@ double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec
   // Run the integrator and post-process
   stdMat outVals;
   stdMat auxOutVals;
-  integrator->run(totalSteps,iniVals,params,outVals,auxOutVals);
-  integrator->ode->postProcess(integrator->timeStep,totalStepsOnSingleCycle,totalSteps,inputs,outVals,auxOutVals,outputs);
+  // Except if the solution crashes
+  try{
+    integrator->run(totalSteps,iniVals,params,outVals,auxOutVals);
+    integrator->ode->postProcess(integrator->timeStep,totalStepsOnSingleCycle,totalSteps,inputs,outVals,auxOutVals,outputs);
+  }catch (exception& e){
+    throw;
+  }
   // Write Results to File
   if(printLevel > 0){
     string outFile("allData.dat");
