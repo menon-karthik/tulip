@@ -25,6 +25,7 @@
 #include "odeModel.h"
 #include "odeNormalAdultSimplePA.h"
 #include "uqTypes.h"
+#include "cmBertiniSolverModel.h"
 %}
 
 %exception{
@@ -74,6 +75,7 @@
 %include "odeModel.h"
 %include "odeNormalAdultSimplePA.h"
 %include "uqTypes.h"
+%include "cmBertiniSolverModel.h"
 
 namespace std {
   typedef std::string String;

@@ -23,6 +23,11 @@ OPTION(buildDocumentation "Build Documentation" OFF)
 # ===================
 OPTION(buildTests "Build tulip Test Suite" OFF)
 
+# ====================================================================
+# Includes Bertini model with equation parser (compilation takes time)
+# ====================================================================
+OPTION(addModelBertini "Add Bertini parser model" OFF)
+
 # ===============================
 # SET FOLDERS FOR CMAKE UTILITIES
 # ===============================
@@ -58,13 +63,31 @@ FILE(GLOB UQ_SRC_H "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/*.h"
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/tools/thirdParty/*.h"
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/tools/uqCore/*.h")
 
+# ADD OTHER BUBDIRECTORIES FOR SPECIFIC OPTIONS
+IF(addModelBertini)
+  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src/models/bertini)
+  FILE(GLOB SRC_BERTINI_C "${CMAKE_CURRENT_SOURCE_DIR}/src/models/bertini/*.cpp")
+  FILE(GLOB SRC_BERTINI_H "${CMAKE_CURRENT_SOURCE_DIR}/src/models/bertini/*.h")
+  SET(UQ_SRC_C ${UQ_SRC_C} ${SRC_BERTINI_C})
+  SET(UQ_SRC_H ${UQ_SRC_H} ${SRC_BERTINI_H})
+ENDIF()
+
+# ====================
 # SWIG INTERFACE FILES
+# ====================
 # UQ functionalities - Uncertainty Quantification
 FILE(GLOB PY_I_UQ "${CMAKE_CURRENT_SOURCE_DIR}/src/tools/uqCore/tulipUQ.i")
+
 # CM functionalities - Computational Models for Hemodynamics
-FILE(GLOB PY_I_CM "${CMAKE_CURRENT_SOURCE_DIR}/src/models/tulipCM.i")
+IF(addModelBertini)
+  FILE(GLOB PY_I_CM "${CMAKE_CURRENT_SOURCE_DIR}/src/models/bertini/tulipCM.i")
+ELSE()
+  FILE(GLOB PY_I_CM "${CMAKE_CURRENT_SOURCE_DIR}/src/models/tulipCM.i")
+ENDIF()
+
 # AC functionalities - High level algorithms for uncertainty analysis
 FILE(GLOB PY_I_AC "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipAC.i")
+
 # DA functionalities - Data structures
 FILE(GLOB PY_I_DA "${CMAKE_CURRENT_SOURCE_DIR}/src/data/tulipDA.i")
 

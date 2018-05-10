@@ -18,6 +18,10 @@ IF(SWIG_FOUND)
     "${CMAKE_SOURCE_DIR}/src/data/"
     "${CMAKE_SOURCE_DIR}/src/tools/")
 
+  IF(addModelBertini)
+    INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/models/bertini")
+  ENDIF()
+
   SET(CMAKE_SWIG_FLAGS "-Wall")
 
   SET(CMAKE_SWIG_OUTDIR ${CMAKE_BINARY_DIR}/py)
