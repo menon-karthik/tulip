@@ -165,76 +165,8 @@ int odeNormalAdultSimplePA::getStateTotal(){
   return 11;
 }
 
-int odeNormalAdultSimplePA::getResultTotal(){
-  return 19;
-}
-
 int odeNormalAdultSimplePA::getAuxStateTotal(){
   return 16;
-}
-
-string odeNormalAdultSimplePA::getResultName(int index){
-  string returnString;
-  switch(index){
-    case 0:
-      returnString = string("HR");
-      break;
-    case 1:
-      returnString = string("SBP");
-      break;
-    case 2:
-      returnString = string("DBP");
-      break;
-    case 3:
-      returnString = string("mBP");
-      break;
-    case 4:
-      returnString = string("RAP");
-      break;
-    case 5:
-      returnString = string("sPAP");
-      break;
-    case 6:
-      returnString = string("dPAP");
-      break;
-    case 7:
-      returnString = string("mPAP");
-      break;
-    case 8:
-      returnString = string("PWP");
-      break;
-    case 9:
-      returnString = string("CO");
-      break;
-    case 10:
-      returnString = string("PVR");
-      break;
-    case 11:
-      returnString = string("SVR");
-      break;
-    case 12:
-      returnString = string("CVP");
-      break;
-    case 13:
-      returnString = string("LVEF");
-      break;
-    case 14:
-      returnString = string("RVEF");
-      break;
-    case 15:
-      returnString = string("sRV");
-      break;
-    case 16:
-      returnString = string("dRV");
-      break;
-    case 17:
-      returnString = string("sLV");
-      break;
-    case 18:
-      returnString = string("dLV");
-      break;
-  }
-  return returnString;
 }
 
 void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){

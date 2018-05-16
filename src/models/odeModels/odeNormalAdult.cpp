@@ -20,14 +20,6 @@ int odeNormalAdult::getAuxStateTotal(){
   return 22; 	
 }
 
-int odeNormalAdult::getResultTotal(){
-  return 5;  
-}
-
-string odeNormalAdult::getResultName(int resID){
-  throw cmException("ERROR: odeNormalAdult::getResultName Not Implemented.");
-}
-
 string odeNormalAdult::getParamName(int index){
   string result;
   switch(index){

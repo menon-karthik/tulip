@@ -14,46 +14,8 @@ int odeSingleVentricleHeart::getAuxStateTotal(){
   return 13;  
 }
 
-int odeSingleVentricleHeart::getResultTotal(){
-  return 8;  
-}
-
 int odeSingleVentricleHeart::getHRIndex(){
   return 0;
-}
-
-// ===========================
-// GET NAME OF RESULT QUANTITY
-// ===========================
-string odeSingleVentricleHeart::getResultName(int resID){
-  string res;
-  switch(resID){
-    case 0:
-      res = string("mPascAo [mmHg]");
-      break;
-    case 1:
-      res = string("maxPAo [mmHg]");
-      break;
-    case 2:
-      res = string("mPsa [mmHg]");
-      break;
-    case 3:
-      res = string("maxPsv [mmHg]");
-      break;
-    case 4:
-      res = string("maxVsv [mL]");
-      break;
-    case 5:
-      res = string("PsvZero [mmHg]");
-      break;
-    case 6:
-      res = string("maxPsa [mmHg]");
-      break;
-    case 7:
-      res = string("mQreg [mL/s]");
-      break;
-  }
-  return res;
 }
 
 // ==================

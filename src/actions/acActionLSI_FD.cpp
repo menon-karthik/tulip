@@ -28,22 +28,21 @@ void acActionLSI_FD::WriteSentitivityTableToFile(string fileName,int par_num,int
   string parName;
   string resName;
 
-  fprintf(stateFile,"%15s ","Param");
+  fprintf(stateFile,"%30s ","Param");
   for(int loopA=0;loopA<res_num;loopA++){
     resName = model->getResultName(loopA);
-    fprintf(stateFile,"%15s ",resName.c_str());
+    fprintf(stateFile,"%30s ",resName.c_str());
   } 
   fprintf(stateFile,"\n");
   for(int loopA=0;loopA<par_num;loopA++){
     // First Column Parameter Name
     parName = model->getParamName(loopA);
-    fprintf(stateFile,"%15s ",parName.c_str());
+    fprintf(stateFile,"%30s ",parName.c_str());
     for(int loopB=0;loopB<res_num;loopB++){
-      fprintf(stateFile,"%15.3f ",sensTable[loopA][loopB]);
+      fprintf(stateFile,"%30.3f ",sensTable[loopA][loopB]);
     }
     fprintf(stateFile,"\n");
   }
-
   // Close State File
   fclose(stateFile);
 }

@@ -21,10 +21,6 @@ int odeNormalAdultSimplePD::getAuxStateTotal(){
   return 18; 	
 }
 
-int odeNormalAdultSimplePD::getResultTotal(){
-  return 15;  
-}
-
 int odeNormalAdultSimplePD::getHRIndex(){
   return 12;
 }
@@ -178,58 +174,6 @@ string odeNormalAdultSimplePD::getParamName(int index){
       break;
     case 48:
       res = string("R_sys_v");
-      break;
-  }
-  return res;
-}
-
-string odeNormalAdultSimplePD::getResultName(int index){
-  string res;
-  switch(index){
-    case 0:
-      res = string("HR");
-      break;
-    case 1:
-      res = string("SBP");
-      break;
-    case 2:
-      res = string("DBP");
-      break;
-    case 3:
-      res = string("mBP");
-      break;
-    case 4:
-      res = string("RAP");
-      break;
-    case 5:
-      res = string("sPAP");
-      break;
-    case 6:
-      res = string("dPAP");
-      break;
-    case 7:
-      res = string("mPAP");
-      break;
-    case 8:
-      res = string("PWP");
-      break;
-    case 9:
-      res = string("CO");
-      break;
-    case 10:
-      res = string("PVR");
-      break;
-    case 11:
-      res = string("SVR");
-      break;
-    case 12:
-      res = string("CVP");
-      break;
-    case 13:
-      res = string("LVEF");
-      break;
-    case 14:
-      res = string("RVEF");
       break;
   }
   return res;

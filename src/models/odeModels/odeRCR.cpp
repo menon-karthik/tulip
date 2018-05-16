@@ -43,28 +43,8 @@ int odeRCR::getStateTotal(){
   return 1; // P_1
 }
 
-int odeRCR::getResultTotal(){
-  return 3; // max(P_0), min(P_0), mean(P_0)
-}
-
 int odeRCR::getAuxStateTotal(){
   return 3; // t (time), P_0, Q_2
-}
-
-string odeRCR::getResultName(int index){
-  string returnString;
-  switch(index){
-    case 0:
-      returnString = string("max_P_0");
-      break;
-    case 1:
-      returnString = string("min_P_0");
-      break;
-    case 2:
-      returnString = string("mean_P_0");
-      break;
-  }
-  return returnString;
 }
 
 void odeRCR::getDefaultParameterLimits(stdVec& limits){

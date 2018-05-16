@@ -31,9 +31,7 @@ class odeRCR: public odeModel{
     virtual int    getParameterTotal();
     virtual string getParamName(int parID);
     virtual int    getStateTotal();
-    virtual int    getResultTotal();
     virtual int    getAuxStateTotal();
-    virtual string getResultName(int resID);
     virtual void   getDefaultParameterLimits(stdVec& limits);
     virtual void   getDefaultParams(stdVec& params);
     virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind);

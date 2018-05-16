@@ -16,7 +16,9 @@ int cmLPNModel::getStateTotal(){
   return this->integrator->ode->getStateTotal();
 }
 int cmLPNModel::getResultTotal(){
-  return this->integrator->ode->getResultTotal();
+  stdStringVec keys;
+  this->integrator->ode->getResultKeys(keys);
+  return keys.size();
 }
 void cmLPNModel::getDefaultParameterLimits(stdVec& limits){
   this->integrator->ode->getDefaultParameterLimits(limits);
@@ -28,7 +30,9 @@ string cmLPNModel::getParamName(int parID){
   return this->integrator->ode->getParamName(parID);
 }
 string cmLPNModel::getResultName(int resID){
-  return this->integrator->ode->getResultName(resID);
+  stdStringVec keys;
+  this->integrator->ode->getResultKeys(keys);
+  return keys[resID];
 }
 void cmLPNModel::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: cmLPNModel::getPriorMapping Not Implemented.");

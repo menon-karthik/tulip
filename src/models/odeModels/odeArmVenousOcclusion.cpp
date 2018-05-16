@@ -234,15 +234,6 @@ int odeArmVenousOcclusion::getStateTotal(){
   return 1;
 }
 
-int odeArmVenousOcclusion::getResultTotal(){
-  // Three Pressures and two flowrates
-  return 1;
-}
-
-string odeArmVenousOcclusion::getResultName(int resID){
-  throw cmException("ERROR: cmRCRModel::getResultName not implemented.\n");
-}
-
 void odeArmVenousOcclusion::getParameterLimits(stdVec& limits){
   limits.resize(22);
   limits[2*0 + 0] = 50.0; limits[2*0 + 1] = 120.0;
