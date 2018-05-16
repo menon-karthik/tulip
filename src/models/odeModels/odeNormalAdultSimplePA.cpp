@@ -1004,7 +1004,6 @@ void odeNormalAdultSimplePA::getFinalOutputs(const stdVec& outputs,stdVec& outs)
       outs.push_back(outputs[ip_0002_diastolic_bp_2]/1333.22);
       outs.push_back(outputs[ip_0002_cardiac_output]*(60.0/1000.0));
       outs.push_back(outputs[ip_0002_systemic_vascular_resistan]);
-      outs.push_back(outputs[ip_0002_pulmonary_vascular_resista]);
       outs.push_back(outputs[ip_0002_cvp]/1333.22);
       outs.push_back(outputs[ip_0002_right_ventricle_diastole]/1333.22);
       outs.push_back(outputs[ip_0002_right_ventricle_systole]/1333.22);
@@ -1099,7 +1098,6 @@ void odeNormalAdultSimplePA::getDataSTD(stdVec& stds){
       stds.push_back(1.5); // diastolic_bp_2
       stds.push_back(0.2); // cardiac_output
       stds.push_back(50.0); // systemic_vascular_resistan
-      stds.push_back(5.0); // pulmonary_vascular_resista
       stds.push_back(0.5); // cvp
       stds.push_back(1.0); // right_ventricle_diastole
       stds.push_back(1.0); // right_ventricle_systole
@@ -1195,7 +1193,6 @@ void odeNormalAdultSimplePA::getResultWeigths(stdVec& weights){
       weights.push_back(1.0); // diastolic_bp_2
       weights.push_back(1.0); // cardiac_output
       weights.push_back(1.0); // systemic_vascular_resistan
-      weights.push_back(1.0); // pulmonary_vascular_resista
       weights.push_back(1.0); // cvp
       weights.push_back(1.0); // right_ventricle_diastole
       weights.push_back(1.0); // right_ventricle_systole
