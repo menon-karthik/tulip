@@ -907,7 +907,6 @@ void odeNormalAdultSimplePA::getResultKeys(stdStringVec& keys){
       keys.push_back(string("diastolic_bp_2"));
       keys.push_back(string("cardiac_output"));
       keys.push_back(string("systemic_vascular_resistan"));
-      keys.push_back(string("pulmonary_vascular_resista"));
       keys.push_back(string("cvp"));
       keys.push_back(string("right_ventricle_diastole"));
       keys.push_back(string("right_ventricle_systole"));
