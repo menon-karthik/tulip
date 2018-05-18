@@ -120,6 +120,11 @@ double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec
     result = data->evalLogLikelihood(keys,outs,stds,weights);
     //result = data->evalOBJ(keys,computedValues,weigths);
   }
+  // Sync Outputs
+  outputs.clear();
+  for(size_t loopA=0;loopA<outs.size();loopA++){
+    outputs.push_back(outs[loopA]);
+  }
   // Return 
   errorCode.clear();
   errorCode.push_back(0);
