@@ -81,8 +81,8 @@ double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec
     params[loopA-totStates] = inputs[loopA];
   }
   // Set Steps per cycle
-  double cycleDuration = 60.0/HR;
-  int totalStepsOnSingleCycle = int(cycleDuration/(double)integrator->timeStep);
+  double cycleDuration = 60.0/(double)HR;
+  int totalStepsOnSingleCycle = int(cycleDuration/(double)integrator->timeStep)+1;
   int totalSteps = totalStepsOnSingleCycle*integrator->totalCycles;
   // Run the integrator and post-process
   stdMat outVals;

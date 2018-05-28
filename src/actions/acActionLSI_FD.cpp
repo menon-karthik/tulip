@@ -65,7 +65,6 @@ int acActionLSI_FD::solveModel(int par_num, double* allParams, int res_num, doub
     } 
     ll = model->evalModelError(inputs,outputs,errorCode);
     for(int loopA=0;loopA<res_num;loopA++){
-
       results[loopA] = outputs[loopA];
     }
     error = errorCode[0];
@@ -113,6 +112,9 @@ int acActionLSI_FD::go(){
     std::string inputFileName(initialParamFile);
     printf("READING PARAMETERS FROM FILE %s.\n",inputFileName.c_str());    
     ReadParamsFromFile(inputFileName,centreParams);    
+    //for(int loopA=0;loopA<par_num;loopA++){
+    //  printf("Params %d, Value: %e.\n",loopA,centreParams[loopA]);
+    //}    
   }else{
     // Start From The Default Parameters
     printf("USING DEFAULT PARAMETERS.\n");
@@ -158,6 +160,11 @@ int acActionLSI_FD::go(){
       printf("Error: Invalid Solution Point for param %s. Exiting.\n",paramName.c_str());
       exit(1);
     }
+
+    //printf("Parameter perturb %d\n",loopA);
+    //for(int loopB=0;loopB<par_num;loopB++){
+    //  printf("Params %d, Value: %e.\n",loopB,perturbParams[loopB]);
+    //}    
 
     // SAVE ALL RESULTS FOR THIS PARAMETER PERTURBATION
     for(int loopB=0;loopB<res_num;loopB++){
