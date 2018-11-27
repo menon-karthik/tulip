@@ -30,7 +30,7 @@ void cmStressStretch_GOH::getDefaultParameterLimits(stdVec& limits){
   limits[6] = 0.0; limits[7] = 1.0/3.0;
   limits[8] = 0.0; limits[9] = M_PI/2.0;
   if(includeDataStdAsParam){
-  	limits[10] = 0.1; limits[11] = 1.0;
+  	limits[10] = 0.1; limits[11] = 10.0;
   }
 }
 void cmStressStretch_GOH::getDefaultParams(stdVec& params){

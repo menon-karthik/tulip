@@ -158,6 +158,10 @@ int acActionLSI_FD::go(){
     if(error != 0){
       string paramName = model->getParamName(loopA);
       printf("Error: Invalid Solution Point for param %s. Exiting.\n",paramName.c_str());
+      for(int loopTemp=0;loopTemp<par_num;loopTemp++){
+        paramName = model->getParamName(loopTemp);
+        printf("Param %s: %f\n",paramName.c_str(),perturbParams[loopTemp]);
+      }
       exit(1);
     }
 

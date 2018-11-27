@@ -583,6 +583,11 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   // DETERMINE START AND END OF LAST HEART CYCLE
   double heartRate = 60.0/(totalStepsOnSingleCycle * timeStep);
   int numCycles = totalSteps/totalStepsOnSingleCycle;
+  if(numCycles < 2){
+    throw cmException("Error: not enough heart cycle to post-process model results.\n");
+  }  
+
+  int startTwoLastCycle = (numCycles-2) * totalStepsOnSingleCycle;
   int startLastCycle = (numCycles-1) * totalStepsOnSingleCycle;
   int stopLastCycle = numCycles * totalStepsOnSingleCycle;
   double output[totalSteps];
@@ -704,31 +709,32 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   double maxPVPG  = getMax (startLastCycle, stopLastCycle, output);
   
   // MITRAL VALVE DECELERATION TIME
-  for(int loopA=startLastCycle;loopA<stopLastCycle;loopA++){
-    output[loopA-startLastCycle] = outVals[7][loopA];
-    valveOpening[loopA-startLastCycle] = auxOutVals[14][loopA];
+  for(int loopA=startTwoLastCycle;loopA<stopLastCycle;loopA++){
+    output[loopA-startTwoLastCycle] = outVals[7][loopA];
+    valveOpening[loopA-startTwoLastCycle] = auxOutVals[14][loopA];
   }
-  if(!zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening)){
-    throw cmException("Error: Valve is not opening in heart cycle.\n");
+  if(!zeroAtValveOpening(0, stopLastCycle - startTwoLastCycle, output, valveOpening)){
+    throw cmException("Error: First Valve is not opening in heart cycle.\n");
   }  
   double mvDecelTime = 0.0;
-  bool isDecelTimeOK = getDecelerationTime(0, stopLastCycle - startLastCycle, timeStep, output, mvDecelTime);
+  bool isDecelTimeOK = getDecelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, mvDecelTime);
   
   // MITRAL VALVE E/A RATIO
   double mvEARatio = 0.0;
-  bool isMVEARatioOK = getEARatio(0, stopLastCycle - startLastCycle, output, mvEARatio);
+  bool isMVEARatioOK = getEARatio(0, stopLastCycle - startTwoLastCycle, output, mvEARatio);
   
   // PULMONARY VALVE ACCELERATION TIME
-  for(int loopA=startLastCycle;loopA<stopLastCycle;loopA++){
-    output[loopA-startLastCycle] = outVals[6][loopA];
-    valveOpening[loopA-startLastCycle] = auxOutVals[13][loopA];
+  for(int loopA=startTwoLastCycle;loopA<stopLastCycle;loopA++){
+    output[loopA-startTwoLastCycle] = outVals[6][loopA];
+    valveOpening[loopA-startTwoLastCycle] = auxOutVals[13][loopA];
+    printf("%e\n",valveOpening[loopA-startTwoLastCycle]);
   }
   // SHIFT CURVE WITH BEGINNING AT VALVE OPENING
-  if(!zeroAtValveOpening(0, stopLastCycle - startLastCycle, output, valveOpening)){
-    throw cmException("Error: Valve is not opening in heart cycle.\n");
+  if(!zeroAtValveOpening(0, stopLastCycle - startTwoLastCycle, output, valveOpening)){
+    throw cmException("Error: Second Valve is not opening in heart cycle.\n");
   }
   double pvAccelTime = 0.0;
-  bool isPVAccelTimeOK = getAccelerationTime(0, stopLastCycle - startLastCycle, timeStep, output, pvAccelTime);
+  bool isPVAccelTimeOK = getAccelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, pvAccelTime);
   
   //printf("mvDecelTime: %f\n",mvDecelTime);
   //printf("mvEARatio: %f\n",mvEARatio);
