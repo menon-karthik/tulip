@@ -17,8 +17,7 @@ using namespace std;
 /*! 
 Child class to read patient information for multiple patients in the same CSV file.
 The first column contains the key of the clinical measurement.
-The second column contains a description of the clinical quantity identifying the row.
-The other column contain the patient data (one patient for each column).
+The other columns contain the patient data (one patient for each column).
 Missing data are identified using the "none" string and discarded.
 */
 

@@ -39,4 +39,6 @@ namespace std {
   %template(stdMat) vector < vector < double > >;
   %template(stdStringVec) vector<string>;
   %template(stdStringMat) vector<vector<string> >;
+  %template(stdBoolVec) vector<bool>;
+  %template(stdBoolMat) vector<vector<bool> >;  
 } 
