@@ -727,7 +727,7 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   for(int loopA=startTwoLastCycle;loopA<stopLastCycle;loopA++){
     output[loopA-startTwoLastCycle] = outVals[6][loopA];
     valveOpening[loopA-startTwoLastCycle] = auxOutVals[13][loopA];
-    printf("%e\n",valveOpening[loopA-startTwoLastCycle]);
+    //printf("%e\n",valveOpening[loopA-startTwoLastCycle]);
   }
   // SHIFT CURVE WITH BEGINNING AT VALVE OPENING
   if(!zeroAtValveOpening(0, stopLastCycle - startTwoLastCycle, output, valveOpening)){

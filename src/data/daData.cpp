@@ -38,12 +38,11 @@ void daData::addKeyValue(string key,double value){
 }
 
 void daData::removeKeyValue(string key){
-  for(dataMap::iterator it = dict.begin(); it!=dict.end();){
-    if(it->first == key){
-      dict.erase(it);
-    }else{
-      it++;	
-    }
+  dataMap::iterator it;
+  it=dict.find(key);
+  if(it != dict.end()){
+    // Remove the element pointed by iterator
+    dict.erase(it);
   }
 }
 
