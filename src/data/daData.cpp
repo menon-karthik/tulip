@@ -1,4 +1,3 @@
-
 # include "daData.h"
 
 using namespace std;
@@ -20,10 +19,12 @@ void daData::extractKeyValues(const stdStringVec& refKeys,const stdBoolVec& unUs
   outValues.clear();
   for(int loopA=0;loopA<refKeys.size();loopA++){
     if((dict.find(refKeys[loopA]) != dict.end())&&(!unUsedKeys[loopA])){
-      // Found Key
-      outKeys.push_back(refKeys[loopA]);
-      // Carefull: Only first Patient
-      outValues.push_back(atof(dict[refKeys[loopA]][0].c_str()));
+      if(dict[refKeys[loopA]][0].compare("none") != 0){
+        // Found Key
+        outKeys.push_back(refKeys[loopA]);
+        // Carefull: Only first Patient
+        outValues.push_back(atof(dict[refKeys[loopA]][0].c_str()));
+      }
     }
   }
 }

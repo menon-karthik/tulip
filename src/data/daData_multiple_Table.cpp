@@ -15,7 +15,8 @@ void daData_multiple_Table::getIndexSet(stdIntVec& indexSet){
   if(useSingleColumn){
     // Only Specified Column
     indexSet.clear();
-    indexSet.push_back(columnID);
+    //indexSet.push_back(columnID);
+    indexSet.push_back(0);
   }else{
     // Insert All the Columns
     indexSet.clear();
@@ -33,16 +34,25 @@ void daData_multiple_Table::readFromFile(string fileName){
   if(error != 0){
     throw daException("Error: in Data.readFromFile, invalid file.\n");
   }
-  for(int loopA=0;loopA<stringTable.size();loopA++){
-  	temp.clear();
-  	for(int loopB=1;loopB<stringTable[0].size();loopB++){
-      // Float Values
-      // printf("Current String: %s\n",stringTable[loopA][loopB].c_str());
-  	  temp.push_back(stringTable[loopA][loopB]);
-  	}
-    // printf("String: %s\n",stringTable[loopA][0].c_str());
-  	dict[stringTable[loopA][0]] = temp;
-  } 
+  if(useSingleColumn){
+    for(int loopA=0;loopA<stringTable.size();loopA++){
+      temp.clear();
+      temp.push_back(stringTable[loopA][columnID+1]);
+      // printf("String: %s\n",stringTable[loopA][0].c_str());
+      dict[stringTable[loopA][0]] = temp;
+    } 
+  }else{
+    for(int loopA=0;loopA<stringTable.size();loopA++){
+      temp.clear();
+      for(int loopB=1;loopB<stringTable[0].size();loopB++){
+        // Float Values
+        // printf("Current String: %s\n",stringTable[loopA][loopB].c_str());
+        temp.push_back(stringTable[loopA][loopB]);
+      }
+      // printf("String: %s\n",stringTable[loopA][0].c_str());
+      dict[stringTable[loopA][0]] = temp;
+    } 
+  }
 }
 
 double daData_multiple_Table::evalOBJ(stdStringVec keys,stdVec values,stdVec weights){
@@ -51,11 +61,11 @@ double daData_multiple_Table::evalOBJ(stdStringVec keys,stdVec values,stdVec wei
   if((keys.size() != values.size())||(keys.size() != weights.size())){
     throw daException("Error in evalOBJ size of keys and values are not consistent.\n");
   }
-  if(useSingleColumn){
-    if(dict.begin()->second.size() < columnID){
-      throw daException("Error in evalOBJ invalid data index.\n");
-    }
-  }
+  //if(useSingleColumn){
+  //  if(dict.begin()->second.size() < columnID){
+  //    throw daException("Error in evalOBJ invalid data index.\n");
+  //  }
+  //}
 
   // Get Index Set
   stdIntVec indexSet;
@@ -99,11 +109,11 @@ double daData_multiple_Table::evalLogLikelihood(stdStringVec keys,stdVec avValue
   if((keys.size() != avValues.size())||(keys.size() != stdFactors.size())||(keys.size() != weights.size())){
     throw daException("Error in evalPosterior size of keys and values are not consistent.\n");
   }
-  if(useSingleColumn){
-    if(dict.begin()->second.size() < columnID){
-      throw daException("Error in evalPosterior invalid data index.\n");
-    }
-  }
+  //if(useSingleColumn){
+  //  if(dict.begin()->second.size() < columnID){
+  //    throw daException("Error in evalPosterior invalid data index.\n");
+  //  }
+  //}
 
   // Get Index Set
   stdIntVec indexSet;
@@ -169,11 +179,11 @@ void daData_multiple_Table::printAndCompare(stdStringVec keys,stdVec values,stdV
   //  printf("Key %s, Value %s\n",iterator->first.c_str(),iterator->second[1].c_str());
   //}
 
-  if(useSingleColumn){
-    if(dict.begin()->second.size() < columnID){
-      throw daException("Error in printAndCompare invalid data index.\n");
-    }
-  }
+  //if(useSingleColumn){
+  //  if(dict.begin()->second.size() < columnID){
+  //    throw daException("Error in printAndCompare invalid data index.\n");
+  //  }
+  //}
 
   // Get Index Set
   stdIntVec indexSet;
@@ -218,7 +228,7 @@ int daData_multiple_Table::getPatientValue(string key,double &result){
     int retVal = 0;
     if(dict.find(key) != dict.end()){
       try{
-        result = atof(dict[key][columnID].c_str());
+        result = atof(dict[key][0].c_str());
       }catch(...){
         result = 0.0;
         retVal = 1;
