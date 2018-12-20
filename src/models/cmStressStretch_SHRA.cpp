@@ -2,9 +2,10 @@
 
 using namespace std;
 
-cmStressStretch_SHRA::cmStressStretch_SHRA(const stdVec& lambda,bool includeDataStdAsParam){
+cmStressStretch_SHRA::cmStressStretch_SHRA(const stdVec& lambda,bool includeDataStdAsParam,bool includeHelixAngle){
   this->lambdaZ = lambda;
   this->includeDataStdAsParam = includeDataStdAsParam;
+  this->includeHelixAngle = includeHelixAngle;
 }
 
 cmStressStretch_SHRA::~cmStressStretch_SHRA(){
@@ -12,11 +13,19 @@ cmStressStretch_SHRA::~cmStressStretch_SHRA(){
 }
 
 int cmStressStretch_SHRA::getParameterTotal(){
-  if(includeDataStdAsParam){
-    return 5;
+  if(includeHelixAngle){
+    if(includeDataStdAsParam){
+      return 5;
+    }else{
+      return 4;
+    }
   }else{
-  	return 4;
-  }
+    if(includeDataStdAsParam){
+      return 4;
+    }else{
+      return 3;
+    }    
+  } 
 }
 int cmStressStretch_SHRA::getStateTotal(){
   return 0;
@@ -29,20 +38,32 @@ void cmStressStretch_SHRA::getDefaultParameterLimits(stdVec& limits){
   limits[0] = 0.0;   limits[1] = 1.0e8;
   limits[2] = 0.0;   limits[3] = 1.0e8;
   limits[4] = 0.001; limits[5] = M_PI/2.0;
-  limits[6] = 0.0;   limits[7] = M_PI/2.0;
-  if(includeDataStdAsParam){
-    limits[8] = 0.1; limits[9] = 10.0;
-  }
+  if(includeHelixAngle){
+    limits[6] = 0.0;   limits[7] = M_PI/2.0;
+    if(includeDataStdAsParam){
+      limits[8] = 0.1; limits[9] = 10.0;
+    }
+  }else{
+    if(includeDataStdAsParam){
+      limits[6] = 0.1; limits[7] = 10.0;
+    }    
+  } 
 }
 void cmStressStretch_SHRA::getDefaultParams(stdVec& params){
   params.resize(getParameterTotal());
   params[0] = 1.0;
   params[1] = 10.0;
   params[2] = M_PI/2.0;
-  params[3] = M_PI/16.0;
-  if(includeDataStdAsParam){
-    params[4] = 1.0;
-  }  
+  if(includeHelixAngle){
+    params[3] = M_PI/16.0;
+    if(includeDataStdAsParam){
+      params[4] = 1.0;
+    }
+  }else{
+    if(includeDataStdAsParam){
+      params[3] = 1.0;
+    }    
+  } 
 }
 void cmStressStretch_SHRA::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: getPriorMapping Not implemented in cmStressStretch_SHRA.\n");
@@ -54,9 +75,11 @@ string cmStressStretch_SHRA::getParamName(int parID){
     return string("E");
   }else if(parID == 2){
     return string("theta0");
-  }else if(parID == 3){
+  }else if((includeHelixAngle)&&(parID == 3)){
     return string("psi");
-  }else if((includeDataStdAsParam)&&(parID == 4)){
+  }else if((!includeHelixAngle)&&(includeDataStdAsParam)&&(parID == 3)){
+    return string("dataStd");
+  }else if((includeHelixAngle)&&(includeDataStdAsParam)&&(parID == 5)){
     return string("dataStd");
   }else{
     throw cmException("ERROR: invalid parameter ID.\n");
@@ -137,12 +160,20 @@ double cmStressStretch_SHRA::evalModelError(const stdVec& inputs,stdVec& outputs
   double mu     = inputs[0];
   double E      = inputs[1];
   double theta0 = inputs[2];
-  double psi    = inputs[3];
+  double psi    = 0.0;
   // Fibril helix angle
   double alpha  = 0.0;
   double dataStd = 1.0;
-  if(includeDataStdAsParam){
-  	double dataStd = inputs[4];
+
+  if(includeHelixAngle){
+    psi = inputs[3];
+    if(includeDataStdAsParam){
+      dataStd = inputs[4];
+    }
+  }else{
+    if(includeDataStdAsParam){
+      dataStd = inputs[3];
+    }    
   }
 
   // Init quantities derived from lambdaZ

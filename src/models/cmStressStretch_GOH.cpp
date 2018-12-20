@@ -2,19 +2,28 @@
 
 using namespace std;
 
-cmStressStretch_GOH::cmStressStretch_GOH(const stdVec& lambda,bool includeDataStdAsParam){
+cmStressStretch_GOH::cmStressStretch_GOH(const stdVec& lambda,bool includeDataStdAsParam,bool includeHelixAngle){
   this->lambdaZ = lambda;
   this->includeDataStdAsParam = includeDataStdAsParam;
+  this->includeHelixAngle = includeHelixAngle;
 }
 cmStressStretch_GOH::~cmStressStretch_GOH(){
   lambdaZ.clear();
 }
 int cmStressStretch_GOH::getParameterTotal(){
-  if(includeDataStdAsParam){
-    return 6;
+  if(includeHelixAngle){
+    if(includeDataStdAsParam){
+      return 6;
+    }else{
+      return 5;
+    }
   }else{
-    return 5;
-  }  
+    if(includeDataStdAsParam){
+      return 5;
+    }else{
+      return 4;
+    }    
+  } 
 }
 int cmStressStretch_GOH::getStateTotal(){
   return 0;
@@ -28,10 +37,16 @@ void cmStressStretch_GOH::getDefaultParameterLimits(stdVec& limits){
   limits[2] = 0.0; limits[3] = 1.0e8;
   limits[4] = 0.0; limits[5] = 1.0e3;
   limits[6] = 0.0; limits[7] = 1.0/3.0;
-  limits[8] = 0.0; limits[9] = M_PI/2.0;
-  if(includeDataStdAsParam){
-  	limits[10] = 0.1; limits[11] = 10.0;
-  }
+  if(includeHelixAngle){
+    limits[8] = 0.0; limits[9] = M_PI/2.0;
+    if(includeDataStdAsParam){
+      limits[10] = 0.1; limits[11] = 10.0;
+    }
+  }else{
+    if(includeDataStdAsParam){
+      limits[8] = 0.1; limits[9] = 10.0;
+    }    
+  } 
 }
 void cmStressStretch_GOH::getDefaultParams(stdVec& params){
   params.resize(getParameterTotal());
@@ -39,10 +54,16 @@ void cmStressStretch_GOH::getDefaultParams(stdVec& params){
   params[1] = 1.0;
   params[2] = 350.0;
   params[3] = 0.15;
-  params[4] = 0.2;
-  if(includeDataStdAsParam){
-  	params[5] = 1.0;
-  }
+  if(includeHelixAngle){
+    params[4] = 0.2;
+    if(includeDataStdAsParam){
+      params[5] = 1.0;
+    }
+  }else{
+    if(includeDataStdAsParam){
+      params[4] = 1.0;
+    }    
+  } 
 }
 void cmStressStretch_GOH::getPriorMapping(int priorModelType,int* prPtr){
   throw cmException("ERROR: getPriorMapping Not implemented in cmStressStretch_GOH.\n");
@@ -56,9 +77,11 @@ string cmStressStretch_GOH::getParamName(int parID){
     return string("c2");
   }else if(parID == 3){
     return string("K");
-  }else if(parID == 4){
+  }else if((includeHelixAngle)&&(parID == 4)){
     return string("alpha");
-  }else if((includeDataStdAsParam)&&(parID == 5)){
+  }else if((!includeHelixAngle)&&(includeDataStdAsParam)&&(parID == 4)){
+    return string("dataStd");
+  }else if((includeHelixAngle)&&(includeDataStdAsParam)&&(parID == 5)){
     return string("dataStd");
   }else{
     throw cmException("ERROR: invalid parameter ID.\n");
@@ -68,7 +91,6 @@ string cmStressStretch_GOH::getResultName(int resID){
   string res(string("Stress") + to_string(resID+1));
   return res;
 }
-
 void cmStressStretch_GOH::setModelResults(const stdVec& outputs,double dataStd,stdStringVec& keys,stdVec& computedValues,stdVec& stdFactors,stdVec& weigths){
 
   // KEYS
@@ -134,14 +156,22 @@ double cmStressStretch_GOH::evalModelError(const stdVec& inputs,stdVec& outputs,
 // ===========================================================================
 
   // Local copy of the parameters
-  double ce    = inputs[0];
-  double c1    = inputs[1];
-  double c2    = inputs[2];
-  double K     = inputs[3];
-  double alpha = inputs[4];
+  double ce      = inputs[0];
+  double c1      = inputs[1];
+  double c2      = inputs[2];
+  double K       = inputs[3];
+  double alpha   = 0.0;
   double dataStd = 1.0;
-  if(includeDataStdAsParam){
-  	double dataStd = inputs[5];
+
+  if(includeHelixAngle){
+    alpha = inputs[4];
+    if(includeDataStdAsParam){
+      dataStd = inputs[5];
+    }
+  }else{
+    if(includeDataStdAsParam){
+      dataStd = inputs[4];
+    }    
   }
 
   // Init quantities derived from lambdaZ

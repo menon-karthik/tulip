@@ -16,9 +16,10 @@ class cmStressStretch_GOH: public cmModel{
     // Experimental Stretches
     stdVec lambdaZ;
     bool includeDataStdAsParam;
+    bool includeHelixAngle;
 
     //! Default constructor
-    cmStressStretch_GOH(const stdVec& lambda,bool includeDataStdAsParam);
+    cmStressStretch_GOH(const stdVec& lambda,bool includeDataStdAsParam,bool includeHelixAngle=true);
     //! Virtual destructor
     virtual ~cmStressStretch_GOH();
 

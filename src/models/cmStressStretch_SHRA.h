@@ -14,9 +14,10 @@ class cmStressStretch_SHRA: public cmModel{
   public:
     vector<double> lambdaZ;
     bool includeDataStdAsParam;
+    bool includeHelixAngle;
 
     //! Default constructor
-    cmStressStretch_SHRA(const stdVec& lambda,bool includeDataStdAsParam);
+    cmStressStretch_SHRA(const stdVec& lambda,bool includeDataStdAsParam,bool includeHelixAngle=true);
     //! Virtual destructor
     virtual ~cmStressStretch_SHRA();
 
