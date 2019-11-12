@@ -1122,12 +1122,13 @@ void odeCongenital4ChambersPAH::getDataSTD(stdVec& stds){
       stds.push_back(20.0); // lv_vol_a4c
       stds.push_back(2.0); // lvef
       stds.push_back(1.0); // lvot_max_flow
-      stds.push_back(0.0); // RVEDV_mri
-      stds.push_back(0.0); // RVESV_mri
-      stds.push_back(0.0); // QPA_mri
-      stds.push_back(0.0); // LVEDV_mri
-      stds.push_back(0.0); // LVESV_mri
-      stds.push_back(0.0); // QAO_mri
+      // New Values
+      stds.push_back(95.0); // RVEDV_mri
+      stds.push_back(82.0); // RVESV_mri
+      stds.push_back(1.2);  // QPA_mri
+      stds.push_back(44.0); // LVEDV_mri
+      stds.push_back(27.0); // LVESV_mri
+      stds.push_back(1.3);  // QAO_mri
       
     }else if(targetConfigMode == ipTargetConfig_HRBPCVP){
       stds.clear();
@@ -1166,12 +1167,13 @@ void odeCongenital4ChambersPAH::getDataSTD(stdVec& stds){
       stds.push_back(1.0); // pap_diastolic
       stds.push_back(1.0); // pap_systolic
       stds.push_back(1.0); // wedge_pressure
-      stds.push_back(0.0); // RVEDV_mri
-      stds.push_back(0.0); // RVESV_mri
-      stds.push_back(0.0); // QPA_mri
-      stds.push_back(0.0); // LVEDV_mri
-      stds.push_back(0.0); // LVESV_mri
-      stds.push_back(0.0); // QAO_mri
+      // New Values
+      stds.push_back(95.0); // RVEDV_mri
+      stds.push_back(82.0); // RVESV_mri
+      stds.push_back(1.2);  // QPA_mri
+      stds.push_back(44.0); // LVEDV_mri
+      stds.push_back(27.0); // LVESV_mri
+      stds.push_back(1.3);  // QAO_mri
     }
   }
 }
@@ -1229,12 +1231,12 @@ void odeCongenital4ChambersPAH::getResultWeigths(stdVec& weights){
       weights.push_back(1.0); // lv_vol_a4c
       weights.push_back(1.0); // lvef
       weights.push_back(1.0); // lvot_max_flow
-      weights.push_back(0.0); // RVEDV_mri
-      weights.push_back(0.0); // RVESV_mri
-      weights.push_back(0.0); // QPA_mri
-      weights.push_back(0.0); // LVEDV_mri
-      weights.push_back(0.0); // LVESV_mri
-      weights.push_back(0.0); // QAO_mri
+      weights.push_back(1.0); // RVEDV_mri
+      weights.push_back(1.0); // RVESV_mri
+      weights.push_back(1.0); // QPA_mri
+      weights.push_back(1.0); // LVEDV_mri
+      weights.push_back(1.0); // LVESV_mri
+      weights.push_back(1.0); // QAO_mri
       
     }else if(targetConfigMode == ipTargetConfig_HRBPCVP){
       weights.clear();
@@ -1273,12 +1275,12 @@ void odeCongenital4ChambersPAH::getResultWeigths(stdVec& weights){
       weights.push_back(1.0); // pap_diastolic
       weights.push_back(1.0); // pap_systolic
       weights.push_back(1.0); // wedge_pressure
-      weights.push_back(0.0); // RVEDV_mri
-      weights.push_back(0.0); // RVESV_mri
-      weights.push_back(0.0); // QPA_mri
-      weights.push_back(0.0); // LVEDV_mri
-      weights.push_back(0.0); // LVESV_mri
-      weights.push_back(0.0); // QAO_mri
+      weights.push_back(1.0); // RVEDV_mri
+      weights.push_back(1.0); // RVESV_mri
+      weights.push_back(1.0); // QPA_mri
+      weights.push_back(1.0); // LVEDV_mri
+      weights.push_back(1.0); // LVESV_mri
+      weights.push_back(1.0); // QAO_mri
     }
   }
 }
