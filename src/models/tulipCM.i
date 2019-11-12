@@ -24,6 +24,7 @@
 #include "odeIntegratorRK4.h"
 #include "odeModel.h"
 #include "odeNormalAdultSimplePA.h"
+#include "odeCongenital_4Chambers_PAH.h"
 #include "uqTypes.h"
 %}
 
@@ -73,6 +74,7 @@
 %include "odeIntegratorRK4.h"
 %include "odeModel.h"
 %include "odeNormalAdultSimplePA.h"
+%include "odeCongenital_4Chambers_PAH.h"
 %include "uqTypes.h"
 
 namespace std {

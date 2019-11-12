@@ -580,7 +580,7 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
 
 void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params,const stdMat& outVals,const stdMat& auxOutVals, stdVec& results){
   
-  // DETERMINE START AND END OF LAST HEART CYCLE
+  // DETERMINE START AND END OF LAST HEART CYCLE  
   double heartRate = 60.0/(totalStepsOnSingleCycle * timeStep);
   int numCycles = totalSteps/totalStepsOnSingleCycle;
   if(numCycles < 2){
@@ -620,7 +620,6 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   // dRV and sRV
   double sRV = maxRVPress;
   double dRV = minRVPress;
-  
   
   // SYSTOLIC, DIASTOLIC AND AVERAGE PA PRESSURES
   for(int loopA=0;loopA<totalSteps;loopA++){
@@ -736,9 +735,10 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   double pvAccelTime = 0.0;
   bool isPVAccelTimeOK = getAccelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, pvAccelTime);
   
-  //printf("mvDecelTime: %f\n",mvDecelTime);
-  //printf("mvEARatio: %f\n",mvEARatio);
-  //printf("pvAccelTime: %f\n",pvAccelTime);
+
+  // printf("mvDecelTime: %f\n",mvDecelTime);
+  // printf("mvEARatio: %f\n",mvEARatio);
+  // printf("pvAccelTime: %f\n",pvAccelTime);
   
   // Assign Results Based on Model Version
   results.clear();

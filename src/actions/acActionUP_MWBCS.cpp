@@ -597,7 +597,7 @@ void evalGlobalStatistics(stdVec partAV,stdVec partSD, stdVec partVolume, stdInt
       printf("VOLUME OF PARTITION %d: %f\n",loopA,partVolume[loopA]);    
     }
     printf("TOTAL VOLUME OF THE PARTITIONS: %f\n",totVol);
-    getchar();
+    //getchar();
   }
   // Evaluate Global Standard Deviation
   double totVariance = 0.0;
@@ -1347,7 +1347,7 @@ int acActionUP_MWBCS::go(){
           if(opts.printDBGMessages){
             printf("Current Partition Integral Value: %f\n",currPartIntMeasure);
             fflush(stdout);
-            getchar();
+            //getchar();
           }
 
           // Set the volume in probability for this partition
@@ -1384,7 +1384,7 @@ int acActionUP_MWBCS::go(){
             //writeTableToFile(outMeasFile,measure);
 
             //performMWOrthogonalityTest(currPartSamples,mwMat,measure);
-            getchar();
+            //getchar();
           }
 
           // Form Multiwavelet Matrix

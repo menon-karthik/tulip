@@ -58,7 +58,7 @@ void writeAllDataToFile(string fileName,int totalSteps,const stdMat& outVals,con
   fclose(outFile);
 }
 
-double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
+double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){  
   // Get Heart Rate from inputs
   double HR = inputs[integrator->ode->getHRIndex()];
   // Get Number of states from ode model
@@ -87,7 +87,7 @@ double cmLPNModel::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec
   // Run the integrator and post-process
   stdMat outVals;
   stdMat auxOutVals;
-  // Except if the solution crashes
+  // Except if the solution crashes  
   try{
     integrator->run(totalSteps,iniVals,params,outVals,auxOutVals);
     integrator->ode->postProcess(integrator->timeStep,totalStepsOnSingleCycle,totalSteps,inputs,outVals,auxOutVals,outputs);

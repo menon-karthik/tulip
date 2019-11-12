@@ -28,5 +28,6 @@
 // ODE Models
 #include "odeModel.h"
 #include "odeNormalAdultSimplePA.h"
+#include "odeCongenital_4Chambers_PAH.h"
 
 #endif // TULIPCM_H
