@@ -67,7 +67,7 @@ class daData{
     \param values inputs values of the model results associated with the vector keys
     \param weights inputs weights that multiply the measurement variance for each quantity
     */
-    virtual double evalOBJ(stdStringVec keys,stdVec values,stdVec weights) = 0;
+    virtual double evalOBJ(const stdStringVec& keys,const stdVec& values,const stdVec& weights) = 0;
 
     /*! 
     \verbatim embed:rst

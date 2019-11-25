@@ -55,7 +55,7 @@ void daData_multiple_Table::readFromFile(string fileName){
   }
 }
 
-double daData_multiple_Table::evalOBJ(stdStringVec keys,stdVec values,stdVec weights){
+double daData_multiple_Table::evalOBJ(const stdStringVec& keys,const stdVec& values,const stdVec& weights){
   
   // Check The Size of keys and values
   if((keys.size() != values.size())||(keys.size() != weights.size())){

@@ -4,10 +4,20 @@
 // CONSTRUCTOR
 acActionUP_MC::acActionUP_MC(uqSamples* locInputs): acActionUP(locInputs){
   inputs = locInputs;
+  // Initialize options
+  opts.numberOfRepeats = 1;
+  opts.sampleGroups.push_back(10);
+  opts.storeSamples = false;
+  opts.useExistingSamples = true;
 }
 
 // PERFORM MCMC
 int acActionUP_MC::go(){
+
+  // Write Warning if using existing samples but more than one group
+  if((opts.sampleGroups.size()>1)&&(opts.useExistingSamples)){
+    printf("Warning: using existing samples with multiple sampling groups. All groups will be equal.\n");
+  }
 
   // Inputs for the numerical model
   stdVec modelInputs;
@@ -54,7 +64,9 @@ int acActionUP_MC::go(){
 
       // Generate Random Samples
       // printf("Generating Samples...\n");
-      inputs->generateRandomSamples(currNumSamples);
+      if(!opts.useExistingSamples){
+        inputs->generateRandomSamples(currNumSamples);
+      }
       // inputs->printToFile("sampleFile.txt",true);
       // getchar();
 
@@ -80,6 +92,14 @@ int acActionUP_MC::go(){
         // Solve Models
         // printf("Evaluating Sample %d...\n",loopC+1);
         ll = model->evalModelError(modelInputs,modelOutputs,modelErrors);
+
+        // Store inputs and outputs in tables if required
+        if(opts.storeSamples){
+          // store inputs in table
+          all_inputs.push_back(modelInputs);
+          // store outputs in table
+          all_outputs.push_back(modelOutputs);
+        }
 
         // Store Results
         currGroupOutputs.push_back(modelOutputs);

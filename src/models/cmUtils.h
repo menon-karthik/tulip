@@ -710,7 +710,7 @@ No Reference
 \param[in] currX The abscissa where the linear interpolant is needed
 result The value of the linear interpolant at currX
 */
-double linInterp(vector<vector<double> > table,int xColumn,int yColumn,double currX);
+double linInterp(const stdMat& table,int xColumn,int yColumn,double currX);
 
 /*! 
 \verbatim embed:rst
@@ -1019,5 +1019,26 @@ No Reference
 \param[out] resY ordinate values of resulting frequency plot
 */
 void generateFrequencyPlot(double minVal,double maxVal,stdVec values,int totBins,bool normalize,stdVec& resX,stdVec& resY);
+
+/*! 
+\verbatim embed:rst
+**Purpose**
+get air properties given altitude for International atmospheric model
+
+**Discussion**
+None
+
+**Modified**
+Nov 2019 - DES
+    
+**Reference**
+No Reference
+\endverbatim
+\param[in] alt altitude in meters
+\param[out] airTemperature in C
+\param[out] airPressure in Pa
+\param[out] airDensity in kg/m3
+*/
+void getAirProps(double alt,double& airTemperature,double& airPressure,double& airDensity);
 
 #endif // LPNUTILSHPP

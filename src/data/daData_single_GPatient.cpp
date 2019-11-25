@@ -39,7 +39,7 @@ void daData_single_GPatient::readFromFile(string fileName){
   }
 }
 
-double daData_single_GPatient::evalOBJ(stdStringVec keys,stdVec values,stdVec weights){
+double daData_single_GPatient::evalOBJ(const stdStringVec& keys,const stdVec& values,const stdVec& weights){
   
   // Check The Size of keys and values
   if((keys.size() != values.size())||(keys.size() != weights.size())){

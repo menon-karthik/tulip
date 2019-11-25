@@ -787,7 +787,7 @@ int readVectorFromFile(std::string fileName,int column,stdVec& vec){
   return error;
 }
 
-double linInterp(vector<vector<double> > table, int xColumn,int yColumn,double currX){
+double linInterp(const stdMat& table, int xColumn,int yColumn,double currX){
   double result = 0.0;
   data temp;
   vector<data> items;
@@ -1381,4 +1381,32 @@ void generateFrequencyPlot(double minVal,double maxVal,stdVec values,int totBins
       resY[loopA] /= intVal;
     }
   }
+}
+
+stdMat getAtmModelTable(int modelType){  
+  if(modelType == 0){
+    stdMat mat{
+      {-610,  +19.0, 108900, 1.2985},
+      {11000, -56.5, 22632,  0.3639},
+      {20000, -56.5, 5474.9, 0.0880},
+      {32000, -44.5, 868.02, 0.0132},
+      {47000, -2.5,  110.91, 0.0020},
+      {51000, -2.5,  66.939, 0.000861606},
+      {71000, -58.5, 3.9564, 0.0000642110},
+      {84852, -86.28,0.3734, 0.00000695788}
+    };
+    return mat;
+  }else{
+    throw cmException("Error: invalid modelType for standard atmospheric model.\n");
+  }
+}
+
+void getAirProps(double alt,double& airTemperature,double& airPressure,double& airDensity){
+  // Get Standard Atmospheric Model Table
+  // Geopot altitude (m), temp (C), press (Pa), density (kg/m3)
+  stdMat table = getAtmModelTable(0);
+  // Compute Values by linear interpolation
+  airTemperature = linInterp(table,0,1,alt);
+  airPressure    = linInterp(table,0,2,alt);
+  airDensity     = linInterp(table,0,3,alt);
 }

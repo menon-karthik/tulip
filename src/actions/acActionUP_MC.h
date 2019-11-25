@@ -13,6 +13,11 @@ struct mcOptions{
   int numberOfRepeats;
   // Sample groups
   stdIntVec sampleGroups;
+  // Store Samples 
+  bool storeSamples;
+  // Generate Samples within the MC loop
+  // This means you can use only one group of samples
+  bool useExistingSamples;
 };
 
 // GENERIC CLASS FOR UNCERTAINTY PROPAGATION ACTION
@@ -27,6 +32,10 @@ class acActionUP_MC: public acActionUP{
     // repeat i, sample group j and output k.
     vector<stdMat> avgStats;
     vector<stdMat> stdStats;
+
+    // Storage for simulation inputs and outputs
+    stdMat all_inputs;
+    stdMat all_outputs;
 
   	// Constructor
   	acActionUP_MC(uqSamples* locInputs);

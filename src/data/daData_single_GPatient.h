@@ -31,7 +31,7 @@ class daData_single_GPatient: public daData{
     virtual ~daData_single_GPatient();
 
     virtual void   readFromFile(string filaName);
-    virtual double evalOBJ(stdStringVec keys,stdVec values,stdVec weights);
+    virtual double evalOBJ(const stdStringVec& keys,const stdVec& values,const stdVec& weights);
     virtual double evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
     virtual double evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
     virtual void   printAndCompare(stdStringVec keys,stdVec values,stdVec weigths);

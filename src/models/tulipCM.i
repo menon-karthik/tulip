@@ -20,6 +20,9 @@
 #include "cmStressStretch_SHRA.h"
 #include "cmStressStretch_GOH.h"
 #include "cmStressStretch_FR.h"
+#include "cm_darpaSimple_code1.h"
+#include "cm_darpaSimple_code2.h"
+#include "cm_darpaSimple_code3.h"
 #include "odeIntegrator.h"
 #include "odeIntegratorRK4.h"
 #include "odeModel.h"
@@ -70,6 +73,9 @@
 %include "cmStressStretch_SHRA.h"
 %include "cmStressStretch_GOH.h"
 %include "cmStressStretch_FR.h"
+%include "cm_darpaSimple_code1.h"
+%include "cm_darpaSimple_code2.h"
+%include "cm_darpaSimple_code3.h"
 %include "odeIntegrator.h"
 %include "odeIntegratorRK4.h"
 %include "odeModel.h"
@@ -89,5 +95,6 @@ namespace std {
 } 
 
 %apply const stdVec & { stdVec & }; 
+%apply const stdIntVec & { stdIntVec & };
 %apply const stdMat & { stdMat & }; 
 

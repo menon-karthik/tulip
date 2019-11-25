@@ -25,6 +25,11 @@
 # include "cmStressStretch_GOH.h"
 # include "cmStressStretch_FR.h"
 
+// Darpa Simplified Codes
+# include "cm_darpaSimple_code1.h"
+# include "cm_darpaSimple_code2.h"
+# include "cm_darpaSimple_code3.h"
+
 // ODE Models
 #include "odeModel.h"
 #include "odeNormalAdultSimplePA.h"
