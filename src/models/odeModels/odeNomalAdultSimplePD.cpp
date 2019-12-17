@@ -234,9 +234,9 @@ void odeNormalAdultSimplePD::getDefaultParams(stdVec& params){
   params[12+22] = 0.1;  // L_rv_pa - Inductance of right ventricle
   params[12+23] = 15.0;  // R_rv_pa - Resistance of right ventricle
   params[12+24] = 0.1;   // L_la_lv - Inductance of left atrium
-  params[12+25] = 20.0;  // R_la_lv - Resistance of left atrium
+  params[12+25] = 25.0;  // R_la_lv - Resistance of left atrium
   params[12+26] = 0.1;   // L_lv_ao - Inductance of left ventricle
-  params[12+27] = 30.0; // R_lv_ao - Resistance of left ventricle
+  params[12+27] = 45.0; // R_lv_ao - Resistance of left ventricle
 
   // --- Aortic Arch
   params[12+28] = 1000.0e-6; // C_ao - Aortic capacitance

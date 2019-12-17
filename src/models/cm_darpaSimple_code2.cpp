@@ -23,15 +23,15 @@ int cm_darpaSimple_code2::getResultTotal(){
 void cm_darpaSimple_code2::getDefaultParams(stdVec& params){
   params.resize(getParameterTotal());
   params[0] = 0.1125e6; // Pa
-  params[1] = 2.50e6; // W/m2
+  params[1] = 1.0e6; // W/m2
   params[2] = 50.0e6; // Pa
 }
 
 void cm_darpaSimple_code2::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
-  limits[0] = 1.0e6; limits[1]  = 1.0e4; // pressure [Pa]
-  limits[2] = 10.0e6; limits[3] = 1.0e4; // heat flux [W/m2]
-  limits[4] = 10.0e5; limits[5] = 10.0e7; // elastic modulus [Pa]
+  limits[0] = 1.0; limits[1] = 1.00e8; // pressure [Pa]
+  limits[2] = 1.0; limits[3] = 1.0e8; // heat flux [W/m2]
+  limits[4] = 10.0e3; limits[5] = 10.0e8; // elastic modulus [Pa]
 }
 
 void cm_darpaSimple_code2::getPriorMapping(int priorModelType,int* prPtr){
@@ -112,10 +112,11 @@ double cm_darpaSimple_code2::evalModelError(const stdVec& inputs,stdVec& outputs
   double result = 0.0;
   if(data != NULL){
     result = data->evalLogLikelihood(keys,outputs,stds,weights);
+    // data->printAndCompare(keys,outputs,weights);
   }
 
   // Sigma di Von Mises and Temperature
-  return sigmaVM,T;
+  return result;
 }
 
 

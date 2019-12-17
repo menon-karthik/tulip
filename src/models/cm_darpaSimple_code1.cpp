@@ -27,7 +27,7 @@ void cm_darpaSimple_code1::getDefaultParams(stdVec& params){
 
 void cm_darpaSimple_code1::getDefaultParameterLimits(stdVec& limits){
   limits.resize(2*getParameterTotal());
-  limits[0] = 2000.0; limits[1] = 10000.0; // m/s 
+  limits[0] = 500.0; limits[1] = 10000.0; // m/s 
 }
 
 void cm_darpaSimple_code1::getPriorMapping(int priorModelType,int* prPtr){
@@ -109,8 +109,8 @@ double cm_darpaSimple_code1::evalModelError(const stdVec& inputs,stdVec& outputs
 
   // Set output Std
   stdVec stds;
-  stds.push_back(5.0e3);  // Std on pressure: 5 KPa
-  stds.push_back(50.0);  // Std on heatflux: 50 W/m2
+  stds.push_back(277461.0);  // Std on pressure: 0.2 MPa
+  stds.push_back(49367.32476940044);  // Std on heatflux: 50 W/m2
   // Set output weight
   stdVec weights;
   weights.push_back(1.0);
