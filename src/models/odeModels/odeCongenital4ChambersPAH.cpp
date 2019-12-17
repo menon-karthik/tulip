@@ -1,4 +1,4 @@
-# include "odeCongenital_4Chambers_PAH.h"
+# include "odeCongenital4ChambersPAH.h"
 
 using namespace std;
 
@@ -1123,13 +1123,13 @@ void odeCongenital4ChambersPAH::getDataSTD(stdVec& stds){
       stds.push_back(2.0); // lvef
       stds.push_back(1.0); // lvot_max_flow
       // New Values
-      stds.push_back(95.0); // RVEDV_mri
-      stds.push_back(82.0); // RVESV_mri
-      stds.push_back(1.2);  // QPA_mri
-      stds.push_back(44.0); // LVEDV_mri
-      stds.push_back(27.0); // LVESV_mri
-      stds.push_back(1.3);  // QAO_mri
-      
+      stds.push_back(41.476); // RVEDV_mri
+      stds.push_back(18.54); // RVESV_mri
+      stds.push_back(1.174);  // QPA_mri
+      stds.push_back(28.589); // LVEDV_mri
+      stds.push_back(12.579); // LVESV_mri
+      stds.push_back(1.272);  // QAO_mri
+
     }else if(targetConfigMode == ipTargetConfig_HRBPCVP){
       stds.clear();
       stds.push_back(3.0); // heart_rate2
@@ -1168,12 +1168,12 @@ void odeCongenital4ChambersPAH::getDataSTD(stdVec& stds){
       stds.push_back(1.0); // pap_systolic
       stds.push_back(1.0); // wedge_pressure
       // New Values
-      stds.push_back(95.0); // RVEDV_mri
-      stds.push_back(82.0); // RVESV_mri
-      stds.push_back(1.2);  // QPA_mri
-      stds.push_back(44.0); // LVEDV_mri
-      stds.push_back(27.0); // LVESV_mri
-      stds.push_back(1.3);  // QAO_mri
+      stds.push_back(41.476); // RVEDV_mri
+      stds.push_back(18.54); // RVESV_mri
+      stds.push_back(1.174);  // QPA_mri
+      stds.push_back(28.589); // LVEDV_mri
+      stds.push_back(12.579); // LVESV_mri
+      stds.push_back(1.272);  // QAO_mri
     }
   }
 }
