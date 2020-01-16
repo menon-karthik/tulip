@@ -736,8 +736,8 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   bool isPVAccelTimeOK = getAccelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, pvAccelTime);
 
   // ALTERNATIVE COMPUTATION OF SVR and PVR
-  double altSVR = 80.0*((avAOPress - avRAPress)/CO);
-  double altPVR = 80.0*((avPAPress - avPCWPress)/CO);
+  double altSVR = 80.0*(((avAOPress/1333.22) - (avRAPress/1333.22))/(CO*(60.0/1000.0)));
+  double altPVR = 80.0*(((avPAPress/1333.22) - (avPCWPress/1333.22))/(CO*(60.0/1000.0)));
 
   // printf("mvDecelTime: %f\n",mvDecelTime);
   // printf("mvEARatio: %f\n",mvEARatio);
