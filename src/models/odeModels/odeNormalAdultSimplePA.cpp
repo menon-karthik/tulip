@@ -234,7 +234,8 @@ void odeNormalAdultSimplePA::getDefaultParameterLimits(stdVec& limits){
   limits[82] = 1.0;      limits[83] = 500.0; // R_pa - Pulmonary resistance
   
   // --- Systemic Resistance and Capacitance
-  limits[84] = 100.0e-6; limits[85] = 0.05;   // C_sys - Systemic capacitance
+  //limits[84] = 100.0e-6; limits[85] = 0.05;   // C_sys - Systemic capacitance
+  limits[84] = 100.0e-6; limits[85] = 0.2;
   limits[86] = 100.0;    limits[87] = 800.0;  // R_sys_a - Systemic Resistance - Arteries
   limits[88] = 500.0;    limits[89] = 2500.0; // R_sys_v - Systemic Resistance - Veins
 }
@@ -764,10 +765,8 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
     // CARDIAC OUTPUT
     results.push_back(CO);
     // PVR AND SVR
-    //results.push_back(params[41]);
-    results.push_back(altPVR);
-    //results.push_back(params[43]+params[44]);
-    results.push_back(altSVR);
+    results.push_back(params[41]);
+    results.push_back(params[43]+params[44]);
     // CENTRAL VENOUS PRESSURE: USE RIGHT ATRIAL PRESSURE
     results.push_back(avRAPress);
     // EJECTION FRACTIONS
