@@ -734,7 +734,10 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   }
   double pvAccelTime = 0.0;
   bool isPVAccelTimeOK = getAccelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, pvAccelTime);
-  
+
+  // ALTERNATIVE COMPUTATION OF SVR and PVR
+  double altSVR = 80.0*((avAOPress - avRAPress)/CO);
+  double altPVR = 80.0*((avPAPress - avPCWPress)/CO);
 
   // printf("mvDecelTime: %f\n",mvDecelTime);
   // printf("mvEARatio: %f\n",mvEARatio);
@@ -761,8 +764,10 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
     // CARDIAC OUTPUT
     results.push_back(CO);
     // PVR AND SVR
-    results.push_back(params[41]);
-    results.push_back(params[43]+params[44]);
+    //results.push_back(params[41]);
+    results.push_back(altPVR);
+    //results.push_back(params[43]+params[44]);
+    results.push_back(altSVR);
     // CENTRAL VENOUS PRESSURE: USE RIGHT ATRIAL PRESSURE
     results.push_back(avRAPress);
     // EJECTION FRACTIONS
