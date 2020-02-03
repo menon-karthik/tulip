@@ -26,4 +26,7 @@
 # include "acActionUP_MC.h"
 # include "acActionUP_MWBCS.h"
 
+// Black-Box Variational Inference
+# include "acActionBBVI.h"
+
 #endif // TULIPAC_H

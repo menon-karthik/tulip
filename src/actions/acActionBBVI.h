@@ -2,16 +2,14 @@
 #define ACACTIONBBVI_H
 
 # include "acAction.h"
+# include "acException.h"
 # include "cmModel.h"
+# include <random>
+# include <iostream>
 
 //! Options for the optimizer
 struct bbviOptimizerOptions{
-  string opt_method;
-  stdVec adj;
-  stdVec a;
-  stdVec b;
-  long numSaves;
-}
+};
 
 /*! 
 Action class for black box variational inference
@@ -20,17 +18,17 @@ class acActionBBVI: public acAction{
   private:
 
     // Adam specific constants
-    static const double ggamma = 0.9;
-    static const double eps = 1E-8;
-    static const double eta = 1E-3; 
+    static constexpr double ggamma = 0.9;
+    static constexpr double eps = 1E-8;
+    static constexpr double eta = 1E-3; 
     // Adadelta specific constant
-    static const double beta1 = 0.9;
-    static const double beta2 = 0.999;
+    static constexpr double beta1 = 0.9;
+    static constexpr double beta2 = 0.999;
 
-  	//! Vector of variational parameter
-  	stdVec lam;
-    //! Vector with parameter distributions: each component can be "normal", "gamma", "beta"
-  	stdStringVec paramDist;
+    // Evaluate log_prior
+    double log_prior(const stdVec& params);
+    double log_joint(const stdVec& params);
+
     //! Matrix storing the lam parameters at various iterations
   	stdMat record;
 
@@ -38,12 +36,26 @@ class acActionBBVI: public acAction{
 
   
   public:
-    //! Optimization options
-    bbviOptimizerOptions opts;
+
+  	//! Optimization options
+    //! Vector of variational parameter and initial guess
+    stdVec lam;
+    //! Vector with parameter distributions: each component can be "normal", "gamma", "beta"
+    stdStringVec paramDist;    
+    //! Optimization-related parameters
+    string opt_method;
+    stdVec adj;
+    stdVec a;
+    stdVec b;
+    long numSaves;
+    long totIt;
+    int batchSize;
   	//! Default Constructor
   	acActionBBVI();
     //! Virtual Destructor
     virtual ~acActionBBVI();
+    //! Initialize Parameters
+    void initParameters();
     // Virtual Go Function
   	virtual int go();
 };

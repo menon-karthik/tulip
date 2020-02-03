@@ -12,6 +12,7 @@
 #include "acActionUP.h"
 #include "acActionUP_MC.h"
 #include "acActionUP_MWBCS.h"
+#include "acActionBBVI.h"
 #include "uqTypes.h"
 %}
 
@@ -50,6 +51,7 @@
 %include "acActionUP.h"
 %include "acActionUP_MC.h"
 %include "acActionUP_MWBCS.h"
+%include "acActionBBVI.h"
 %include "uqTypes.h"
 
 namespace std {

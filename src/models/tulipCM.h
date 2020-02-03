@@ -30,9 +30,12 @@
 # include "cm_darpaSimple_code2.h"
 # include "cm_darpaSimple_code3.h"
 
+// Oscillator Model for testing BBVI
+# include "cmOscillator.h"
+
 // ODE Models
-#include "odeModel.h"
-#include "odeNormalAdultSimplePA.h"
-#include "odeCongenital4ChambersPAH.h"
+# include "odeModel.h"
+# include "odeNormalAdultSimplePA.h"
+# include "odeCongenital4ChambersPAH.h"
 
 #endif // TULIPCM_H
