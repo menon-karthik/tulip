@@ -29,6 +29,8 @@
 #include "odeModel.h"
 #include "odeNormalAdultSimplePA.h"
 #include "odeCongenital4ChambersPAH.h"
+#include "odeRCR.h"
+#include "odeRCRCR.h"
 #include "uqTypes.h"
 %}
 
@@ -83,6 +85,8 @@
 %include "odeModel.h"
 %include "odeNormalAdultSimplePA.h"
 %include "odeCongenital4ChambersPAH.h"
+%include "odeRCR.h"
+%include "odeRCRCR.h"
 %include "uqTypes.h"
 
 namespace std {

@@ -37,5 +37,7 @@
 # include "odeModel.h"
 # include "odeNormalAdultSimplePA.h"
 # include "odeCongenital4ChambersPAH.h"
+# include "odeRCR.h"
+# include "odeRCRCR.h"
 
 #endif // TULIPCM_H
