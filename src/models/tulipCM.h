@@ -29,6 +29,7 @@
 # include "cm_darpaSimple_code1.h"
 # include "cm_darpaSimple_code2.h"
 # include "cm_darpaSimple_code3.h"
+# include "cmDarpaBeamStress.h"
 
 // ODE Models
 #include "odeModel.h"

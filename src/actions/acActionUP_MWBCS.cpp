@@ -759,8 +759,6 @@ int acActionUP_MWBCS::go(){
       }
     }
 
-    
-
     // Evaluate Results
     if(opts.printDBGMessages){
       printf("Evaluating Model...");

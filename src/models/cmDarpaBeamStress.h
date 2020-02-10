@@ -1,36 +1,31 @@
-#ifndef CMSOBOLFUNCTION_H
-#define CMSOBOLFUNCTION_H
+#ifndef CMDARPABEAMSTRESS_H
+#define CMDARPABEAMSTRESS_H
 
 # include <string>
 
-# include "uqTypes.h"
 # include "cmModel.h"
 # include "cmException.h"
 
 using namespace std;
 
 // GENERIC CLASS FOR MODELS
-class cmSobolFunction: public cmModel{
-  protected:
-    int dims;
-    stdVec params;
-    int functionType;
+class cmDarpaBeamStress: public cmModel{
   public:
 
-    //! Default constructor
-    cmSobolFunction(int numDim, int ftype, const stdVec& pk);
+  	//! Default constructor
+  	cmDarpaBeamStress();
     //! Virtual destructor
-    virtual ~cmSobolFunction();
+    virtual ~cmDarpaBeamStress();
 
     virtual int getParameterTotal();
     virtual int getStateTotal();
     virtual int getResultTotal();
+  	virtual void getDefaultParams(stdVec& params);
     virtual void getDefaultParameterLimits(stdVec& limits);
-    virtual void getDefaultParams(stdVec& params);
-    virtual void getPriorMapping(int priorModelType,int* prPtr);
+  	virtual void getPriorMapping(int priorModelType,int* prPtr);
     virtual string getParamName(int parID);
     virtual string getResultName(int resID);
     virtual double evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode);
 };
 
-#endif // CMSOBOLFUNCTION_H
+#endif //CMDARPABEAMSTRESS_H
