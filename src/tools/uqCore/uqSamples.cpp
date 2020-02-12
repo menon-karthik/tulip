@@ -1321,6 +1321,9 @@ void uqSamples::rescaleFromHypercubeToPartition(stdVec currLimits){
 // ========================================
 void uqSamples::extractSampleColumnWithIndex(stdIntVec Indexes,int outCol,stdVec& rhs){
   rhs.clear();
+  if(Indexes.size() > values.size()){
+    throw uqException("ERROR in extractSampleColumnWithIndex: Input/output mismatch.\n");
+  }
   for(int loopA=0;loopA<Indexes.size();loopA++){
     rhs.push_back(values[Indexes[loopA]][outCol]);
   }
