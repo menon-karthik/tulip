@@ -83,66 +83,6 @@ struct model3DRecord{
 /*! 
 \verbatim embed:rst
 **Purpose**
-Left trim of string
-    
-**Discussion**
-None
-    
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] s The untrimmed string
-return The left trimmed string
-*/
-string &ltrim(string &s);
-
-/*! 
-\verbatim embed:rst
-**Purpose**
-Right trim of string
-    
-**Discussion**
-None
-    
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] s The untrimmed string
-return The right trimmed string
-*/
-string &rtrim(string &s);
-
-/*! 
-\verbatim embed:rst
-**Purpose**
-Right and left trim string
-    
-**Discussion**
-None
-    
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] s The untrimmed string
-return The trimmed string
-*/
-string &trim(string &s);
-
-/*! 
-\verbatim embed:rst
-**Purpose**
 Get maximum value in array between two
 prescribed lower and upped index bounds
 [start, stop]

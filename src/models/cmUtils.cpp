@@ -1,4 +1,5 @@
 # include "cmUtils.h"
+# include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -87,25 +88,10 @@ double trapz(int start, int stop, const stdVec& xVals, const stdVec& yVals){
   return result;
 }
 
-
-string &ltrim(string &s) {
-        s.erase(s.begin(), find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace))));
-        return s;
-}
-
-string &rtrim(string &s) {
-        s.erase(find_if(s.rbegin(), s.rend(), not1(std::ptr_fun<int, int>(isspace))).base(), s.end());
-        return s;
-}
-
-string &trim(string &s) {
-        return ltrim(rtrim(s));
-}
-
 void schSplit(string sentence,vector<string> &tokens,const char* separator){
   char* pch;
   tokens.clear();
-  sentence = ltrim(rtrim(sentence));
+  boost::algorithm::trim(sentence);
   pch = strtok ((char*)sentence.c_str(),separator);
   while (pch != NULL){
     tokens.push_back(string(pch));

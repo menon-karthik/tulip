@@ -248,7 +248,7 @@ void uqSamples::readFromFile(string outMatFile,bool skipFirstLine){
     lineCount++;
     
     // Trim String
-    trim(buffer);
+    boost::algorithm::trim(buffer);
     if((buffer != "")&&(buffer.at(0) != '#')){
       
       // Tokenize String
