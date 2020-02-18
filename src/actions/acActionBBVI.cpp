@@ -318,4 +318,5 @@ int acActionBBVI::go(){
       recordIP += 1;
     }
   }
+  return 0;
 }
