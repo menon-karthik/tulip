@@ -1,4 +1,9 @@
 %module tulipUQ
+
+%include <cstring.i>
+%include <std_string.i>
+%include <std_vector.i>
+%include <std_map.i>
  
 %{
 /* Includes the header in the wrapper code */
@@ -29,11 +34,6 @@
 %}
  
 /* Parse the header file to generate wrappers */
-
-%include <cstring.i>
-%include <std_string.i>
-%include <std_vector.i>
-%include <std_map.i>
 
 %apply const int & { int & }; 
 %apply const double & { double & }; 
