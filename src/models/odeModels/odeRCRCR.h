@@ -33,13 +33,21 @@ class odeRCRCR: public odeModel{
   public:
   	// CONSTRUCTOR
   	odeRCRCR(double r1, double c, double r2, stdMat p);
+    //! Virtual destructor
+    virtual ~odeRCRCR();
 
-    // FUNCTIONS THAT MUST BE IMPLEMENTED BY THE SUB CLASSES
+    // Virtual functions to be implemented by child classes
     virtual int    getParameterTotal();
-    virtual string getParamName(int parID);
     virtual int    getStateTotal();
-  	virtual void   getParameterLimits(stdVec& limits);
-  	virtual void   getDefaultParams(stdVec& params);
-    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,stdVec& DXk,stdVec& auxOut);
-    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
+    virtual int    getAuxStateTotal();
+    virtual void   getDefaultParams(stdVec& params);
+    virtual void   getDefaultParameterLimits(stdVec& limits);
+    virtual string getParamName(int parID);
+    virtual void   evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind);
+    virtual void   postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
+    virtual void   getResultKeys(stdStringVec& keys);
+    virtual void   getFinalOutputs(const stdVec& outputs, stdVec& outs);
+    virtual void   getDataSTD(stdVec& stds);
+    virtual void   getResultWeigths(stdVec& weights);
+    virtual int    getHRIndex();
 };

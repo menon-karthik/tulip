@@ -654,7 +654,7 @@ int detect_peak(int data_count, double* t, double* data,
     return retValue;
 }
 
-int readTableFromFile(std::string fileName,vector<vector<double> > &samples){
+int readTableFromFile(std::string fileName,stdMat &samples){
   // Open File
   ifstream myReadFile;
   string buffer;

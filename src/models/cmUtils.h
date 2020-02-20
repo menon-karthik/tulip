@@ -343,7 +343,7 @@ No Reference
 \param[in] samples std Matrix where to store the table
 return Error code
 */
-int readTableFromFile(std::string fileName,vector<vector<double> > &samples);
+int readTableFromFile(std::string fileName,stdMat &samples);
 
 /*! 
 \verbatim embed:rst

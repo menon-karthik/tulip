@@ -1,7 +1,7 @@
 # Imports
 import sys,os
 # Set library path
-sys.path.insert(0,'/home/dschiava/Documents/01_Development/01_PythonApps/05_tulip/bin/py')
+sys.path.insert(0,'../../../../../bin/py')
 # Import UQ Library
 import tulipUQ as uq
 # Import Computational Model Library
@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Test: Run One instance of the Oscillation Model
-def runModel(param=181875.0):
+def runModel():
 
   # Set Data Object
   # useSingleColumn = True
@@ -28,6 +28,9 @@ def runModel(param=181875.0):
 
   # Define forcing
   forcing = uq.stdMat()
+
+  # Read Focing in cgs from file
+  cm.readTableFromFile('inlet.flow',forcing)
 
   # Create a ODE Model Integrator
   timeStep = 0.005
@@ -53,26 +56,36 @@ def runModel(param=181875.0):
 
   # Solve First Model
   ll = lpnModel.evalModelError(inputs,outputs,errorCodes)
+    
+  # Return ll
+  return np.array(outputs)
 
 def genData(numDataPoints,std,dataFileName):
   '''
   Implement the data generation process
   '''
-  stdGaussVals = np.random.normal(size=numDataPoints)
+  stdGaussVals = np.random.normal(size=(3,numDataPoints))
   
   # Run Model for the default parameter Value
   ob = runModel()
 
   # Constuct data
-  data = ob + stdGaussVals * std
+  data = ob.reshape(3,-1) + stdGaussVals * std.reshape(3,-1)
 
+  # Create Data File
   outFile = open(dataFileName,'w')
-  outFile.write("dmax,")
-  for i in range(len(data)):    
-    outFile.write('%8.3e,' %(data[i]))
-
+  outFile.write("min_P_0,")
+  for i in range(data.shape[1]):    
+    outFile.write('%8.3e,' %(data[0,i]))
+  outFile.write('\n')    
+  outFile.write("max_P_0,")
+  for i in range(data.shape[1]):    
+    outFile.write('%8.3e,' %(data[1,i]))
+  outFile.write('\n')    
+  outFile.write("av_P_0,")
+  for i in range(data.shape[1]):    
+    outFile.write('%8.3e,' %(data[2,i]))
   outFile.write('\n')
-
 
 # Test: Run One instance of the Oscillation Model
 def runBBVI(dataFile):
@@ -119,8 +132,8 @@ def runBBVI(dataFile):
 # ====
 if __name__ == "__main__":
   
-  runMode = 'testing'
-  # runMode = 'gendata'
+  # runMode = 'testing'
+  runMode = 'gendata'
   # runMode = 'bbvi'
   
   dataFileName = 'data.txt'
@@ -128,11 +141,11 @@ if __name__ == "__main__":
   if runMode == 'testing':
     # Test the model works
     res = runModel()
-    print(res)
+    print('outputs: ',res)
   elif runMode == 'gendata':
     # Set Params
     numDataPoints = 600
-    dataStd = 0.1*0.007504
+    dataStd =  5.0*np.ones(3)
     # Generate Data
     genData(numDataPoints,dataStd,dataFileName)
   elif runMode == 'bbvi':
