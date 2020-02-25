@@ -3686,7 +3686,8 @@ int acActionDREAM::go()
       cerr << "DREAM - Fatal error!\n";
       cerr << "  CHAIN_NUM < 3.\n";
     }
-    exit(1);
+    // CAREFULL!!!
+    // exit(1);
   }
   if (cr_num < 1){
     if(globRank == 0){
