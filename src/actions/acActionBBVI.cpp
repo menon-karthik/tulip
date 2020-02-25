@@ -197,7 +197,7 @@ int acActionBBVI::go(){
 
     stdVec ff(2 * totParams,0.0);
     stdVec hh(2 * totParams,0.0);
-    stdVec varf(2 * totParams,0.0);
+    //stdVec varf(2 * totParams,0.0);
     stdVec varh(2 * totParams,0.0);
     stdVec cov(2 * totParams,0.0);
     stdVec grad(2 * totParams,0.0);
@@ -230,11 +230,12 @@ int acActionBBVI::go(){
           double g1 = distribution_B1(generator);
           double g2 = distribution_B2(generator);
           sample[j] = g1 / (g1 + g2) * a[j] + b[j];
+        }else if (paramDist[j] == "const"){
+          sample[j] = lam[2 * j];
         }else{
           throw acException("ERROR: Invalid variational family.\n");
         }
       }
-
       // Calculate the joint probability of seeing the data given the sample
       double lj = log_joint(sample);
 
@@ -257,6 +258,9 @@ int acActionBBVI::go(){
           hh[2 * j] = temp[0] / adj[2 * j];
           hh[2 * j + 1] = temp[1] / adj[2 * j + 1];
           temp1 = log_gamma((sample[j] - b[j]) / a[j],lam[2 * j] / adj[2 * j], lam[2 * j + 1] / adj[2 * j + 1]);
+        }else if (paramDist[j] == "const"){
+          varh[2 * j] = 1.0;
+          varh[2 * j + 1] = 1.0;
         }else{
           throw acException("ERROR: Invalid variational family.\n");
         }
@@ -271,12 +275,11 @@ int acActionBBVI::go(){
         ffb[2 * j] = (double)i / ((double)i + 1.0) * ffb[2 * j] + ff[2 * j] / ((double)i + 1.0);
         ffb[2 * j + 1] = (double)i / ((double)i + 1.0) * ffb[2 * j + 1] + ff[2 * j + 1] / ((double)i + 1.0);
         if(i>0){
-
           // Sequential version of variance of h, f, and covariance.
           varh[2 * j] = (double)i / ((double)i + 1.0) * varh[2 * j] + 1.0 / (double)i * (hh[2 * j] - hhb[2 * j]) * (hh[2 * j] - hhb[2 * j]);
           varh[2 * j + 1] = (double)i / ((double)i + 1.0) * varh[2 * j + 1] + 1.0 / (double)i * (hh[2 * j + 1] - hhb[2 * j + 1]) * (hh[2 * j + 1] - hhb[2 * j + 1]);
-          varf[2 * j] = (double)i / ((double)i + 1.0) * varf[2 * j] + 1.0 / (double)i * (ff[2 * j] - ffb[2 * j]) * (ff[2 * j] - ffb[2 * j]);
-          varf[2 * j + 1] = (double)i / ((double)i + 1.0) * varf[2 * j + 1] + 1.0 / (double)i * (ff[2 * j + 1] - ffb[2 * j + 1]) * (ff[2 * j + 1] - ffb[2 * j + 1]);
+          //varf[2 * j] = (double)i / ((double)i + 1.0) * varf[2 * j] + 1.0 / (double)i * (ff[2 * j] - ffb[2 * j]) * (ff[2 * j] - ffb[2 * j]);
+          //varf[2 * j + 1] = (double)i / ((double)i + 1.0) * varf[2 * j + 1] + 1.0 / (double)i * (ff[2 * j + 1] - ffb[2 * j + 1]) * (ff[2 * j + 1] - ffb[2 * j + 1]);
           cov[2 * j] = (double)i / ((double)i + 1.0) * cov[2 * j] + 1.0 / (double)i * (hh[2 * j] - hhb[2 * j]) * (ff[2 * j] - ffb[2 * j]);
           cov[2 * j + 1] = (double)i / ((double)i + 1.0) * cov[2 * j + 1] + 1.0 / (double)i * (hh[2 * j + 1] - hhb[2 * j + 1]) * (ff[2 * j + 1] - ffb[2 * j + 1]);
         }

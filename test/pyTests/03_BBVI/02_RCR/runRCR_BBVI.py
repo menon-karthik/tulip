@@ -93,34 +93,62 @@ def runBBVI(dataFile):
   # Set Data Object
   useSingleColumn = False
   columnID = 0
-  data = da.daData_multiple_Table(useSingleColumn,columnID);
-  data.readFromFile(dataFile);
-    
+  data = da.daData_multiple_Table(useSingleColumn,columnID)
+  data.readFromFile(dataFile)
+  
+  # Create a ODE Model
+  ode = cm.odeRCR()
+  # Define forcing
+  forcing = uq.stdMat()
+  # Read Focing in cgs from file
+  cm.readTableFromFile('inlet.flow',forcing)
+  # Create a ODE Model Integrator
+  timeStep = 0.005
+  totalCycles = 20
+  rk4 = cm.odeIntegratorRK4(ode,timeStep,totalCycles,forcing)
   # Create new LPN model
-  model = cm.cmOscillator()
+  lpnModel = cm.cmLPNModel(rk4)
   # Print all data etc.
-  model.printLevel = 0
-
+  lpnModel.printLevel = 0
   # Assign Data Object To Model
-  model.setData(data)
-
+  lpnModel.setData(data)
   bbvi = ac.acActionBBVI()
-  bbvi.setModel(model)
+  bbvi.setModel(lpnModel)
   bbvi.initParameters()
-
+  
+  
   # opt_method;
   # adj;
   # stdVec a;
   # stdVec b;
 
   # double Lam[2] = {3.0, 0.5}; // For Normal
-  bbvi.lam[0] = 3.0
-  bbvi.lam[1] = 0.5
+  bbvi.lam[0] = 750.0
+  bbvi.lam[1] = 50.0
+  bbvi.lam[2] = 750.0
+  bbvi.lam[3] = 50.0
+  bbvi.lam[4] = 1.0e-4
+  bbvi.lam[5] = 1.0e-6
+  #bbvi.lam[6] = 0.0
+  #bbvi.lam[7] = 0.0
+  #bbvi.lam[8] = 60.0
+  #bbvi.lam[9] = 0.0
+
+  bbvi.lam[6] = 1.0e-6
+  bbvi.lam[7] = 1.0e-8
+  bbvi.lam[8] = 80.0
+  bbvi.lam[9] = 20.0
   # double adj[2] = {1.0, 1.0};
   # double a[1] = {kmax - kmin};
-  bbvi.a[0] = 220000-140000
-  bbvi.b[0] = 0.0
-  # double b[1] = {0.0};
+  # bbvi.a[0] = 1.0
+  # bbvi.b[0] = 0.0
+
+
+  bbvi.paramDist[0] = "const"
+  bbvi.paramDist[1] = "normal"
+  bbvi.paramDist[2] = "normal"
+  bbvi.paramDist[3] = "normal"
+  bbvi.paramDist[4] = "normal"
 
   # long numSaves;
   bbvi.totIt = 10000
@@ -133,8 +161,8 @@ def runBBVI(dataFile):
 if __name__ == "__main__":
   
   # runMode = 'testing'
-  runMode = 'gendata'
-  # runMode = 'bbvi'
+  # runMode = 'gendata'
+  runMode = 'bbvi'
   
   dataFileName = 'data.txt'
   # Running mode
