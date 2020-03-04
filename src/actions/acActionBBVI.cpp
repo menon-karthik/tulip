@@ -95,6 +95,7 @@ double acActionBBVI::log_joint(const stdVec& params){
   stdIntVec errorCode;
   //double log_joint = log_prior(params) - model->evalModelError(params,outputs,errorCode);
   double log_like = -model->evalModelError(params,outputs,errorCode);
+  std::cout << log_like << std::endl;
   double log_joint = log_prior(params) + log_like;
   //printf("k : %f\n",params[0]);
   //printf("log_prior: %f\n",log_prior(params));
@@ -152,7 +153,7 @@ void acActionBBVI::initParameters(){
 
   // Set Default parameters
   // For total iterations
-  totIt = 100000;
+  totIt = 10000;
   batchSize = 25;
 
 }
@@ -165,7 +166,6 @@ int acActionBBVI::go(){
   // paramDist: vector of string, indicating variational families (Normal, Lognormal, Gamma, Beta)
   // Record: trace of the optimizor
   // opt_method: name of the optimizor (adadelta, adam)
-
   // Get the totIt number of parames in the model
   int totParams = model->getParameterTotal();
 
@@ -197,7 +197,7 @@ int acActionBBVI::go(){
 
     stdVec ff(2 * totParams,0.0);
     stdVec hh(2 * totParams,0.0);
-    stdVec varf(2 * totParams,0.0);
+    //stdVec varf(2 * totParams,0.0);
     stdVec varh(2 * totParams,0.0);
     stdVec cov(2 * totParams,0.0);
     stdVec grad(2 * totParams,0.0);
@@ -208,6 +208,8 @@ int acActionBBVI::go(){
     stdVec sample(totParams,0.0);
     stdVec temp(2,0.0);
     double temp1 = 0.0;
+    double L = 0.0;
+    double lq = 0.0;
 
     for (int i = 0; i < batchSize; i++){
 
@@ -230,11 +232,12 @@ int acActionBBVI::go(){
           double g1 = distribution_B1(generator);
           double g2 = distribution_B2(generator);
           sample[j] = g1 / (g1 + g2) * a[j] + b[j];
+        }else if (paramDist[j] == "const"){
+          sample[j] = lam[2 * j];
         }else{
           throw acException("ERROR: Invalid variational family.\n");
         }
       }
-
       // Calculate the joint probability of seeing the data given the sample
       double lj = log_joint(sample);
 
@@ -257,6 +260,10 @@ int acActionBBVI::go(){
           hh[2 * j] = temp[0] / adj[2 * j];
           hh[2 * j + 1] = temp[1] / adj[2 * j + 1];
           temp1 = log_gamma((sample[j] - b[j]) / a[j],lam[2 * j] / adj[2 * j], lam[2 * j + 1] / adj[2 * j + 1]);
+        }else if (paramDist[j] == "const"){
+          varh[2 * j] = 1.0;
+          varh[2 * j + 1] = 1.0;
+          temp1 = 0.0;
         }else{
           throw acException("ERROR: Invalid variational family.\n");
         }
@@ -271,16 +278,15 @@ int acActionBBVI::go(){
         ffb[2 * j] = (double)i / ((double)i + 1.0) * ffb[2 * j] + ff[2 * j] / ((double)i + 1.0);
         ffb[2 * j + 1] = (double)i / ((double)i + 1.0) * ffb[2 * j + 1] + ff[2 * j + 1] / ((double)i + 1.0);
         if(i>0){
-
           // Sequential version of variance of h, f, and covariance.
           varh[2 * j] = (double)i / ((double)i + 1.0) * varh[2 * j] + 1.0 / (double)i * (hh[2 * j] - hhb[2 * j]) * (hh[2 * j] - hhb[2 * j]);
           varh[2 * j + 1] = (double)i / ((double)i + 1.0) * varh[2 * j + 1] + 1.0 / (double)i * (hh[2 * j + 1] - hhb[2 * j + 1]) * (hh[2 * j + 1] - hhb[2 * j + 1]);
-          varf[2 * j] = (double)i / ((double)i + 1.0) * varf[2 * j] + 1.0 / (double)i * (ff[2 * j] - ffb[2 * j]) * (ff[2 * j] - ffb[2 * j]);
-          varf[2 * j + 1] = (double)i / ((double)i + 1.0) * varf[2 * j + 1] + 1.0 / (double)i * (ff[2 * j + 1] - ffb[2 * j + 1]) * (ff[2 * j + 1] - ffb[2 * j + 1]);
           cov[2 * j] = (double)i / ((double)i + 1.0) * cov[2 * j] + 1.0 / (double)i * (hh[2 * j] - hhb[2 * j]) * (ff[2 * j] - ffb[2 * j]);
           cov[2 * j + 1] = (double)i / ((double)i + 1.0) * cov[2 * j + 1] + 1.0 / (double)i * (hh[2 * j + 1] - hhb[2 * j + 1]) * (ff[2 * j + 1] - ffb[2 * j + 1]);
         }
+        lq = lq + temp1;
       }
+      L = (double) i / ((double) i + 1.0) * L  + (lj - lq) / ((double) i + 1.0);
     }
 
     // Calculate gradient as shown in Alg 2
@@ -310,11 +316,12 @@ int acActionBBVI::go(){
     
     // Take a record of the trace
     if((t + 1) % (totIt / 100) == 0){
+      std::cout << recordIP << '%' << ' ';
       for (int i = 0; i < 2 * totParams; i++){
         record[recordIP][i] = lam[i];
         std::cout << lam[i] << ' ';
       }
-      std::cout << recordIP << '%' << std::endl;
+      std::cout << "L= " << L << std::endl;
       recordIP += 1;
     }
   }

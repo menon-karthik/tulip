@@ -1,7 +1,10 @@
+# Usage: running estimate.py to get the traces file.  The parameter traces are required to run the MCMC in step 3
+
 # Imports
-import sys,os
-# Set library path
-sys.path.insert(0,'/home/dschiava/Documents/01_Development/01_PythonApps/05_tulip/bin/py')
+import sys
+# sys.path.insert(0, '/Users/karlynharrod/Documents/Documents/UND/Research_Projects/Heart/tulip_v07/tulipBIN/py')
+sys.path.insert(0,'../../../../../bin/py')
+# sys.path.insert(0,'/home/dschiava/Documents/01_Development/01_PythonApps/05_tulip/bin/py')
 # Import UQ Library
 import tulipUQ as uq
 # Import Computational Model Library
@@ -10,12 +13,14 @@ import tulipCM as cm
 import tulipDA as da
 # Import Action Library
 import tulipAC as ac
-# Numpy and Matplotlib
+# Import Mat File From MATLAB
+#import scipy.io
 import numpy as np
-import matplotlib.pyplot as plt
+from mpi4py import MPI
+
 
 # Test: Run One instance of the Oscillation Model
-def runModel(param=181875.0):
+def runModel():
 
   # Set Data Object
   # useSingleColumn = True
@@ -23,111 +28,169 @@ def runModel(param=181875.0):
   # data = da.daData_multiple_Table(useSingleColumn,columnID);
   # data.readFromFile(dataFile);
     
+  # Create a ODE Model
+  ode = cm.odeRCR()
+
+  # Define forcing
+  forcing = uq.stdMat()
+
+  # Read Focing in cgs from file
+  cm.readTableFromFile('inlet.flow',forcing)
+
+  # Create a ODE Model Integrator
+  timeStep = 0.005
+  totalCycles = 20
+  rk4 = cm.odeIntegratorRK4(ode,timeStep,totalCycles,forcing)
+
   # Create new LPN model
-  model = cm.cmOscillator()
+  lpnModel = cm.cmLPNModel(rk4)
+
   # Print all data etc.
-  model.printLevel = 1
-  
+  lpnModel.printLevel = 1
+
   # Assign Data Object To Model
-  # model.setData(data)
+  # lpnModel.setData(data)
 
   # Init inputs/outputs/errors
   inputs = uq.stdVec()
-  inputs.push_back(param)
   outputs = uq.stdVec()
   errorCodes = uq.stdIntVec()
 
-  # Solve First Model
-  ll = model.evalModelError(inputs,outputs,errorCodes)
+  # Set the dafult parameters
+  ode.getDefaultParams(inputs)
 
-  # Write Results
-  return outputs[0]
+  # Solve First Model
+  ll = lpnModel.evalModelError(inputs,outputs,errorCodes)
+    
+  # Return ll
+  return np.array(outputs)
 
 def genData(numDataPoints,std,dataFileName):
   '''
   Implement the data generation process
   '''
-  stdGaussVals = np.random.normal(size=numDataPoints)
+  stdGaussVals = np.random.normal(size=(3,numDataPoints))
   
   # Run Model for the default parameter Value
   ob = runModel()
 
   # Constuct data
-  data = ob + stdGaussVals * std
+  data = ob.reshape(3,-1) + stdGaussVals * std.reshape(3,-1)
 
+  # Create Data File
   outFile = open(dataFileName,'w')
-  outFile.write("dmax,")
-  for i in range(len(data)):    
-    outFile.write('%8.3e,' %(data[i]))
-
+  outFile.write("min_P_0,")
+  for i in range(data.shape[1]):    
+    outFile.write('%8.3e,' %(data[0,i]))
+  outFile.write('\n')    
+  outFile.write("max_P_0,")
+  for i in range(data.shape[1]):    
+    outFile.write('%8.3e,' %(data[1,i]))
+  outFile.write('\n')    
+  outFile.write("av_P_0,")
+  for i in range(data.shape[1]):    
+    outFile.write('%8.3e,' %(data[2,i]))
   outFile.write('\n')
 
-
-# Test: Run One instance of the Oscillation Model
-def runBBVI(dataFile):
-
+# MAIN FUNCTION
+def runMCMC(dataFile, comm):
+  # MPI Init
+  rank = comm.Get_rank()
+  size = comm.Get_size()
   # Set Data Object
   useSingleColumn = False
   columnID = 0
-  data = da.daData_multiple_Table(useSingleColumn,columnID);
-  data.readFromFile(dataFile);
-    
+  data = da.daData_multiple_Table(useSingleColumn,columnID)
+  data.readFromFile(dataFile)
+
+  # Create a ODE Model
+  ode = cm.odeRCR()
+  # Define forcing
+  forcing = uq.stdMat()
+  # Read Focing in cgs from file
+  cm.readTableFromFile('inlet.flow',forcing)
+  # Create a ODE Model Integrator
+  timeStep = 0.005
+  totalCycles = 20
+  rk4 = cm.odeIntegratorRK4(ode,timeStep,totalCycles,forcing)
   # Create new LPN model
-  model = cm.cmOscillator()
+  lpnModel = cm.cmLPNModel(rk4)
   # Print all data etc.
-  model.printLevel = 0
-
+  lpnModel.printLevel = 0
   # Assign Data Object To Model
-  model.setData(data)
+  lpnModel.setData(data)
 
-  bbvi = ac.acActionBBVI()
-  bbvi.setModel(model)
-  bbvi.initParameters()
 
-  # opt_method;
-  # adj;
-  # stdVec a;
-  # stdVec b;
+  # Set DREAM Parameters
+  totChains         = size  # size
+  totGenerations    = 30000  #30000
+  totalCR           = 3
+  totCrossoverPairs = 5
+  dreamGRThreshold  = 1.2
+  dreamJumpStep     = 10
+  dreamGRPrintStep  = 10
 
-  # double Lam[2] = {3.0, 0.5}; // For Normal
-  bbvi.lam[0] = 3.0
-  bbvi.lam[1] = 0.5
-  # double adj[2] = {1.0, 1.0};
-  # double a[1] = {kmax - kmin};
-  bbvi.a[0] = 220000-140000
-  bbvi.b[0] = 0.0
-  # double b[1] = {0.0};
+  # Set OUTPUT Files
+  dreamChainFileName = 'chain_GR_000000.txt'
+  dreamGRFileName    = 'gr_GR.txt'
 
-  # long numSaves;
-  bbvi.totIt = 10000
-  bbvi.batchSize = 30
-  bbvi.go()
+  # Set Restart File
+  # No restart Simulation
+  dreamRestartReadFileName = ''
+  # string dreamRestartReadFileName = "restart_read_GR.txt";
+  # Write restart file just in case
+  dreamRestartWriteFileName = 'restart_write_GR.txt'
+
+  # Set Prior Information
+  usePriorFromFile = False
+  priorFileName = ''
+  priorModelType = 0
+
+  # Initialize DREAM Action
+  dream = ac.acActionDREAM(totChains,
+                           totGenerations,
+                           totalCR,
+                           totCrossoverPairs,
+                           dreamChainFileName,
+                           dreamGRFileName,
+                           dreamGRThreshold,
+                           dreamJumpStep,
+                           dreamGRPrintStep,
+                           dreamRestartReadFileName,
+                           dreamRestartWriteFileName,
+                           usePriorFromFile,
+                           priorFileName,
+                           priorModelType)
+
+  # Set Model
+  dream.setModel(lpnModel)
+
+  # Run MCMC Simulation
+  dream.go()
 
 # ====
 # MAIN
 # ====
 if __name__ == "__main__":
-  runMode = 'bbvi'
-  # runMode = 'gendata'
+
+  runMode = "mcmc"
   dataFileName = 'data.txt'
   # Running mode
   if runMode == 'testing':
     # Test the model works
     res = runModel()
-    print(res)
+    print('outputs: ',res)
   elif runMode == 'gendata':
     # Set Params
     numDataPoints = 600
-    dataStd = 0.1*0.007504
+    dataStd =  5.0*np.ones(3)
     # Generate Data
     genData(numDataPoints,dataStd,dataFileName)
-  elif runMode == 'bbvi':
+  elif runMode == 'mcmc':
+    # Init MPI
+    comm = MPI.COMM_WORLD
     # Run Main Function
-    runBBVI(dataFileName)
+    runMCMC(dataFileName,comm)
   else:
     print('Error: Invalid Running Mode')
-
-
-
-
 
