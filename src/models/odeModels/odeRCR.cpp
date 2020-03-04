@@ -94,7 +94,7 @@ void odeRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdM
   // ====================================================
 
   double V_P1_t = 0.0;
-  double Q_2 = (Xk[0] - P_D)/ R_2; // Q2 = delta(P) = P1 - P2, since P2 < P1 (P2 = P_D)
+  double Q_2 = (P_1 - P_D)/ R_2; // Q2 = delta(P) = P1 - P2, since P2 < P1 (P2 = P_D)
   double Q_1 = linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
   double P_0 = P_1 + R_1*Q_1;
   
@@ -170,7 +170,6 @@ void odeRCR::getDataSTD(stdVec& stds){
 }
 
 void odeRCR::getResultWeigths(stdVec& weights){
-    // STANDARD DEVIATIONS
     weights.clear();
     weights.push_back(1.0); // min_P_0
     weights.push_back(1.0); // max_P_0

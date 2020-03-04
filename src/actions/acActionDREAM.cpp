@@ -3684,10 +3684,9 @@ int acActionDREAM::go()
     if(globRank == 0){
       cerr << "\n";
       cerr << "DREAM - Fatal error!\n";
-      cerr << "  CHAIN_NUM < 3.\n";
+      cerr << "  CHAIN_NUM < 3. Please use the serial version of DREAM instead.\n";
     }
-    // CAREFULL!!!
-    // exit(1);
+    exit(1);
   }
   if (cr_num < 1){
     if(globRank == 0){
