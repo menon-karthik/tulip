@@ -44,7 +44,7 @@ int odeRCR::getStateTotal(){
 }
 
 int odeRCR::getAuxStateTotal(){
-  return 3; // t (time), P_0, Q_2
+  return 5; // t (time), P_0, Q_2
 }
 
 void odeRCR::getDefaultParameterLimits(stdVec& limits){
@@ -85,36 +85,21 @@ void odeRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdM
   // Assign state variables
   double P_1    = Xk[0];
 
-  // SET OPTIONS
-  bool printMessages = false;
-  int totalStates = Xk.size();
-
-  // ====================================================
-  // COMPUTE THE VARIATION IN P_1 OVER TIME
-  // ====================================================
-
-  double V_P1_t = 0.0;
+  // Compute other variables
+  double P_0 = P_1 + R_1*Q_1;
   double Q_2 = (P_1 - P_D)/ R_2; // Q2 = delta(P) = P1 - P2, since P2 < P1 (P2 = P_D)
   double Q_1 = linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
-  double P_0 = P_1 + R_1*Q_1;
+  double V_P1_t = (Q_1 - Q_2) / (double)C;
   
-  //printf("%f %f \n",t, Q_1);
-  //fflush(stdout);
-  
-  // Variation of Pressure over time  dP_1 / dt = (Q_1 - Q_2) / C  Question.  Know Q_1 - Q_2 isn't correct syntax.
-  V_P1_t = (Q_1 - Q_2) / C;
-
-  if(printMessages){
-    printf("V_P1_t: %f\n",V_P1_t);
-  }
-
   // Store the derivatives
   DXk[0] = V_P1_t;
 
   // Get Auxiliary Results  Question. Do I keep t as an auxOut variable?  If so, then I should change # auxVar to 3
   auxOut[0]  = t;       // Current Time
-  auxOut[1]  = P_0;     // P_0
-  auxOut[2]  = Q_2;     // Q_2
+  auxOut[1]  = P_D;     // P_D
+  auxOut[2]  = P_0;     // P_0
+  auxOut[3]  = Q_1;     // Q_1
+  auxOut[4]  = Q_2;     // Q_2
 }
 
 // Question.  We discussed both P_1 and P_0 last time, but I though that the min,max,mean of P_0 were the only results
