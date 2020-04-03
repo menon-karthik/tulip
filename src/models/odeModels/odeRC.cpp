@@ -1,96 +1,89 @@
-# include "odeRCR.h"
+# include "odeRC.h"
 
 using namespace std;
 
-odeRCR::odeRCR(){
+odeRC::odeRC(){
 }
 
-odeRCR::~odeRCR(){
+odeRC::~odeRC(){
 
 }
 
-int odeRCR::getParameterTotal(){
-  return 6;
+int odeRC::getParameterTotal(){
+  return 5;
 }
 
-int odeRCR::getHRIndex(){
- return 5;
+int odeRC::getHRIndex(){
+ return 4;
 }
 
-string odeRCR::getParamName(int index){
+string odeRC::getParamName(int index){
   string returnString;
   switch(index){
     case 0:
       returnString = string("P1_ini");
       break;
     case 1:
-      returnString = string("R_1");
+      returnString = string("R");
       break;
     case 2:
-      returnString = string("R_2");
-      break;
-    case 3:
       returnString = string("C");
       break;
-    case 4:
+    case 3:
       returnString = string("P_D");
       break;
-    case 5:
+    case 4:
       returnString = string("HR");
       break;
   }
   return returnString;
 }
 
-int odeRCR::getStateTotal(){
+int odeRC::getStateTotal(){
   return 1; // P_1
 }
 
-int odeRCR::getAuxStateTotal(){
-  return 5; // t (time), P_0, Q_2
+int odeRC::getAuxStateTotal(){
+  return 4; // t (time), P_0, Q_2
 }
 
-void odeRCR::getDefaultParameterLimits(stdVec& limits){
+void odeRC::getDefaultParameterLimits(stdVec& limits){
 
   limits.resize(2*getParameterTotal());
     // --- Initial conditions note: max and min
-  limits[0]  = 30.0*convertmmHgToBarye; limits[1]  = 30.0*convertmmHgToBarye; // Initia value of P1
+  limits[0]  = 55.0*convertmmHgToBarye; limits[1]  = 55.0*convertmmHgToBarye; // Initia value of P1
   limits[2]  = 0.0;                     limits[3]  = 1500.0; // R_1
-  limits[4]  = 0.0;                     limits[5]  = 1500.0; // R_2
-  limits[6]  = 1.0e-8;                  limits[7]  = 1.0e-2; // C
-  limits[8]  = 30.0*convertmmHgToBarye; limits[9]  = 30.0*convertmmHgToBarye; // P_D, units: CGS
-  limits[10] = 60/1.09;                 limits[11] = 60/1.09; // HR
+  limits[4]  = 1.0e-8;                  limits[5]  = 1.0e-2; // C
+  limits[6]  = 55.0*convertmmHgToBarye; limits[7]  = 55.0*convertmmHgToBarye; // P_D, units: CGS
+  limits[8]  = 60/1.09;                 limits[9]  = 60/1.09; // HR
 }
 
-void odeRCR::getDefaultParams(stdVec& params){ // Question: what do I set these to initially? A: assigned to mean of range
+void odeRC::getDefaultParams(stdVec& params){ // Question: what do I set these to initially? A: assigned to mean of range
 
   // Resize Parameter Array
   params.resize(getParameterTotal());
   
   // NOTE: CGS Units: Pressures in Barye, Flowrates in mL/s
-  params[0] = 30.0*convertmmHgToBarye;
+  params[0] = 55.0*convertmmHgToBarye;
   params[1] = 1000.0;
-  params[2] = 1000.0;
-  params[3] = 0.0001;
-  params[4] = 30.0*convertmmHgToBarye;
-  params[5] = 60/1.09;
+  params[2] = 0.00005;
+  params[3] = 55.0*convertmmHgToBarye;
+  params[4] = 60/1.09;
 }
 
-void odeRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind){
+void odeRC::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind){
 
   // Assign the Parameters
-  double R_1 = params[0]; // R_1
-  double R_2 = params[1]; // R_2
-  double C   = params[2]; // C
-  double P_D = params[3]; // P_D
+  double R   = params[0]; // R
+  double C   = params[1]; // C
+  double P_D = params[2]; // P_D
 
   // Assign state variables
   double P_1 = Xk[0];
 
   // Compute other variables
   double Q_1    = linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
-  double P_0    = P_1 + R_1*Q_1;
-  double Q_2    = (P_1 - P_D)/ R_2; // Q2 = delta(P) = P1 - P2, since P2 < P1 (P2 = P_D)
+  double Q_2    = (P_1 - P_D)/ R;
   double V_P1_t = (Q_1 - Q_2) / (double)C;
   
   // Store the derivatives
@@ -99,13 +92,12 @@ void odeRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdM
   // Get Auxiliary Results  Question. Do I keep t as an auxOut variable?  If so, then I should change # auxVar to 3
   auxOut[0] = t;   // Current Time
   auxOut[1] = P_D; // P_D
-  auxOut[2] = P_0; // P_0
-  auxOut[3] = Q_1; // Q_1
-  auxOut[4] = Q_2; // Q_2
+  auxOut[2] = Q_1; // Q_1
+  auxOut[3] = Q_2; // Q_2
 }
 
 // Question.  We discussed both P_1 and P_0 last time, but I though that the min,max,mean of P_0 were the only results
-void odeRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params,const stdMat& outVals,const stdMat& auxOutVals, stdVec& results){
+void odeRC::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params,const stdMat& outVals,const stdMat& auxOutVals, stdVec& results){
 
   // DETERMINE START AND END OF LAST HEART CYCLE
   double heartRate = 60.0/(totalStepsOnSingleCycle * timeStep);
@@ -117,7 +109,7 @@ void odeRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int total
 
   // P_0 PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
-    output[loopA] = auxOutVals[2][loopA];
+    output[loopA] = outVals[0][loopA];
   }
   double minP_0Press = getMin(startLastCycle, stopLastCycle, output);
   double maxP_0Press = getMax(startLastCycle, stopLastCycle, output);
@@ -131,7 +123,7 @@ void odeRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int total
   results.push_back(avP_0Press);
 }
 
-void odeRCR::getResultKeys(stdStringVec& keys){
+void odeRC::getResultKeys(stdStringVec& keys){
   // KEYS
   keys.clear();
   keys.push_back(string("min_P_0"));
@@ -140,23 +132,23 @@ void odeRCR::getResultKeys(stdStringVec& keys){
 }
 
 // question.  What are the outputs?  Seems like it these are coming from above, but I thought there were only 3?
-void odeRCR::getFinalOutputs(const stdVec& outputs,stdVec& outs){
+void odeRC::getFinalOutputs(const stdVec& outputs,stdVec& outs){
   // COMPUTED VALUES
   outs.clear();
-  outs.push_back(outputs[ip_min_P_0]/1333.22);
-  outs.push_back(outputs[ip_max_P_0]/1333.22);
-  outs.push_back(outputs[ip_av_P_0]/1333.22);
+  outs.push_back(outputs[0]/1333.22);
+  outs.push_back(outputs[1]/1333.22);
+  outs.push_back(outputs[2]/1333.22);
 }
 
-void odeRCR::getDataSTD(stdVec& stds){
+void odeRC::getDataSTD(stdVec& stds){
   // STANDARD DEVIATIONS
   stds.clear();
-  stds.push_back(1.0); // min P_0
-  stds.push_back(1.0); // max P_0
-  stds.push_back(1.0); // av P_0
+  stds.push_back(1.0); // min P_0, mmHg
+  stds.push_back(1.0); // max P_0, mmHg
+  stds.push_back(1.0); // av P_0, mmHg
 }
 
-void odeRCR::getResultWeigths(stdVec& weights){
+void odeRC::getResultWeigths(stdVec& weights){
   weights.clear();
   weights.push_back(1.0); // min_P_0
   weights.push_back(1.0); // max_P_0

@@ -37,6 +37,7 @@
 # include "odeModel.h"
 # include "odeNormalAdultSimplePA.h"
 # include "odeCongenital4ChambersPAH.h"
+# include "odeRC.h"
 # include "odeRCR.h"
 # include "odeRCRCR.h"
 
