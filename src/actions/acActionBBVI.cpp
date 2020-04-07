@@ -222,8 +222,8 @@ int acActionBBVI::go(){
 
         // Generate samples w.r.t variational families
         if(paramDist[j] == "normal"){
-          sample[j] = limit[2 * j] - 1.0;
-          while((sample[j] < limit[2 * j]) || (sample[j] > limit[2 * j + 1])){
+          sample[j] = limits[2 * j] - 1.0;
+          while((sample[j] < limits[2 * j]) || (sample[j] > limits[2 * j + 1])){
             std::normal_distribution<double> distribution(lam[2 * j] / adj[2 * j], lam[2 * j + 1] / adj[2 * j + 1]);
             sample[j] = distribution(generator) * a[j] + b[j];
           }
@@ -312,17 +312,17 @@ int acActionBBVI::go(){
         lam[2 * i + 1] += Dx[2 * i + 1];
 
         if (paramDist[i] == "normal"){
-          if (lam[2 * i] / adj[2 * i] * a[i] + b[i] < limit[2 * i]){
-            lam[2 * i] = (limit[2 * i] - b[i]) / a[i] * adj[2 * i];
-          } else if (lam[2 * i] / adj[2 * i] * a[i] + b[i] > limit[2 * i + 1]){
-            lam[2 * i] = (limit[2 * i + 1] - b[i]) / a[i] * adj[2 * i];
+          if (lam[2 * i] / adj[2 * i] * a[i] + b[i] < limits[2 * i]){
+            lam[2 * i] = (limits[2 * i] - b[i]) / a[i] * adj[2 * i];
+          } else if (lam[2 * i] / adj[2 * i] * a[i] + b[i] > limits[2 * i + 1]){
+            lam[2 * i] = (limits[2 * i + 1] - b[i]) / a[i] * adj[2 * i];
           }
 
           if (lam[2 * i + 1] / adj[2 * i] * a[i] < 0){
             lam[2 * i + 1] = 0;
           }
         } else {
-          throw acException("ERROR: Invalid Variational family")
+          throw acException("ERROR: Invalid Variational family");
         } // Still under construction
       }
     }else if (opt_method == "adam"){
@@ -340,17 +340,17 @@ int acActionBBVI::go(){
         lam[2 * i + 1] += eta * m_hat[2 * i + 1] / (sqrt(v_hat[2 * i + 1]) + eps);
 
         if (paramDist[i] == "normal"){
-          if (lam[2 * i] / adj[2 * i] * a[i] + b[i] < limit[2 * i]){
-            lam[2 * i] = (limit[2 * i] - b[i]) / a[i] * adj[2 * i];
-          } else if (lam[2 * i] / adj[2 * i] * a[i] + b[i] > limit[2 * i + 1]){
-            lam[2 * i] = (limit[2 * i + 1] - b[i]) / a[i] * adj[2 * i];
+          if (lam[2 * i] / adj[2 * i] * a[i] + b[i] < limits[2 * i]){
+            lam[2 * i] = (limits[2 * i] - b[i]) / a[i] * adj[2 * i];
+          } else if (lam[2 * i] / adj[2 * i] * a[i] + b[i] > limits[2 * i + 1]){
+            lam[2 * i] = (limits[2 * i + 1] - b[i]) / a[i] * adj[2 * i];
           }
 
           if (lam[2 * i + 1] / adj[2 * i] * a[i] < 0){
             lam[2 * i + 1] = 0;
           }
         } else {
-          throw acException("ERROR: Invalid Variational family")
+          throw acException("ERROR: Invalid Variational family");
         } // Still under construction
       }
     }else{
