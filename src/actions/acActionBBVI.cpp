@@ -95,7 +95,7 @@ double acActionBBVI::log_joint(const stdVec& params){
   stdIntVec errorCode;
   //double log_joint = log_prior(params) - model->evalModelError(params,outputs,errorCode);
   double log_like = -model->evalModelError(params,outputs,errorCode);
-  std::cout << log_like << std::endl;
+  //std::cout << log_like << std::endl;
   double log_joint = log_prior(params) + log_like;
   //printf("k : %f\n",params[0]);
   //printf("log_prior: %f\n",log_prior(params));
@@ -183,6 +183,10 @@ int acActionBBVI::go(){
   stdVec m_hat(2 * totParams,0.0);
   stdVec v_hat(2 * totParams,0.0);
   
+  // Get parameter limits
+  stdVec limits;
+  model->getParameterLimits(limits);
+
   // Loop on each iteration of the optimizor
   for (long t = 0; t < totIt; t++){
     
@@ -218,8 +222,8 @@ int acActionBBVI::go(){
 
         // Generate samples w.r.t variational families
         if(paramDist[j] == "normal"){
-          sample[j] = -1.0;
-          while(sample[j] < 0){
+          sample[j] = limit[2 * j] - 1.0;
+          while((sample[j] < limit[2 * j]) || (sample[j] > limit[2 * j + 1])){
             std::normal_distribution<double> distribution(lam[2 * j] / adj[2 * j], lam[2 * j + 1] / adj[2 * j + 1]);
             sample[j] = distribution(generator) * a[j] + b[j];
           }
@@ -296,24 +300,63 @@ int acActionBBVI::go(){
 
     // Given gradient, use adadelta or adam to search for next Parameters of Variational Family.
     if (opt_method == "adadelta"){
-      for (int i = 0; i < 2 * totParams; i++){
-        Egsq[i] = ggamma * Egsq[i] + (1.0 - ggamma) * grad[i] * grad[i];
-        Dx[i] = sqrt((Edxsq[i] + eps) / (Egsq[i] + eps)) * grad[i];
-        Edxsq[i] = ggamma * Edxsq[i] + (1.0 - ggamma) * Dx[i] * Dx[i];
-        lam[i] += Dx[i];
+      for (int i = 0; i < totParams; i++){
+        Egsq[2 * i] = ggamma * Egsq[2 * i] + (1.0 - ggamma) * grad[2 * i] * grad[2 * i];
+        Dx[2 * i] = sqrt((Edxsq[2 * i] + eps) / (Egsq[2 * i] + eps)) * grad[2 * i];
+        Edxsq[2 * i] = ggamma * Edxsq[2 * i] + (1.0 - ggamma) * Dx[2 * i] * Dx[2 * i];
+        lam[2 * i] += Dx[2 * i];
+
+        Egsq[2 * i + 1] = ggamma * Egsq[2 * i + 1] + (1.0 - ggamma) * grad[2 * i + 1] * grad[2 * i + 1];
+        Dx[2 * i + 1] = sqrt((Edxsq[2 * i + 1] + eps) / (Egsq[2 * i + 1] + eps)) * grad[2 * i] + 1;
+        Edxsq[2 * i + 1] = ggamma * Edxsq[2 * i + 1] + (1.0 - ggamma) * Dx[2 * i + 1] * Dx[2 * i + 1];
+        lam[2 * i + 1] += Dx[2 * i + 1];
+
+        if (paramDist[i] == "normal"){
+          if (lam[2 * i] / adj[2 * i] * a[i] + b[i] < limit[2 * i]){
+            lam[2 * i] = (limit[2 * i] - b[i]) / a[i] * adj[2 * i];
+          } else if (lam[2 * i] / adj[2 * i] * a[i] + b[i] > limit[2 * i + 1]){
+            lam[2 * i] = (limit[2 * i + 1] - b[i]) / a[i] * adj[2 * i];
+          }
+
+          if (lam[2 * i + 1] / adj[2 * i] * a[i] < 0){
+            lam[2 * i + 1] = 0;
+          }
+        } else {
+          throw acException("ERROR: Invalid Variational family")
+        } // Still under construction
       }
     }else if (opt_method == "adam"){
-      for (int i = 0; i < 2 * totParams; i++){
-        m[i] = beta1 * m[i] + (1 - beta1) * grad[i];
-        v[i] = beta2 * v[i] + (1 - beta2) * grad[i] * grad[i];
-        m_hat[i] = m[i] / (1 - pow(beta1, t + 1));
-        v_hat[i] = v[i] / (1 - pow(beta2, t + 1));
-        lam[i] += eta * m_hat[i] / (sqrt(v_hat[i]) + eps);
+      for (int i = 0; i < totParams; i++){
+        m[2 * i] = beta1 * m[2 * i] + (1 - beta1) * grad[2 * i];
+        v[2 * i] = beta2 * v[2 * i] + (1 - beta2) * grad[2 * i] * grad[2 * i];
+        m_hat[2 * i] = m[2 * i] / (1 - pow(beta1, t + 1));
+        v_hat[2 * i] = v[2 * i] / (1 - pow(beta2, t + 1));
+        lam[2 * i] += eta * m_hat[2 * i] / (sqrt(v_hat[2 * i]) + eps);
+
+        m[2 * i + 1] = beta1 * m[2 * i + 1] + (1 - beta1) * grad[2 * i + 1];
+        v[2 * i + 1] = beta2 * v[2 * i + 1] + (1 - beta2) * grad[2 * i + 1] * grad[2 * i + 1];
+        m_hat[2 * i + 1] = m[2 * i + 1] / (1 - pow(beta1, t + 1));
+        v_hat[2 * i + 1] = v[2 * i + 1] / (1 - pow(beta2, t + 1));
+        lam[2 * i + 1] += eta * m_hat[2 * i + 1] / (sqrt(v_hat[2 * i + 1]) + eps);
+
+        if (paramDist[i] == "normal"){
+          if (lam[2 * i] / adj[2 * i] * a[i] + b[i] < limit[2 * i]){
+            lam[2 * i] = (limit[2 * i] - b[i]) / a[i] * adj[2 * i];
+          } else if (lam[2 * i] / adj[2 * i] * a[i] + b[i] > limit[2 * i + 1]){
+            lam[2 * i] = (limit[2 * i + 1] - b[i]) / a[i] * adj[2 * i];
+          }
+
+          if (lam[2 * i + 1] / adj[2 * i] * a[i] < 0){
+            lam[2 * i + 1] = 0;
+          }
+        } else {
+          throw acException("ERROR: Invalid Variational family")
+        } // Still under construction
       }
     }else{
       throw acException("ERROR: Invalid optimization algorithm.\n");
     }
-    
+
     // Take a record of the trace
     if((t + 1) % (totIt / 100) == 0){
       std::cout << recordIP << '%' << ' ';
