@@ -321,6 +321,8 @@ int acActionBBVI::go(){
           if (lam[2 * i + 1] / adj[2 * i] * a[i] < 0){
             lam[2 * i + 1] = 0;
           }
+        } else if (paramDist[i] == "const"){
+          
         } else {
           throw acException("ERROR: Invalid Variational family");
         } // Still under construction
@@ -349,6 +351,8 @@ int acActionBBVI::go(){
           if (lam[2 * i + 1] / adj[2 * i] * a[i] < 0){
             lam[2 * i + 1] = 0;
           }
+        } else if (paramDist[i] == "const"){
+
         } else {
           throw acException("ERROR: Invalid Variational family");
         } // Still under construction
