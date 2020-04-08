@@ -343,13 +343,16 @@ int acActionBBVI::go(){
 
         if (paramDist[i] == "normal"){
           if (lam[2 * i] / adj[2 * i] * a[i] + b[i] < limits[2 * i]){
+            std::cout << "small mu " << std::endl;
             lam[2 * i] = (limits[2 * i] - b[i]) / a[i] * adj[2 * i];
           } else if (lam[2 * i] / adj[2 * i] * a[i] + b[i] > limits[2 * i + 1]){
             lam[2 * i] = (limits[2 * i + 1] - b[i]) / a[i] * adj[2 * i];
+            std::cout << "large mu " << std::endl;
           }
 
           if (lam[2 * i + 1] / adj[2 * i] * a[i] < 0){
-            lam[2 * i + 1] = 0;
+            lam[2 * i + 1] = -lam[2 * i + 1];
+            std:: cout << "neg std" << std::endl;
           }
         } else if (paramDist[i] == "const"){
 
