@@ -18,6 +18,9 @@
 const int kMWFixedMaxDetailLevel = 0;
 const int kMWFixedColumns = 1;
 
+// Need Forward Declaration to Resolve Circular Reference
+class uqSamples;
+
 // MW MATRIX CLASS
 class uqMWMatrix: public uqMatrix{
   public:
@@ -31,14 +34,14 @@ class uqMWMatrix: public uqMatrix{
     int        num_basis;
     
     // CONSTUCTOR
-    uqMWMatrix(int maxOrder,uqSamples* XValues,
+    uqMWMatrix(int maxOrder, uqSamples* XValues,
                bool addLegendrePoly, bool addMW, bool useBinaryPartitions,
                int mwMatType, bool mwMatIncludeNullColumns,
                bool useExactMW, int mwQuadOrder, stdMat measure,
                int &maxColumns, int &maxDetailLevel);
     
     // DESTRUCTOR
-    ~uqMWMatrix();
+    virtual ~uqMWMatrix();
 
 };
 

@@ -142,7 +142,7 @@ void odeRCRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const st
   double tc = (60.0/(double)HR);
 
   // GET FLOW
-  double QAo = linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
+  double QAo = cmUtils::linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
   double Qven = 0.0;
 
   // UNPACK STATE VARIABLES
@@ -216,29 +216,29 @@ void odeRCRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int tot
   }
 
   // GET AVERAGE VALUES
-  double mP0 = trapz(0,totalStepsOnSingleCycle,t,P0)/(double)cycleTime;
-  double mP1 = trapz(0,totalStepsOnSingleCycle,t,P1)/(double)cycleTime;
-  double mP2 = trapz(0,totalStepsOnSingleCycle,t,P2)/(double)cycleTime;
-  double mP3 = trapz(0,totalStepsOnSingleCycle,t,P3)/(double)cycleTime;
-  double mQ1 = trapz(0,totalStepsOnSingleCycle,t,Q1)/(double)cycleTime;
-  double mQ2 = trapz(0,totalStepsOnSingleCycle,t,Q2)/(double)cycleTime;
-  double mQ3 = trapz(0,totalStepsOnSingleCycle,t,Q3)/(double)cycleTime;
+  double mP0 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P0)/(double)cycleTime;
+  double mP1 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P1)/(double)cycleTime;
+  double mP2 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P2)/(double)cycleTime;
+  double mP3 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P3)/(double)cycleTime;
+  double mQ1 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q1)/(double)cycleTime;
+  double mQ2 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q2)/(double)cycleTime;
+  double mQ3 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q3)/(double)cycleTime;
 
   // GET MAXIMUM AND MINIMUM VALUES
-  double minP0 = getMin(0,totalStepsOnSingleCycle,P0);
-  double maxP0 = getMax(0,totalStepsOnSingleCycle,P0);
-  double minP1 = getMin(0,totalStepsOnSingleCycle,P1);
-  double maxP1 = getMax(0,totalStepsOnSingleCycle,P1);
-  double minP2 = getMin(0,totalStepsOnSingleCycle,P2);
-  double maxP2 = getMax(0,totalStepsOnSingleCycle,P2);
-  double minP3 = getMin(0,totalStepsOnSingleCycle,P3);
-  double maxP3 = getMax(0,totalStepsOnSingleCycle,P3);
-  double minQ1 = getMin(0,totalStepsOnSingleCycle,Q1);
-  double maxQ1 = getMax(0,totalStepsOnSingleCycle,Q1);
-  double minQ2 = getMin(0,totalStepsOnSingleCycle,Q2);
-  double maxQ2 = getMax(0,totalStepsOnSingleCycle,Q2);
-  double minQ3 = getMin(0,totalStepsOnSingleCycle,Q3);
-  double maxQ3 = getMax(0,totalStepsOnSingleCycle,Q3);
+  double minP0 = cmUtils::getMin(0,totalStepsOnSingleCycle,P0);
+  double maxP0 = cmUtils::getMax(0,totalStepsOnSingleCycle,P0);
+  double minP1 = cmUtils::getMin(0,totalStepsOnSingleCycle,P1);
+  double maxP1 = cmUtils::getMax(0,totalStepsOnSingleCycle,P1);
+  double minP2 = cmUtils::getMin(0,totalStepsOnSingleCycle,P2);
+  double maxP2 = cmUtils::getMax(0,totalStepsOnSingleCycle,P2);
+  double minP3 = cmUtils::getMin(0,totalStepsOnSingleCycle,P3);
+  double maxP3 = cmUtils::getMax(0,totalStepsOnSingleCycle,P3);
+  double minQ1 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q1);
+  double maxQ1 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q1);
+  double minQ2 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q2);
+  double maxQ2 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q2);
+  double minQ3 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q3);
+  double maxQ3 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q3);
 
   // COPY FINAL RESULTS
   results.clear();

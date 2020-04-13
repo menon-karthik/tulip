@@ -20,6 +20,8 @@
 
 // MCMC
 # include "acActionDREAM.h"
+# include "acActionDREAMseq.h"
+# include "acActionDREAMmpi.h"
 
 // Uncertainty Propagation
 # include "acActionUP.h"

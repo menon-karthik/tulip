@@ -474,20 +474,20 @@ void odeSingleVentricleHeart::postProcess(double timeStep, int totalStepsOnSingl
   }
 
   // GET AVERAGE VALUES
-  double CO      = trapz(0,totalStepsOnSingleCycle,t,QAo)/(double)cycleTime;
-  double mPsa    = trapz(0,totalStepsOnSingleCycle,t,Psa)/(double)cycleTime;
-  double mPascAo = trapz(0,totalStepsOnSingleCycle,t,PAo)/(double)cycleTime;
-  double mQAo    = trapz(0,totalStepsOnSingleCycle,t,QAo)/(double)cycleTime;
-  double mQven   = trapz(0,totalStepsOnSingleCycle,t,Qven)/(double)cycleTime;
-  double mQreg   = trapz(0,totalStepsOnSingleCycle,t,Qreg)/(double)cycleTime;
+  double CO      = cmUtils::trapz(0,totalStepsOnSingleCycle,t,QAo)/(double)cycleTime;
+  double mPsa    = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Psa)/(double)cycleTime;
+  double mPascAo = cmUtils::trapz(0,totalStepsOnSingleCycle,t,PAo)/(double)cycleTime;
+  double mQAo    = cmUtils::trapz(0,totalStepsOnSingleCycle,t,QAo)/(double)cycleTime;
+  double mQven   = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Qven)/(double)cycleTime;
+  double mQreg   = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Qreg)/(double)cycleTime;
 
   // GET MAXIMUM AND MINIMUM VALUES
-  double maxPsv = getMax(0,totalStepsOnSingleCycle,Psv);
-  double maxPsa = getMax(0,totalStepsOnSingleCycle,Psa);
-  double maxVsv = getMax(0,totalStepsOnSingleCycle,Vsv);
-  double minVsv = getMin(0,totalStepsOnSingleCycle,Vsv);
-  double maxPAo = getMax(0,totalStepsOnSingleCycle,PAo);
-  double minPAo = getMin(0,totalStepsOnSingleCycle,PAo);
+  double maxPsv = cmUtils::getMax(0,totalStepsOnSingleCycle,Psv);
+  double maxPsa = cmUtils::getMax(0,totalStepsOnSingleCycle,Psa);
+  double maxVsv = cmUtils::getMax(0,totalStepsOnSingleCycle,Vsv);
+  double minVsv = cmUtils::getMin(0,totalStepsOnSingleCycle,Vsv);
+  double maxPAo = cmUtils::getMax(0,totalStepsOnSingleCycle,PAo);
+  double minPAo = cmUtils::getMin(0,totalStepsOnSingleCycle,PAo);
 
   // Copy Final Results
   results.clear();

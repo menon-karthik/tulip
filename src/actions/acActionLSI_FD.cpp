@@ -111,7 +111,7 @@ int acActionLSI_FD::go(){
     // Read Parameter Starting Location From File
     std::string inputFileName(initialParamFile);
     printf("READING PARAMETERS FROM FILE %s.\n",inputFileName.c_str());    
-    ReadParamsFromFile(inputFileName,centreParams);    
+    cmUtils::ReadParamsFromFile(inputFileName,centreParams);    
     //for(int loopA=0;loopA<par_num;loopA++){
     //  printf("Params %d, Value: %e.\n",loopA,centreParams[loopA]);
     //}    

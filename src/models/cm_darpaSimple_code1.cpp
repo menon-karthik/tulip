@@ -64,7 +64,7 @@ double cm_darpaSimple_code1::evalModelError(const stdVec& inputs,stdVec& outputs
   double airTemperature = 0.0;
   double airPressure = 0.0;
   double airDensity = 0.0;
-  getAirProps(alt,airTemperature,airPressure,airDensity);
+  cmUtils::getAirProps(alt,airTemperature,airPressure,airDensity);
 
   // Get heat capacity ratio
   double gamma = 1.4;

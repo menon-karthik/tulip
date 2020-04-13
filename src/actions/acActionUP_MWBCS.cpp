@@ -1201,7 +1201,7 @@ int acActionUP_MWBCS::go(){
           
           // Write RHS to file
           if(opts.printDBGMessages){
-            writeVectorToFile("RHS.txt",rhs);
+            cmUtils::writeVectorToFile("RHS.txt",rhs);
           }
 
         }else{

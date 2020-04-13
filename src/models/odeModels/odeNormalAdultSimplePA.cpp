@@ -598,25 +598,25 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[8][loopA];
   }
-  double maxAOPress  = getMax(startLastCycle, stopLastCycle, output);
-  double minAOPress  = getMin(startLastCycle, stopLastCycle, output);
-  double avAOPress   = getMean(startLastCycle, stopLastCycle, output);
+  double maxAOPress = cmUtils::getMax(startLastCycle, stopLastCycle, output);
+  double minAOPress = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double avAOPress  = cmUtils::getMean(startLastCycle, stopLastCycle, output);
   
   // RA PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[5][loopA];
   }
-  double minRAPress  = getMin(startLastCycle, stopLastCycle, output);
-  double maxRAPress  = getMax(startLastCycle, stopLastCycle, output);
-  double avRAPress   = getMean(startLastCycle, stopLastCycle, output);
+  double minRAPress = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double maxRAPress = cmUtils::getMax(startLastCycle, stopLastCycle, output);
+  double avRAPress  = cmUtils::getMean(startLastCycle, stopLastCycle, output);
   
   // RV PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[7][loopA];
   }
-  double minRVPress  = getMin(startLastCycle, stopLastCycle, output);
-  double maxRVPress  = getMax(startLastCycle, stopLastCycle, output);
-  double avRVPress   = getMean(startLastCycle, stopLastCycle, output);
+  double minRVPress  = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double maxRVPress  = cmUtils::getMax(startLastCycle, stopLastCycle, output);
+  double avRVPress   = cmUtils::getMean(startLastCycle, stopLastCycle, output);
   
   // dRV and sRV
   double sRV = maxRVPress;
@@ -626,24 +626,24 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[5][loopA];
   }
-  double maxPAPress  = getMax(startLastCycle, stopLastCycle, output);
-  double minPAPress  = getMin(startLastCycle, stopLastCycle, output);
-  double avPAPress  = getMean(startLastCycle, stopLastCycle, output);
+  double maxPAPress  = cmUtils::getMax(startLastCycle, stopLastCycle, output);
+  double minPAPress  = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double avPAPress  = cmUtils::getMean(startLastCycle, stopLastCycle, output);
   
   // PWD OR AVERAGE LEFT ATRIAL PRESSURE
   // AVERAGE PCWP PRESSURE - INDIRECT MEASURE OF LEFT ATRIAL PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[6][loopA];
   }
-  double avPCWPress = getMean(startLastCycle, stopLastCycle, output);
+  double avPCWPress = cmUtils::getMean(startLastCycle, stopLastCycle, output);
   
   // LEFT VENTRICULAR PRESSURES
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[8][loopA];
   }
-  double minLVPress  = getMin(startLastCycle, stopLastCycle, output);
-  double maxLVPress  = getMax(startLastCycle, stopLastCycle, output);
-  double avgLVPress  = getMean(startLastCycle, stopLastCycle, output);
+  double minLVPress  = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double maxLVPress  = cmUtils::getMax(startLastCycle, stopLastCycle, output);
+  double avgLVPress  = cmUtils::getMean(startLastCycle, stopLastCycle, output);
   
   // dLV and sLV
   double sLV = maxLVPress;
@@ -653,7 +653,7 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[9][loopA];
   }
-  double CO = getMean(startLastCycle, stopLastCycle, output);
+  double CO = cmUtils::getMean(startLastCycle, stopLastCycle, output);
   
   // LEFT AND RIGHT VENTRICULAR VOLUMES
   double minRVVolume = outVals[2][startLastCycle];
@@ -679,13 +679,13 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[0][loopA];
   }
-  double minRAVolume = getMin(startLastCycle, stopLastCycle, output);
+  double minRAVolume = cmUtils::getMin(startLastCycle, stopLastCycle, output);
   
   // END SYSTOLIC LEFT ATRIAL VOLUME
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[1][loopA];
   }
-  double minLAVolume = getMin(startLastCycle, stopLastCycle, output);
+  double minLAVolume = cmUtils::getMin(startLastCycle, stopLastCycle, output);
   
   // EJECTION FRACTION
   double LVEF = ((maxLVVolume - minLVVolume)/maxLVVolume)*100.0;
@@ -698,30 +698,30 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = fabs(outVals[8][loopA] - auxOutVals[8][loopA]) * auxOutVals[15][loopA]; // fabs(aortic - LV) * IND(AOV)
   }
-  double meanAOVPG = getMean(startLastCycle, stopLastCycle, output);
-  double maxAOVPG  = getMax (startLastCycle, stopLastCycle, output);
+  double meanAOVPG = cmUtils::getMean(startLastCycle, stopLastCycle, output);
+  double maxAOVPG  = cmUtils::getMax (startLastCycle, stopLastCycle, output);
   
   // PRESSURE GRADIENT ACROSS PULMONARY VALVE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = fabs(outVals[5][loopA] - auxOutVals[7][loopA]) * auxOutVals[13][loopA]; // fabs(pulmonary - RV) * IND(PV)
   }
-  double meanPVPG = getMean(startLastCycle, stopLastCycle, output);
-  double maxPVPG  = getMax (startLastCycle, stopLastCycle, output);
+  double meanPVPG = cmUtils::getMean(startLastCycle, stopLastCycle, output);
+  double maxPVPG  = cmUtils::getMax (startLastCycle, stopLastCycle, output);
   
   // MITRAL VALVE DECELERATION TIME
   for(int loopA=startTwoLastCycle;loopA<stopLastCycle;loopA++){
     output[loopA-startTwoLastCycle] = outVals[7][loopA];
     valveOpening[loopA-startTwoLastCycle] = auxOutVals[14][loopA];
   }
-  if(!zeroAtValveOpening(0, stopLastCycle - startTwoLastCycle, output, valveOpening)){
+  if(!cmUtils::zeroAtValveOpening(0, stopLastCycle - startTwoLastCycle, output, valveOpening)){
     throw cmException("Error: First Valve is not opening in heart cycle.\n");
   }  
   double mvDecelTime = 0.0;
-  bool isDecelTimeOK = getDecelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, mvDecelTime);
+  bool isDecelTimeOK = cmUtils::getDecelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, mvDecelTime);
   
   // MITRAL VALVE E/A RATIO
   double mvEARatio = 0.0;
-  bool isMVEARatioOK = getEARatio(0, stopLastCycle - startTwoLastCycle, output, mvEARatio);
+  bool isMVEARatioOK = cmUtils::getEARatio(0, stopLastCycle - startTwoLastCycle, output, mvEARatio);
   
   // PULMONARY VALVE ACCELERATION TIME
   for(int loopA=startTwoLastCycle;loopA<stopLastCycle;loopA++){
@@ -730,11 +730,11 @@ void odeNormalAdultSimplePA::postProcess(double timeStep, int totalStepsOnSingle
     //printf("%e\n",valveOpening[loopA-startTwoLastCycle]);
   }
   // SHIFT CURVE WITH BEGINNING AT VALVE OPENING
-  if(!zeroAtValveOpening(0, stopLastCycle - startTwoLastCycle, output, valveOpening)){
+  if(!cmUtils::zeroAtValveOpening(0, stopLastCycle - startTwoLastCycle, output, valveOpening)){
     throw cmException("Error: Second Valve is not opening in heart cycle.\n");
   }
   double pvAccelTime = 0.0;
-  bool isPVAccelTimeOK = getAccelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, pvAccelTime);
+  bool isPVAccelTimeOK = cmUtils::getAccelerationTime(0, stopLastCycle - startTwoLastCycle, timeStep, output, pvAccelTime);
 
   // ALTERNATIVE COMPUTATION OF SVR and PVR
   double altSVR = 80.0*(((avAOPress/1333.22) - (avRAPress/1333.22))/(CO*(60.0/1000.0)));

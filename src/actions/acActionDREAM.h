@@ -25,13 +25,15 @@
 # include "acAction.h"
 # include "pdflib.h"
 # include "rnglib.h"
-# include "auxlib.h"
 # include "cmUtils.h"
+# include "uqUtils.h"
 
 using namespace std;
 
 /*! 
-This class implements the Differential Evolution adaptive Metropolis algorithm 
+This class implements the common routines for the 
+serial and parallel implementation of the 
+Differential Evolution adaptive Metropolis (DREAM) algorithm 
 to sample from the joint parameter posterior for arbitrary models.
 */
 class acActionDREAM: public acAction{
@@ -62,73 +64,55 @@ class acActionDREAM: public acAction{
     string priorFileName;
     int priorModelType;
     
-    // Private Functions
-  	void problem_size(int &chain_num, int &cr_num, int &gen_num, int &pair_num, int &par_num);
-  	void problem_value ( string *chain_filename, string *gr_filename, 
-    double &gr_threshold, int &jumpstep, double limits[], int par_num, 
-    int &printstep, string *restart_read_filename, 
-    string *restart_write_filename );
-    double* prior_sample (int par_num, int prior_num, int* prPtr, vector<double> prAv, vector<double> prSd);
-    double sample_likelihood ( int par_num, double zp[] );
-    void chain_init ( int chain_num, double fit[], int gen_num, int par_num, 
-                      double z[], int prior_num, int* prPtr, vector<double> prAv, vector<double> prSd, int globRank,
-                      MPI_Comm comm_sm, MPI_Comm mainProcessComm, int size_sm, int totGroups, int rank_sm);
-    double* sample_candidate ( int chain_index, int chain_num, double cr[], 
-    int cr_index, int cr_num, int gen_index, int gen_num, 
-    double jumprate_table[], int jumpstep, double limits[], int pair_num, 
-    int par_num, double z[] );
-    int cr_index_choose ( int cr_num, double cr_prob[] );
-    void cr_init ( double cr[], double cr_dis[], int cr_num, double cr_prob[], 
-    int cr_ups[] );
-    void dream_algm ( int rank_sm, int id, int num_procs, int size_sm, int* localGroupNumbers, 
-                      MPI_Comm comm_sm, MPI_Status info, int totGroups, MPI_Comm mainProcessComm,
-                      int chain_num, int cr_num, double fit[], int gen_num, 
-                      double gr[], int &gr_conv, int &gr_count, int gr_num, double gr_threshold,
-                      double jumprate_table[], int jumpstep, double limits[], int pair_num, 
-                      int par_num, int printstep, double z[], 
-                      int prior_num, int* prPtr, vector<double> prAv, vector<double> prSd,
-                      double iniMean[], double iniStd[]);
-    void chain_init_print ( int chain_num, double fit[], int gen_num, int par_num, 
-    string restart_read_filename, double z[] );
-    void restart_read ( int chain_num, double fit[], int gen_num, int par_num, 
-    string restart_read_filename, double z[] );
-    void gr_init ( double gr[], int &gr_conv, int &gr_count, int gr_num, 
-    int par_num );
-    void jumprate_table_print ( double jumprate_table[], int pair_num, int par_num );
-    double* jumprate_table_init ( int pair_num, int par_num );
+    // Protected Functions
+    void std_compute_ini (int chain_num, int gen_index, int gen_num, int par_num, 
+                          double z[], double currentMean[], double currentStd[]);
+    void std_compute (int chain_num, int gen_index, int gen_num, int par_num, double z[], 
+                      double storedMean[], double storedStd[], 
+                      double currentMean[], double currentStd[]);
+    double* sample_candidate (int chain_index, int chain_num, double cr[], 
+                              int cr_index, int cr_num, int gen_index, int gen_num, 
+                              double jumprate_table[], int jumpstep, double limits[], int pair_num, 
+                              int par_num, double z[]);
+    int cr_index_choose(int cr_num, double cr_prob[]);
+    void cr_init (double cr[], double cr_dis[], int cr_num, double cr_prob[], int cr_ups[]);
+    void restart_read(int chain_num, double fit[], int gen_num, int par_num, string restart_read_filename, double z[]);
+    void gr_init(double gr[], int &gr_conv, int &gr_count, int gr_num, int par_num);
+    double* jumprate_table_init(int pair_num, int par_num);
+    double prior_density(int par_num, double zp[], 
+                         int prior_num, int* prPtr, 
+                         const stdVec& prAv, const stdVec& prSd);
+    void chain_outliers (int chain_num, int gen_index, int gen_num, int par_num, double fit[], double z[]);
+    void chain_write (string chain_filename, int chain_num, double fit[], int gen_num, int par_num, double z[]);
+    void cr_prob_update(double cr_dis[], int cr_num, double cr_prob[], int cr_ups[]);
+    double* diff_compute (int chain_num, int gen_index, int gen_num, 
+                          int jump_dim[], int jump_num, int pair_num, int par_num, int r[], double z[]);
+    void filename_inc(string *filename);
+    void gr_compute (int chain_num, int gen_index, int gen_num, double gr[], 
+                     int &gr_conv, int &gr_count, int gr_num, double gr_threshold, 
+                     int par_num, double z[]);
+    void gr_write(double gr[], string gr_filename, int gr_num, int par_num, int printstep);
+    void jumprate_choose (double cr[], int cr_index, int cr_num, int gen_index,
+                          int jump_dim[], int &jump_num, double &jumprate, double jumprate_table[],
+                          int jumpstep, int par_num);
+    void sample_limits(double limits[], int par_num, double zp[]);
+    void problem_size(int &chain_num, int &cr_num, int &gen_num, int &pair_num, int &par_num);
+    void problem_value (string *chain_filename, string *gr_filename, 
+                        double &gr_threshold, int &jumpstep, double limits[], int par_num, 
+                        int &printstep, string *restart_read_filename, string *restart_write_filename);
+    double* prior_sample ( int par_num, int prior_num, int* prPtr, const stdVec& prAv, const stdVec& prSd);
+    double sample_likelihood (int par_num, double zp[]);
+    void writeStatisticsToLatexTable(int par_num,stdMat& modelStats);
+
+    // To be removed !!!
+    int r8_round_i4 ( double x );
+    double* r8vec_copy_new(int n, double a1[]);
+    void r8vec_heap_d(int n, double a[]);
+    void r8vec_sort_heap_a(int n, double a[]);
+    double* r8vec_zero_new (int n);
+    int* i4vec_zero_new(int n);
     double* r8block_zero_new ( int l, int m, int n );
     double* r8mat_zero_new ( int m, int n );
-    void input_print ( string chain_filename, int chain_num, int cr_num, 
-    string gr_filename, double gr_threshold, int jumpstep, double limits[], 
-    int gen_num, int pair_num, int par_num, int printstep, 
-    string restart_read_filename, string restart_write_filename );
-    double prior_density ( int par_num, double zp[], int prior_num, int* prPtr, 
-    vector<double> prAv, vector<double> prSd );
-    void chain_outliers ( int chain_num, int gen_index, int gen_num, int par_num,
-    double fit[], double z[] );
-    void chain_write ( string chain_filename, int chain_num, double fit[], 
-    int gen_num, int par_num, double z[] );
-    void cr_dis_update ( int chain_index, int chain_num, double cr_dis[], 
-    int cr_index, int cr_num, int cr_ups[], int gen_index, int gen_num, 
-    int par_num, double z[], int id, double storedMean[], double storedStd[],
-    double currentMean[], double currentStd[]);
-    void cr_prob_update ( double cr_dis[], int cr_num, double cr_prob[], 
-    int cr_ups[] );
-    double* diff_compute ( int chain_num, int gen_index, int gen_num, 
-    int jump_dim[], int jump_num, int pair_num, int par_num, int r[], 
-    double z[] );
-    void filename_inc ( string *filename );
-    void gr_compute ( int chain_num, int gen_index, int gen_num, double gr[], 
-    int &gr_conv, int &gr_count, int gr_num, double gr_threshold, int par_num, 
-    double z[] );
-    void gr_write ( double gr[], string gr_filename, int gr_num, int par_num, 
-    int printstep );
-    void jumprate_choose ( double cr[], int cr_index, int cr_num, int gen_index,
-    int jump_dim[], int &jump_num, double &jumprate, double jumprate_table[],
-    int jumpstep, int par_num );
-    void sample_limits ( double limits[], int par_num, double zp[] );
-    // POST
-    void writeStatisticsToLatexTable(int par_num,vector<vector<double> > &modelStats);
 
   public:
   	/*! 
@@ -199,7 +183,7 @@ class acActionDREAM: public acAction{
   	int postProcess(bool debugMode, double burnInPercent);
 
   	// Virtual Function from acAction
-  	virtual int go();
+  	virtual int go() = 0;
 };
 
 #endif //ACACTIONDREAM_H

@@ -3681,7 +3681,7 @@ void nwspgr ( void rule ( int n, double x[], double w[] ),
 //
 //  Normalize the weights to sum to 1.
 //
-  t = r8vec_sum ( r, weights );
+  t = uqUtils::sumvec(r, weights);
 
   for ( j = 0; j < r; j++ )
   {

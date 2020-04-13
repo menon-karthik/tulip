@@ -30,7 +30,7 @@ void daData_multiple_Table::getIndexSet(stdIntVec& indexSet){
 void daData_multiple_Table::readFromFile(string fileName){
   stdStringMat stringTable;
   stdStringVec temp;
-  int error = readCSStringTableFromFile(fileName,stringTable);
+  int error = cmUtils::readCSStringTableFromFile(fileName,stringTable);
   if(error != 0){
     throw daException("Error: in Data.readFromFile, invalid file.\n");
   }

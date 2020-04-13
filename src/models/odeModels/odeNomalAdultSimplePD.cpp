@@ -638,42 +638,42 @@ void odeNormalAdultSimplePD::postProcess(double timeStep, int totalStepsOnSingle
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[ipAOPressure][loopA];
   }
-  double maxAOPress  = getMax(startLastCycle, stopLastCycle, output);
-  double minAOPress  = getMin(startLastCycle, stopLastCycle, output);
-  double avAOPress  = getMean(startLastCycle, stopLastCycle, output);
+  double maxAOPress = cmUtils::getMax(startLastCycle, stopLastCycle, output);
+  double minAOPress = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double avAOPress  = cmUtils::getMean(startLastCycle, stopLastCycle, output);
 
   // AVERAGE RA PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[ipAuxRAPressure][loopA];
   }
-  double avRAPress  = getMean(startLastCycle, stopLastCycle, output);
+  double avRAPress  = cmUtils::getMean(startLastCycle, stopLastCycle, output);
 
   // RV PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[ipAuxRVPressure][loopA];
   }
-  double minRVPress  = getMin(startLastCycle, stopLastCycle, output);
-  double maxRVPress  = getMax(startLastCycle, stopLastCycle, output);
+  double minRVPress  = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double maxRVPress  = cmUtils::getMax(startLastCycle, stopLastCycle, output);
 
   // SYSTOLIC, DIASTOLIC AND AVERAGE PA PRESSURES
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[ipPAAPressure][loopA];
   }
-  double maxPAPress  = getMax(startLastCycle, stopLastCycle, output);
-  double minPAPress  = getMin(startLastCycle, stopLastCycle, output);
-  double avPAPress   = getMean(startLastCycle, stopLastCycle, output);
+  double maxPAPress = cmUtils::getMax(startLastCycle, stopLastCycle, output);
+  double minPAPress = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double avPAPress  = cmUtils::getMean(startLastCycle, stopLastCycle, output);
 
   // AVERAGE PCWP PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[ipPAVPressure][loopA];
   }
-  double avPCWPress  = getMean(startLastCycle, stopLastCycle, output);
+  double avPCWPress = cmUtils::getMean(startLastCycle, stopLastCycle, output);
 
   // CARDIAC OUTPUT
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[ipAOFlow][loopA];
   }
-  double CO =  getMean(startLastCycle, stopLastCycle, output);
+  double CO = cmUtils::getMean(startLastCycle, stopLastCycle, output);
 
   // MAXIMUM AND MINIMUM VENTRICULAR VOLUMES
   double minRVVolume = outVals[ipRVVolume][startLastCycle];
