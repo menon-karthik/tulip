@@ -160,7 +160,7 @@ int uq1DApproximant_SE::importFromTextFile(string fileName,bool startFromTop,int
       lineCount++;
       // Read One Line of Input File
       std::getline(myReadFile,buffer);
-      buffer = trim(buffer);
+      boost::algorithm::trim(buffer);
       if(!buffer.empty()){
         switch(lineCount) {
           case 1 : // Save Approx Types: atPoly,atOrthoPoly,atMW

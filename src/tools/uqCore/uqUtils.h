@@ -35,7 +35,7 @@ namespace uqUtils{
   void fft1DInv(int size, int gSize, double* GX, double* GY, double* fftWeights);
 
   // Solve Dense Linear System Of Equations
-  void solveDenseLinearSystem(int totRows, int totCols, stdMat coeffMat, stdVec currentRHS, stdVec& sol);
+  void solveDenseLinearSystem(int totRows, int totCols, stdMat coeffMat, const stdVec& currentRHS, stdVec& sol);
 
   /*! 
   \verbatim embed:rst
@@ -96,6 +96,9 @@ namespace uqUtils{
   \return number of lines in file
   */
   int countLinesInFile(string fileName);
+
+  // Basic utilities
+  double sumvec(int num,double vec[]);
 
 }
 

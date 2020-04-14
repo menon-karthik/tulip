@@ -248,11 +248,11 @@ void uqSamples::readFromFile(string outMatFile,bool skipFirstLine){
     lineCount++;
     
     // Trim String
-    trim(buffer);
+    boost::algorithm::trim(buffer);
     if((buffer != "")&&(buffer.at(0) != '#')){
       
       // Tokenize String
-      schSplit(buffer,tokenizedString);
+      cmUtils::schSplit(buffer,tokenizedString);
       
       // Assign Total Number of dimensions for first line
       if(lineCount == 1){
@@ -1236,7 +1236,7 @@ uqSamples uqSamples::removeVariable(int idx){
 void uqSamples::addVariableFromFile(string fileName,int numColumn){
   // Read Table From File
   stdMat table;
-  int error = readTableFromFile(fileName,table);
+  int error = cmUtils::readTableFromFile(fileName,table);
   if(error != 0){
     throw uqException("ERROR: Invalid Outlet Mapping File.\n");
   }
@@ -1321,6 +1321,9 @@ void uqSamples::rescaleFromHypercubeToPartition(stdVec currLimits){
 // ========================================
 void uqSamples::extractSampleColumnWithIndex(stdIntVec Indexes,int outCol,stdVec& rhs){
   rhs.clear();
+  if(Indexes.size() > values.size()){
+    throw uqException("ERROR in extractSampleColumnWithIndex: Input/output mismatch.\n");
+  }
   for(int loopA=0;loopA<Indexes.size();loopA++){
     rhs.push_back(values[Indexes[loopA]][outCol]);
   }
@@ -1883,7 +1886,7 @@ void uqSamples::readMCMCSubSamples(string mcmcTraceFile,int totSubSamples,int st
   stdVec oneSample;
 
   // Read Table From File using Util
-  subSampleTableData(mcmcTraceFile,totSubSamples,startColumn,endColumn,subSampleTable,sampleIndexes);
+  cmUtils::subSampleTableData(mcmcTraceFile,totSubSamples,startColumn,endColumn,subSampleTable,sampleIndexes);
 
   // Assign the dimensionality
   totDims = (int)subSampleTable[0].size();
@@ -1904,7 +1907,7 @@ void uqSamples::readMCMCSubSamplesWithIndex(string mcmcTraceFile,int totSubSampl
   stdVec oneSample;
 
   // Read Table From File using Util
-  subSampleTableDataWithIndex(mcmcTraceFile,sampleIndexes,startColumn,endColumn,subSampleTable);
+  cmUtils::subSampleTableDataWithIndex(mcmcTraceFile,sampleIndexes,startColumn,endColumn,subSampleTable);
 
   // Assign the dimensionality
   totDims = (int)subSampleTable[0].size();

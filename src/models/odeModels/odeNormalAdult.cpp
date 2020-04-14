@@ -726,7 +726,7 @@ void odeNormalAdult::postProcess(double timeStep, int totalStepsOnSingleCycle, i
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[9][loopA];
   }
-  double CO = getMean(startLastCycle, stopLastCycle, output);
+  double CO = cmUtils::getMean(startLastCycle, stopLastCycle, output);
 
   // Write Results
   results.push_back(CO);

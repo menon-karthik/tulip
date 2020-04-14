@@ -9,9 +9,12 @@
 #include "acActionOPT_NM.h"
 #include "acActionOPT_RSSD.h"
 #include "acActionDREAM.h"
+#include "acActionDREAMseq.h"
+#include "acActionDREAMmpi.h"
 #include "acActionUP.h"
 #include "acActionUP_MC.h"
 #include "acActionUP_MWBCS.h"
+#include "acActionBBVI.h"
 #include "uqTypes.h"
 %}
 
@@ -47,9 +50,12 @@
 %include "acActionOPT_NM.h"
 %include "acActionOPT_RSSD.h"
 %include "acActionDREAM.h"
+%include "acActionDREAMseq.h"
+%include "acActionDREAMmpi.h"
 %include "acActionUP.h"
 %include "acActionUP_MC.h"
 %include "acActionUP_MWBCS.h"
+%include "acActionBBVI.h"
 %include "uqTypes.h"
 
 namespace std {

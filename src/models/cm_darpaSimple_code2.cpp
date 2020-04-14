@@ -74,7 +74,7 @@ double cm_darpaSimple_code2::evalModelError(const stdVec& inputs,stdVec& outputs
   double airTemperature = 0.0;
   double airPressure = 0.0;
   double airDensity = 0.0;
-  getAirProps(alt,airTemperature,airPressure,airDensity);
+  cmUtils::getAirProps(alt,airTemperature,airPressure,airDensity);
 
   // Determine max temperature and assume it to be uniform 
   double T = airTemperature + qdot/convCoeff;

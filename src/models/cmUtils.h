@@ -22,6 +22,8 @@
 
 using namespace std;
 
+namespace cmUtils{
+
 //! Descending sorting options
 const int ipSortDescending = 0;
 //! Ascending sorting options
@@ -83,66 +85,6 @@ struct model3DRecord{
 /*! 
 \verbatim embed:rst
 **Purpose**
-Left trim of string
-    
-**Discussion**
-None
-    
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] s The untrimmed string
-return The left trimmed string
-*/
-string &ltrim(string &s);
-
-/*! 
-\verbatim embed:rst
-**Purpose**
-Right trim of string
-    
-**Discussion**
-None
-    
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] s The untrimmed string
-return The right trimmed string
-*/
-string &rtrim(string &s);
-
-/*! 
-\verbatim embed:rst
-**Purpose**
-Right and left trim string
-    
-**Discussion**
-None
-    
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] s The untrimmed string
-return The trimmed string
-*/
-string &trim(string &s);
-
-/*! 
-\verbatim embed:rst
-**Purpose**
 Get maximum value in array between two
 prescribed lower and upped index bounds
 [start, stop]
@@ -163,7 +105,7 @@ No Reference
 return Maximum value in the array in the index interval [start,stop]
 */
 double getMax(int start, int stop, double* vector);
-double getMax(int start, int stop, stdVec vector); // added so that it can take vector in standard vector form
+double getMax(int start, int stop, const stdVec& vector); // added so that it can take vector in standard vector form
 
 /*! 
 \verbatim embed:rst
@@ -381,7 +323,7 @@ No Reference
 \param[out] prSd The second array in the file (second column)
 return Error code (if =0 execution OK)
 */
-int readPriorFromFile(string inputFileName,int &prior_num,vector<double> &prAv,vector<double> &prSd);
+int readPriorFromFile(string inputFileName,int &prior_num,stdVec& prAv,stdVec& prSd);
 
 /*! 
 \verbatim embed:rst
@@ -403,7 +345,7 @@ No Reference
 \param[in] samples std Matrix where to store the table
 return Error code
 */
-int readTableFromFile(std::string fileName,vector<vector<double> > &samples);
+int readTableFromFile(std::string fileName,stdMat& samples);
 
 /*! 
 \verbatim embed:rst
@@ -425,7 +367,7 @@ No Reference
 \param[in] samples std Matrix where to store the table
 return Error code
 */
-int readIntTableFromCSVFile(std::string fileName,stdIntMat &samples);
+int readIntTableFromCSVFile(std::string fileName,stdIntMat& samples);
 
 /*! 
 \verbatim embed:rst
@@ -446,7 +388,7 @@ No Reference
 \param[out] vec The vector where the indexes read from a "fileName" will be stored
 return Error code
 */
-int readIntVectorFromFile(std::string fileName,vector<int> &vec);
+int readIntVectorFromFile(std::string fileName,stdIntVec& vec);
 
 /*! 
 \verbatim embed:rst
@@ -466,7 +408,7 @@ No Reference
 \param[in] fileName Name of the file to be written
 \param[in] table std Matrix to print
 */
-void writeTableToFile(std::string fileName,vector<vector<double> > table);
+void writeTableToFile(std::string fileName,const stdMat& table);
 
 /*! 
 \verbatim embed:rst
@@ -1041,4 +983,5 @@ No Reference
 */
 void getAirProps(double alt,double& airTemperature,double& airPressure,double& airDensity);
 
+}
 #endif // LPNUTILSHPP

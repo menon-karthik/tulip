@@ -269,7 +269,7 @@ int acActionGSI::go(){
     // Read Marginal Statistics From File
     int prior_num = 0;
     printf("Reading marginal statistics from file %s\n",priorParamFile.c_str());
-    int error = readPriorFromFile(priorParamFile,prior_num,tempStat1,tempStat2);
+    int error = cmUtils::readPriorFromFile(priorParamFile,prior_num,tempStat1,tempStat2);
     if((error != 0)||(prior_num != par_num)){
       printf("ERROR: Invalid file with prior parameters.\n");
       exit(1);

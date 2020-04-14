@@ -31,9 +31,14 @@
 # include "cm_darpaSimple_code3.h"
 # include "cmDarpaBeamStress.h"
 
+// Oscillator Model for testing BBVI
+# include "cmOscillator.h"
+
 // ODE Models
-#include "odeModel.h"
-#include "odeNormalAdultSimplePA.h"
-#include "odeCongenital4ChambersPAH.h"
+# include "odeModel.h"
+# include "odeNormalAdultSimplePA.h"
+# include "odeCongenital4ChambersPAH.h"
+# include "odeRCR.h"
+# include "odeRCRCR.h"
 
 #endif // TULIPCM_H

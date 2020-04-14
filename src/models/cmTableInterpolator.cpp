@@ -70,7 +70,7 @@ cmTableInterpolator::cmTableInterpolator(string tableFile, string weightFile,
   polyOrder = order;
 
   // Read Table from file
-  int error = readTableFromFile(tableFile,tableValues);
+  int error = cmUtils::readTableFromFile(tableFile,tableValues);
   if(error != 0){
     printf("ERROR: Reading Simulation Table.\n");
     exit(1);
@@ -155,7 +155,7 @@ cmTableInterpolator::cmTableInterpolator(string tableFile, string weightFile,
       // COMPUTATION OF THE COEFFICIENTS WITH NUMERICAL INTEGRATION ON SPARSE GRIDS
       // Read Weight Matrix
       stdMat weightTable;
-      int error = readTableFromFile(weightFile,weightTable);
+      int error = cmUtils::readTableFromFile(weightFile,weightTable);
       if(error != 0){
         throw new cmException("ERROR: Invalid Weight Matrix Files.\n");  
       }

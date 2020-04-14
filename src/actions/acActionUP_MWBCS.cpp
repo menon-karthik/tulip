@@ -1189,7 +1189,7 @@ int acActionUP_MWBCS::go(){
         if((opts.inputMode == imRandom)||(opts.inputMode == imTable)||(opts.inputMode == imCVSimVTK)||(opts.inputMode == imFromMCMC)){
 
           // Get Samples on Current Partition
-          currPartSamples = new uqSamples();        
+          currPartSamples = new uqSamples();      
 
           // Extract Samples for Current Partition
           currPartSamples->extractPartitionSamples(inputs,currLimits,sampleIndexes);
@@ -1199,7 +1199,7 @@ int acActionUP_MWBCS::go(){
           
           // Write RHS to file
           if(opts.printDBGMessages){
-            writeVectorToFile("RHS.txt",rhs);
+            cmUtils::writeVectorToFile("RHS.txt",rhs);
           }
 
         }else{
@@ -1825,7 +1825,7 @@ void acActionUP_MWBCS::evalSurrogate(stdMat params,stdVec& surrogate){
   leafIndex = partitionTree->getLeafIndex();
 
   // Loop on the leaves of the binary tree
-  for(int loopA=0;loopA<totPartitions;loopA++){   
+  for(int loopA=0;loopA<totPartitions;loopA++){  
     
     // Get Leaf Index
     currLeafIndex = leafIndex[loopA];
@@ -1839,13 +1839,20 @@ void acActionUP_MWBCS::evalSurrogate(stdMat params,stdVec& surrogate){
     partitionSamples->extractPartitionSamples(sampleLocations,currLimits,sampleIndexes);    
 
     // Evaluate Errors Only if there are checkpoint samples
-    if(partitionSamples->getTotSamples() > 0){            
+    if(partitionSamples->getTotSamples() > 0){        
 
       // Rescale Samples on Hypercube
       partitionSamples->rescaleOnHypercube(currLimits);
 
       // Get measure for current partition
       currPartition->getMeasure(currMeasure);
+
+      //for(int loopA=0;loopA<currMeasure.size();loopA++){
+      //  for(int loopB=0;loopB<currMeasure[loopA].size();loopB++){
+      //    printf("%f ",currMeasure[loopA][loopB]);
+      //  }
+      //  printf("\n");
+      //}
 
       // Resample Multiwavelet Matrix
       mwResampledMat = new uqMWMatrix(opts.maxMWOrder,partitionSamples,

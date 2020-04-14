@@ -2,11 +2,20 @@
 
 using namespace std;
 
+
+odeRCRCR::odeRCRCR(double r1, double c, double r2, stdMat p){
+
+}
+  
+odeRCRCR::~odeRCRCR(){
+
+}
+
 // ========================
 // GET NUMBER OF PARAMETERS
 // ========================
 int odeRCRCR::getParameterTotal(){
-  return 7;
+  return 8;
 }
 
 // ========================
@@ -14,6 +23,14 @@ int odeRCRCR::getParameterTotal(){
 // ========================
 int odeRCRCR::getStateTotal(){
   return 2; 
+}
+
+int odeRCRCR::getAuxStateTotal(){
+  return 6;
+}
+
+int odeRCRCR::getHRIndex(){
+  return 7;
 }
 
 // ==================
@@ -57,12 +74,19 @@ string odeRCRCR::getParamName(int parID){
       result = "Initial-P2";
       break;
     }    
+    case 7:
+    {      
+      result = "HR";
+      break;
+    }    
+
   }
   return result;
 }
 
 // GET MODEL PARAMETERS
 void odeRCRCR::getDefaultParams(stdVec& params){
+  params.resize(getParameterTotal());
   params[0] = 3.07;  // Rtot
   params[1] = 0.56;  // Ctot
   params[2] = 0.2;   // C1C2_Ratio
@@ -70,17 +94,20 @@ void odeRCRCR::getDefaultParams(stdVec& params){
   params[4] = 0.2;   // R3R2_Ratio
   params[5] = 5.0;   // Initial P1
   params[6] = 5.0;   // Initial P2
+  params[7] = 60.0;  // HR
 }
 
 // GET PARAMETER RANGES
-void odeRCRCR::getParameterLimits(stdVec& limits){
-  limits[0]=2.0; limits[1]=4.0;   // Rtot
-  limits[2]=0.5; limits[3]=3.0;   // tau
-  limits[4]=0.1; limits[5]=1.0;   // C1C2_Ratio
-  limits[6]=0.1; limits[7]=1.0;   // R1R2_Ratio
-  limits[8]=0.1; limits[9]=1.0;   // R3R2_Ratio
-  limits[10]=5.0; limits[11]=5.0; // Initial P1
-  limits[12]=5.0; limits[13]=5.0; // Initial P2
+void odeRCRCR::getDefaultParameterLimits(stdVec& limits){
+  limits.resize(2*getParameterTotal());
+  limits[0] =2.0;  limits[1] =4.0;   // Rtot
+  limits[2] =0.5;  limits[3] =3.0;   // tau
+  limits[4] =0.1;  limits[5] =1.0;   // C1C2_Ratio
+  limits[6] =0.1;  limits[7] =1.0;   // R1R2_Ratio
+  limits[8] =0.1;  limits[9] =1.0;   // R3R2_Ratio
+  limits[10]=5.0;  limits[11]=5.0; // Initial P1
+  limits[12]=5.0;  limits[13]=5.0; // Initial P2
+  limits[14]=60.0; limits[15]=60.0;// HR
 }
 
 // GET FOURIER COEFFICIENTS FOR ALL MODELS
@@ -102,63 +129,25 @@ void getFourierCoefficients(int patientID,
 // =====================
 // SOLVE SINGLE ODE STEP
 // =====================
-void heartODE(int patientID, double tn, double* Xn, double* params, double* Xn1,double* out){
-
+void odeRCRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind){
   // INITIALIZE VARIABLES
   // STORE LOCAL COPIES OF PARAMETERS
-  double HR = 117.65;
-  double tc = (60.0/(double)HR);
-
   double Rtot = params[0];
   double tau = params[1];
   double C1C2ratio = params[2];
   double R1R2ratio = params[3];
   double R3R2ratio = params[4];
 
-  // ====================
-  // FOURIER COEFFICIENTS
-  // ====================
-  // IN
-  double ain1,ain2,ain3,ain4,ain5,ain6,ain7,ain8,ain9;
-  double bin1,bin2,bin3,bin4,bin5,bin6,bin7,bin8;
-  // OUT  
-  double aout1,aout2,aout3,aout4,aout5,aout6,aout7,aout8,aout9;
-  double bout1,bout2,bout3,bout4,bout5,bout6,bout7,bout8;
-  // Freq
-  double w = 2.0*M_PI/(double)tc;
+  double HR = params[7];
+  double tc = (60.0/(double)HR);
 
-  // Get The Coefficients for different Models
-  getFourierCoefficients(patientID,
-                         ain1,ain2,ain3,ain4,ain5,ain6,ain7,ain8,ain9,
-                         bin1,bin2,bin3,bin4,bin5,bin6,bin7,bin8,
-                         aout1,aout2,aout3,aout4,aout5,aout6,aout7,aout8,aout9,
-                         bout1,bout2,bout3,bout4,bout5,bout6,bout7,bout8);
-  
-  // SHIFT TIME TO ACCOUNT FOR INPUT/OUTPUT CURVE DELAY
-  double teff1 = tn;
-  double teff2 = tn;
-
-  // SUM UP VENOUS FLUX
-  double Qin1 = ain9+ain1*cos(teff1*w)+bin1*sin(teff1*w)+ain2*cos(2*teff1*w);
-  double Qin2 = bin2*sin(2*teff1*w)+ain3*cos(3*teff1*w)+bin3*sin(3*teff1*w);
-  double Qin3 = ain4*cos(4*teff1*w)+bin4*sin(4*teff1*w)+ain5*cos(5*teff1*w);
-  double Qin4 = bin5*sin(5*teff1*w)+ain6*cos(6*teff1*w)+bin6*sin(6*teff1*w);
-  double Qin5 = ain7*cos(7*teff1*w)+bin7*sin(7*teff1*w)+ain8*cos(8*teff1*w) ;
-  double Qin6 = bin8*sin(8*teff1*w);
-  double Qven = Qin1+Qin2+Qin3+Qin4+Qin5+Qin6;
-
-  // EVAL AORTIC FLOW RATE
-  double Qout1 = aout9 + aout1*cos(teff2*w) + bout1*sin(teff2*w) + aout2*cos(2*teff2*w);
-  double Qout2 = bout2*sin(2*teff2*w)+aout3*cos(3*teff2*w)+bout3*sin(3*teff2*w);
-  double Qout3 = aout4*cos(4*teff2*w)+bout4*sin(4*teff2*w)+aout5*cos(5*teff2*w);
-  double Qout4 = bout5*sin(5*teff2*w)+aout6*cos(6*teff2*w)+bout6*sin(6*teff2*w);
-  double Qout5 = aout7*cos(7*teff2*w)+bout7*sin(7*teff2*w)+aout8*cos(8*teff2*w);
-  double Qout6 = bout8*sin(8*teff2*w);
-  double QAo = Qout1+Qout2+Qout3+Qout4+Qout5+Qout6;
+  // GET FLOW
+  double QAo = cmUtils::linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
+  double Qven = 0.0;
 
   // UNPACK STATE VARIABLES
-  double P1 = Xn[0]; // Pressure in 1
-  double P2 = Xn[1]; // Pressure in 2
+  double P1 = Xk[0]; // Pressure in 1
+  double P2 = Xk[1]; // Pressure in 2
 
   // Resistances
   double R2 = Rtot/(1.0 + R1R2ratio + R3R2ratio);
@@ -180,21 +169,21 @@ void heartODE(int patientID, double tn, double* Xn, double* params, double* Xn1,
   double Q3 = Qven;
   
   // STORE TIME DERIVATIVES
-  Xn1[0] = P1p;
-  Xn1[1] = P2p;
+  DXk[0] = P1p;
+  DXk[1] = P2p;
 
   // STORE SECONDARY OUTPUT
-  out[0] = P0;
-  out[1] = P3;
-  out[2] = Q1;
-  out[3] = Q2;
-  out[4] = Q3;
-  out[5] = tn;
+  auxOut[0] = P0;
+  auxOut[1] = P3;
+  auxOut[2] = Q1;
+  auxOut[3] = Q2;
+  auxOut[4] = Q3;
+  auxOut[5] = t;
 }
 
 
 // EXTRACT MODEL RESULTS
-void postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results){
+void odeRCRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results){
 
   double cycleTime = timeStep*totalStepsOnSingleCycle;
 
@@ -227,50 +216,195 @@ void postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, c
   }
 
   // GET AVERAGE VALUES
-  double mP0 = trapz(0,totalStepsOnSingleCycle,t,P0)/(double)cycleTime;
-  double mP1 = trapz(0,totalStepsOnSingleCycle,t,P1)/(double)cycleTime;
-  double mP2 = trapz(0,totalStepsOnSingleCycle,t,P2)/(double)cycleTime;
-  double mP3 = trapz(0,totalStepsOnSingleCycle,t,P3)/(double)cycleTime;
-  double mQ1 = trapz(0,totalStepsOnSingleCycle,t,Q1)/(double)cycleTime;
-  double mQ2 = trapz(0,totalStepsOnSingleCycle,t,Q2)/(double)cycleTime;
-  double mQ3 = trapz(0,totalStepsOnSingleCycle,t,Q3)/(double)cycleTime;
+  double mP0 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P0)/(double)cycleTime;
+  double mP1 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P1)/(double)cycleTime;
+  double mP2 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P2)/(double)cycleTime;
+  double mP3 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P3)/(double)cycleTime;
+  double mQ1 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q1)/(double)cycleTime;
+  double mQ2 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q2)/(double)cycleTime;
+  double mQ3 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q3)/(double)cycleTime;
 
   // GET MAXIMUM AND MINIMUM VALUES
-  double minP0 = getMin(0,totalStepsOnSingleCycle,P0);
-  double maxP0 = getMax(0,totalStepsOnSingleCycle,P0);
-  double minP1 = getMin(0,totalStepsOnSingleCycle,P1);
-  double maxP1 = getMax(0,totalStepsOnSingleCycle,P1);
-  double minP2 = getMax(0,totalStepsOnSingleCycle,P2);
-  double maxP2 = getMax(0,totalStepsOnSingleCycle,P2);
-  double minP3 = getMax(0,totalStepsOnSingleCycle,P3);
-  double maxP3 = getMax(0,totalStepsOnSingleCycle,P3);
-  double minQ1 = getMin(0,totalStepsOnSingleCycle,Q1);
-  double maxQ1 = getMax(0,totalStepsOnSingleCycle,Q1);
-  double minQ2 = getMax(0,totalStepsOnSingleCycle,Q2);
-  double maxQ2 = getMax(0,totalStepsOnSingleCycle,Q2);
-  double minQ3 = getMax(0,totalStepsOnSingleCycle,Q3);
-  double maxQ3 = getMax(0,totalStepsOnSingleCycle,Q3);
+  double minP0 = cmUtils::getMin(0,totalStepsOnSingleCycle,P0);
+  double maxP0 = cmUtils::getMax(0,totalStepsOnSingleCycle,P0);
+  double minP1 = cmUtils::getMin(0,totalStepsOnSingleCycle,P1);
+  double maxP1 = cmUtils::getMax(0,totalStepsOnSingleCycle,P1);
+  double minP2 = cmUtils::getMin(0,totalStepsOnSingleCycle,P2);
+  double maxP2 = cmUtils::getMax(0,totalStepsOnSingleCycle,P2);
+  double minP3 = cmUtils::getMin(0,totalStepsOnSingleCycle,P3);
+  double maxP3 = cmUtils::getMax(0,totalStepsOnSingleCycle,P3);
+  double minQ1 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q1);
+  double maxQ1 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q1);
+  double minQ2 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q2);
+  double maxQ2 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q2);
+  double minQ3 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q3);
+  double maxQ3 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q3);
 
   // COPY FINAL RESULTS
-  results[0] = minP0;
-  results[1] = mP0;
-  results[2] = maxP0;
-  results[3] = minP1;
-  results[4] = mP1;
-  results[5] = maxP1;
-  results[6] = minP2;
-  results[7] = mP2;
-  results[8] = maxP2;
-  results[9] = minP3;
-  results[10] = mP3;
-  results[11] = maxP3;
-  results[12] = minQ1;
-  results[13] = mQ1;
-  results[14] = maxQ1;
-  results[15] = minQ2;
-  results[16] = mQ2;
-  results[17] = maxQ2;
-  results[18] = minQ3;
-  results[19] = mQ3;
-  results[20] = maxQ3;
+  results.clear();
+  // P_0 PRESSURE
+  results.push_back(minP0);
+  results.push_back(mP0);
+  results.push_back(maxP0);
+  // P_1 PRESSURE
+  results.push_back(minP1);
+  results.push_back(mP1);
+  results.push_back(maxP1);
+  // P_2 PRESSURE
+  results.push_back(minP2);
+  results.push_back(mP2);
+  results.push_back(maxP2);
+  // P_3 PRESSURE
+  results.push_back(minP3);
+  results.push_back(mP3);
+  results.push_back(maxP3);
+  // Q_1 PRESSURE
+  results.push_back(minQ1);
+  results.push_back(mQ1);
+  results.push_back(maxQ1);
+  // Q_2 PRESSURE
+  results.push_back(minQ2);
+  results.push_back(mQ2);
+  results.push_back(maxQ2);
+  // Q_3 PRESSURE
+  results.push_back(minQ3);
+  results.push_back(mQ3);
+  results.push_back(maxQ3);
 }
+
+void odeRCRCR::getResultKeys(stdStringVec& keys){
+  // KEYS
+  keys.clear();
+  // P_0 PRESSURE
+  keys.push_back(string("minP0"));
+  keys.push_back(string("mP0"));
+  keys.push_back(string("maxP0"));
+  // P_1 PRESSURE
+  keys.push_back(string("minP1"));
+  keys.push_back(string("mP1"));
+  keys.push_back(string("maxP1"));
+  // P_2 PRESSURE
+  keys.push_back(string("minP2"));
+  keys.push_back(string("mP2"));
+  keys.push_back(string("maxP2"));
+  // P_3 PRESSURE
+  keys.push_back(string("minP3"));
+  keys.push_back(string("mP3"));
+  keys.push_back(string("maxP3"));
+  // Q_1 PRESSURE
+  keys.push_back(string("minQ1"));
+  keys.push_back(string("mQ1"));
+  keys.push_back(string("maxQ1"));
+  // Q_2 PRESSURE
+  keys.push_back(string("minQ2"));
+  keys.push_back(string("mQ2"));
+  keys.push_back(string("maxQ2"));
+  // Q_3 PRESSURE
+  keys.push_back(string("minQ3"));
+  keys.push_back(string("mQ3"));
+  keys.push_back(string("maxQ3"));
+
+}
+
+// question.  What are the outputs?  Seems like it these are coming from above, but I thought there were only 3?
+void odeRCRCR::getFinalOutputs(const stdVec& outputs,stdVec& outs){
+  // COMPUTED VALUES
+  outs.clear();
+  // P0 in mmHg
+  outs.push_back(outputs[0]/1333.22);
+  outs.push_back(outputs[1]/1333.22);
+  outs.push_back(outputs[2]/1333.22);
+  // P1 in mmHg
+  outs.push_back(outputs[3]/1333.22);
+  outs.push_back(outputs[4]/1333.22);
+  outs.push_back(outputs[5]/1333.22);
+  // P2 in mmHg
+  outs.push_back(outputs[6]/1333.22);
+  outs.push_back(outputs[7]/1333.22);
+  outs.push_back(outputs[8]/1333.22);
+  // P3 in mmHg
+  outs.push_back(outputs[9]/1333.22);
+  outs.push_back(outputs[10]/1333.22);
+  outs.push_back(outputs[11]/1333.22);
+  // Q1 in L/min
+  outs.push_back(outputs[12]*60.0/1000.0);
+  outs.push_back(outputs[13]*60.0/1000.0);
+  outs.push_back(outputs[14]*60.0/1000.0);
+  // Q2 in L/min
+  outs.push_back(outputs[15]*60.0/1000.0);
+  outs.push_back(outputs[16]*60.0/1000.0);
+  outs.push_back(outputs[17]*60.0/1000.0);
+  // Q3 in L/min
+  outs.push_back(outputs[18]*60.0/1000.0);
+  outs.push_back(outputs[19]*60.0/1000.0);
+  outs.push_back(outputs[20]*60.0/1000.0);
+}
+
+void odeRCRCR::getDataSTD(stdVec& stds){
+  // STANDARD DEVIATIONS
+  stds.clear();
+  stds.push_back(2.0); // min P_0
+  stds.push_back(2.0); // max P_0
+  stds.push_back(2.0); // av P_0
+  // P1 in mmHg
+  stds.push_back(2.0);
+  stds.push_back(2.0);
+  stds.push_back(2.0);
+  // P2 in mmHg
+  stds.push_back(2.0);
+  stds.push_back(2.0);
+  stds.push_back(2.0);
+  // P3 in mmHg
+  stds.push_back(2.0);
+  stds.push_back(2.0);
+  stds.push_back(2.0);
+  // Q1 in L/min
+  stds.push_back(0.6);
+  stds.push_back(0.6);
+  stds.push_back(0.6);
+  // Q2 in L/min
+  stds.push_back(0.6);
+  stds.push_back(0.6);
+  stds.push_back(0.6);
+  // Q3 in L/min
+  stds.push_back(0.6);
+  stds.push_back(0.6);
+  stds.push_back(0.6);
+}
+
+void odeRCRCR::getResultWeigths(stdVec& weights){
+  // STANDARD DEVIATIONS
+  weights.clear();
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+  weights.push_back(1.0);
+
+}
+
+
+
+    

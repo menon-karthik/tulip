@@ -8,8 +8,7 @@
 # include <cmath>
 # include <ctime>
 # include <cstring>
-
-# include "auxlib.h"
+# include "uqUtils.h"
 
 using namespace std;
 

@@ -15,7 +15,7 @@ odeArmVenousOcclusion::odeArmVenousOcclusion(const stdMat& pressureHist){
 
 // EVAL FORCING
 double evalCuffPressure(double currTime,const stdMat& cuffPressureHistory){
-  return linInterp(cuffPressureHistory,0,1,currTime);
+  return cmUtils::linInterp(cuffPressureHistory,0,1,currTime);
 }
 
 // NON LINEAR FUNCTION TO SOLVE

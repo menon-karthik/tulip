@@ -2,50 +2,51 @@
 
 using namespace std;
 
+namespace cmUtils{
 
-double getMax(int start, int stop, double* vector){
+double getMax(int start, int stop, const double* vector){
   double maxVal = -std::numeric_limits<double>::max();
   double currValue = 0.0;
   for(int loopA=start;loopA<stop;loopA++){
-     currValue = vector[loopA];
-     if(currValue>maxVal){
-       maxVal = currValue;
-     }
+    currValue = vector[loopA];
+    if(currValue>maxVal){
+      maxVal = currValue;
+    }
   }
   return maxVal;
 }
 
-double getMax(int start, int stop, stdVec vector){
-  return getMax(start,stop,(double*)vector.data()); // vector.data() gives you a primative 8bit uint array, (double*) casts that array as a double array, so turns vector into a double array and calls function above
+double getMax(int start, int stop, const stdVec& vector){
+  return getMax(start, stop, &vector[0]); // vector.data() gives you a primative 8bit uint array, (double*) casts that array as a double array, so turns vector into a double array and calls function above
 }
 
-double getMin(int start, int stop, double* vector){
+double getMin(int start, int stop, const double* vector){
   double minVal = std::numeric_limits<double>::max();
   double currValue = 0.0;
   for(int loopA=start;loopA<stop;loopA++){
-     currValue = vector[loopA];
-     if(currValue<minVal){
-       minVal = currValue;
-     }
+    currValue = vector[loopA];
+    if(currValue<minVal){
+      minVal = currValue;
+    }
   }
   return minVal;
 }
-double getMin(int start, int stop, stdVec vector){
-  return getMin(start, stop, (double*)vector.data()); // vector.data() gives you a primative 8bit unit array, (double*) casts that array as a double array, so turns vector into a double array and calls function above
+double getMin(int start, int stop, const stdVec& vector){
+  return getMin(start, stop, &vector[0]); // vector.data() gives you a primative 8bit unit array, (double*) casts that array as a double array, so turns vector into a double array and calls function above
 }
 
-double getMean(int start, int stop, double* vector){
+double getMean(int start, int stop, const double* vector){
   double result = 0.0;
   for(int loopA=start;loopA<stop;loopA++){
      result += vector[loopA];
   }
   return result/(double)(stop - start);
 }
-double getMean(int start, int stop, stdVec vector){
-  return getMean(start, stop, (double*)vector.data()); //(double*)vector.data() changes vector from stdVec to double*
+double getMean(int start, int stop, const stdVec& vector){
+  return getMean(start, stop, &vector[0]); //(double*)vector.data() changes vector from stdVec to double*
 }
 
-double getSum(int start, int stop, double* vector){
+double getSum(int start, int stop, const double* vector){
   double result = 0.0;
   for(int loopA=start;loopA<stop;loopA++){
      result += vector[loopA];
@@ -53,11 +54,11 @@ double getSum(int start, int stop, double* vector){
   return result;
 }
 
-double getSum(int start, int stop, stdVec vector){
-  return getSum(start, stop, (double*)vector.data());
+double getSum(int start, int stop, const stdVec& vector){
+  return getSum(start, stop, &vector[0]);
 }
 
-int getMaxLoc(int start, int stop, double* vector){
+int getMaxLoc(int start, int stop, const double* vector){
   double maxVal = -std::numeric_limits<double>::max();
   int maxLoc = 0;
   double currValue = 0.0;
@@ -87,25 +88,10 @@ double trapz(int start, int stop, const stdVec& xVals, const stdVec& yVals){
   return result;
 }
 
-
-string &ltrim(string &s) {
-        s.erase(s.begin(), find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace))));
-        return s;
-}
-
-string &rtrim(string &s) {
-        s.erase(find_if(s.rbegin(), s.rend(), not1(std::ptr_fun<int, int>(isspace))).base(), s.end());
-        return s;
-}
-
-string &trim(string &s) {
-        return ltrim(rtrim(s));
-}
-
 void schSplit(string sentence,vector<string> &tokens,const char* separator){
   char* pch;
   tokens.clear();
-  sentence = ltrim(rtrim(sentence));
+  boost::algorithm::trim(sentence);
   pch = strtok ((char*)sentence.c_str(),separator);
   while (pch != NULL){
     tokens.push_back(string(pch));
@@ -147,7 +133,7 @@ int ReadParamsFromFile(std:: string inputFileName,double* params){
   return 0;
 }
 
-int readPriorFromFile(string inputFileName,int &prior_num,vector<double> &prAv,vector<double> &prSd){
+int readPriorFromFile(string inputFileName,int &prior_num,stdVec& prAv,stdVec& prSd){
   // Open File
   ifstream myReadFile;
   string buffer;
@@ -668,7 +654,7 @@ int detect_peak(int data_count, double* t, double* data,
     return retValue;
 }
 
-int readTableFromFile(std::string fileName,vector<vector<double> > &samples){
+int readTableFromFile(std::string fileName,stdMat& samples){
   // Open File
   ifstream myReadFile;
   string buffer;
@@ -746,7 +732,7 @@ int readIntTableFromCSVFile(std::string fileName,stdIntMat &samples){
   return 0;
 }
 
-void writeTableToFile(std::string fileName,vector<vector<double> > table){
+void writeTableToFile(std::string fileName,const stdMat& table){
   FILE* stateFile;
   stateFile = fopen(fileName.c_str(),"w");
   for(int loopA=0;loopA<table.size();loopA++){
@@ -760,7 +746,7 @@ void writeTableToFile(std::string fileName,vector<vector<double> > table){
 }
 
 // Write Vector to Text File
-void writeVectorToFile(std::string fileName,stdVec vec){
+void writeVectorToFile(std::string fileName,const stdVec& vec){
   FILE* stateFile;
   stateFile = fopen(fileName.c_str(),"w");
   for(int loopA=0;loopA<vec.size();loopA++){
@@ -936,7 +922,7 @@ string getPolyTypeString(int polyType){
   return result;
 }
 
-int readIntVectorFromFile(std::string fileName,vector<int> &vec){
+int readIntVectorFromFile(std::string fileName,stdIntVec& vec){
   // Open File
   ifstream myReadFile;
   string buffer;
@@ -962,7 +948,7 @@ int readIntVectorFromFile(std::string fileName,vector<int> &vec){
   return 0;
 }
 
-bool isParamPositive(int curr_par, stdVec limits){
+bool isParamPositive(int curr_par, const stdVec& limits){
   double limitMin = limits[curr_par*2 + 0];
   double limitMax = limits[curr_par*2 + 1];
   if((limitMin>=0.0)&&(limitMax>=0.0)){
@@ -972,7 +958,7 @@ bool isParamPositive(int curr_par, stdVec limits){
   }
 }
 
-bool isParamNegative(int curr_par, stdVec limits){
+bool isParamNegative(int curr_par, const stdVec& limits){
   double limitMin = limits[curr_par*2 + 0];
   double limitMax = limits[curr_par*2 + 1];
   if((limitMin<0.0)&&(limitMax<0.0)){
@@ -982,7 +968,7 @@ bool isParamNegative(int curr_par, stdVec limits){
   }
 }
 
-int readCSStringTableFromFile(std::string fileName,vector<vector<string> > &table){
+int readCSStringTableFromFile(std::string fileName,stdStringMat& table){
   // Open File
   ifstream myReadFile;
   string buffer;
@@ -1409,4 +1395,6 @@ void getAirProps(double alt,double& airTemperature,double& airPressure,double& a
   airTemperature = linInterp(table,0,1,alt);
   airPressure    = linInterp(table,0,2,alt);
   airDensity     = linInterp(table,0,3,alt);
+}
+
 }

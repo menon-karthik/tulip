@@ -46,7 +46,7 @@ void fft1DInv(int size, int gSize, double* GX, double* GY, double* fftWeights){
 }
 
 // Solve Dense Linear System Of Equations
-void solveDenseLinearSystem(int totRows, int totCols, stdMat coeffMat, stdVec currentRHS, stdVec& sol){  
+void solveDenseLinearSystem(int totRows, int totCols, stdMat coeffMat, const stdVec& currentRHS, stdVec& sol){  
   mat A(totRows,totCols);
   vec b(totRows);
   vec xVec(totCols);
@@ -86,6 +86,7 @@ void applyFourierSmoothing(int numFreq,stdVec& margY){
   for(int loopA=0;loopA<mergYFreq.size();loopA++){
     printf("Freq: %d, Ampl: %f\n",loopA,norm(mergYFreq[loopA]));
   }
+  printf("Press a key to continue...\n");
   getchar();
 
   // Filter in the Frequency Domain 
@@ -149,6 +150,15 @@ int countLinesInFile(string fileName){
   std::ifstream inFile(fileName); 
   return std::count(std::istreambuf_iterator<char>(inFile), 
          std::istreambuf_iterator<char>(), '\n');
+}
+
+
+double sumvec(int num,double vec[]){
+  double res = 0.0;
+  for(int loopA=0;loopA<num;loopA++){
+    res = res + vec[loopA];
+  }
+  return res;
 }
 
 }

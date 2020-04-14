@@ -354,7 +354,7 @@ double cmArmVenousOcclusion::evalModelError(const stdVec& inputs, stdVec& output
   }
 
   // Print Matrix To File
-  writeTableToFile("allData_B.txt",outMatrix);
+  cmUtils::writeTableToFile("allData_B.txt",outMatrix);
     
   // Return the results
   outputs.clear();

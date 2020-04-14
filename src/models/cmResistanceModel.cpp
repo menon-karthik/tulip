@@ -63,7 +63,7 @@ double cmResistanceModel::evalModelError(const stdVec& inputs,stdVec& outputs,st
   // Second Input: Current Flow Rate
   double currFlowRate = inputs[1];
   // Get Distal pressure at current time
-  double currDistPressure = linInterp(distPressure,0,1,currTime);
+  double currDistPressure = cmUtils::linInterp(distPressure,0,1,currTime);
   // Output: Pressure at current time
   double currPressure = currDistPressure + currFlowRate * resistance;
   // Write outputs

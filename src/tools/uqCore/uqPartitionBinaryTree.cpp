@@ -1,4 +1,3 @@
-
 # include "uqPartitionBinaryTree.h"
 # include "uqSamples.h"
 # include "uqException.h"

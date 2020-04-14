@@ -6,6 +6,7 @@
 # include <math.h>
 # include <fstream> 
 # include <algorithm>
+# include <boost/algorithm/string.hpp>
 
 # define ARMA_DONT_USE_CXX11
 # include <armadillo>
@@ -17,6 +18,7 @@
 # include "uqPartitionBinaryTree.h"
 # include "uqException.h"
 # include "cmUtils.h"
+# include "uqUtils.h"
 # include "sparse_grid_cc.h"
 # include "uq1DQuadratureRule.h"
 # include "uq1DQuadratureRule_CC.h"

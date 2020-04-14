@@ -115,7 +115,7 @@ int readMCMCSamplesFromFile(double burnInPercent,std::string fileName,std::vecto
       if(!buffer.empty()){
         lineCount++;
         //printf("Buffer: %s \n",buffer.c_str());
-        schSplit(buffer,tokens," ");      
+        cmUtils::schSplit(buffer,tokens," ");      
         currParams.clear();
         for(int loopA=0;loopA<tokens.size();loopA++){
           try{
@@ -150,7 +150,7 @@ int readMCMCSamplesFromFile(double burnInPercent,std::string fileName,std::vecto
 // =========================================
 // WRITE PARAMETER STATISTICS TO LATEX TABLE
 // =========================================
-void acActionDREAM::writeStatisticsToLatexTable(int par_num,vector<vector<double> > &modelStats){
+void acActionDREAM::writeStatisticsToLatexTable(int par_num,stdMat& modelStats){
   FILE *f;
   string paramName;
   f = fopen("priorTable.txt", "w");

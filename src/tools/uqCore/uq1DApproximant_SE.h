@@ -3,6 +3,7 @@
 
 # include "uq1DApproximant.h"
 # include "uqMWBasis.h"
+# include <boost/algorithm/string.hpp>
 
 // APPROXIMANT ON A SINGLE ELEMENT
 class uq1DApproximant_SE: public uq1DApproximant{
