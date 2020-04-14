@@ -23,8 +23,6 @@
 # include <mpi.h>
 
 # include "acAction.h"
-# include "pdflib.h"
-# include "rnglib.h"
 # include "cmUtils.h"
 # include "uqUtils.h"
 

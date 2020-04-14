@@ -7,7 +7,6 @@
 # include <iomanip>
 # include "acAction.h"
 # include "cmModel.h"
-# include "rnglib.h"
 # include "cmUtils.h"
 
 // GENERIC CLASS FOR SAMPLES

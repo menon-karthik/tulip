@@ -11,8 +11,6 @@
 # define ARMA_DONT_USE_CXX11
 # include <armadillo>
 # include "sobol.h"   //This is new [Sean 12/2018].
-# include "pdflib.h"
-# include "rnglib.h"
 # include "uqTypes.h"
 # include "uqConstants.h"
 # include "uqPartitionBinaryTree.h"

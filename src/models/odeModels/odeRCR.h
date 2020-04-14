@@ -12,11 +12,6 @@
 # include "cmUtils.h"
 # include "cmException.h"
 
-// Constants for Result Quantities
-const int ip_min_P_0 = 0;
-const int ip_max_P_0 = 1;
-const int ip_av_P_0  = 2;
-
 // GENERIC CLASS FOR SAMPLES
 class odeRCR: public odeModel{
   public:
