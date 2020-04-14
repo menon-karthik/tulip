@@ -1,5 +1,5 @@
-#ifndef odeRCR_H
-#define odeRCR_H
+#ifndef odeRC_H
+#define odeRC_H
 
 # include <stdio.h>
 # include <string>
@@ -12,20 +12,15 @@
 # include "cmUtils.h"
 # include "cmException.h"
 
-// Constants for Result Quantities
-const int ip_min_P_0 = 0;
-const int ip_max_P_0 = 1;
-const int ip_av_P_0  = 2;
-
 // GENERIC CLASS FOR SAMPLES
-class odeRCR: public odeModel{
+class odeRC: public odeModel{
   public:
     
     // CONSTRUCTOR
-    odeRCR();
+    odeRC();
 
     // DESTRUCTOR
-    virtual ~odeRCR();
+    virtual ~odeRC();
 
     // VIRTUAL FUNCTIONS TO IMPLEMENT
     virtual int    getParameterTotal();
@@ -43,4 +38,4 @@ class odeRCR: public odeModel{
     virtual int    getHRIndex();
 };
 
-#endif // odeRCR_H
+#endif // odeRC_H

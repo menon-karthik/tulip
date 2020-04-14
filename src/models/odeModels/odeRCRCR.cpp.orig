@@ -74,7 +74,28 @@ void odeRCRCR::getDefaultParameterLimits(stdVec& limits){
   limits[16] = 60/1.09;                 limits[17] = 60/1.09; // HR
 }
 
+<<<<<<< HEAD
+// =====================
+// SOLVE SINGLE ODE STEP
+// =====================
+void odeRCRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMat& fn, stdVec& DXk, stdVec& auxOut, stdVec& Ind){
+  // INITIALIZE VARIABLES
+  // STORE LOCAL COPIES OF PARAMETERS
+  double Rtot = params[0];
+  double tau = params[1];
+  double C1C2ratio = params[2];
+  double R1R2ratio = params[3];
+  double R3R2ratio = params[4];
+
+  double HR = params[7];
+  double tc = (60.0/(double)HR);
+
+  // GET FLOW
+  double QAo = cmUtils::linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
+  double Qven = 0.0;
+=======
 void odeRCRCR::getDefaultParams(stdVec& params){ // Question: what do I set these to initially? A: assigned to mean of range
+>>>>>>> bbvi
 
   // Resize Parameter Array
   params.resize(getParameterTotal());
@@ -141,11 +162,40 @@ void odeRCRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int tot
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[2][loopA];
   }
-  double minP_0Press = cmUtils::getMin(startLastCycle, stopLastCycle, output);
-  double maxP_0Press = cmUtils::getMax(startLastCycle, stopLastCycle, output);          
-  double avP_0Press  = cmUtils::trapz(startLastCycle, stopLastCycle, output)/(double)cycleTime;
+  double minP_0Press = getMin(startLastCycle, stopLastCycle, output);
+  double maxP_0Press = getMax(startLastCycle, stopLastCycle, output);
+  double avP_0Press  = getMean(startLastCycle, stopLastCycle, output);
 
+<<<<<<< HEAD
+  // GET AVERAGE VALUES
+  double mP0 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P0)/(double)cycleTime;
+  double mP1 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P1)/(double)cycleTime;
+  double mP2 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P2)/(double)cycleTime;
+  double mP3 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,P3)/(double)cycleTime;
+  double mQ1 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q1)/(double)cycleTime;
+  double mQ2 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q2)/(double)cycleTime;
+  double mQ3 = cmUtils::trapz(0,totalStepsOnSingleCycle,t,Q3)/(double)cycleTime;
+
+  // GET MAXIMUM AND MINIMUM VALUES
+  double minP0 = cmUtils::getMin(0,totalStepsOnSingleCycle,P0);
+  double maxP0 = cmUtils::getMax(0,totalStepsOnSingleCycle,P0);
+  double minP1 = cmUtils::getMin(0,totalStepsOnSingleCycle,P1);
+  double maxP1 = cmUtils::getMax(0,totalStepsOnSingleCycle,P1);
+  double minP2 = cmUtils::getMin(0,totalStepsOnSingleCycle,P2);
+  double maxP2 = cmUtils::getMax(0,totalStepsOnSingleCycle,P2);
+  double minP3 = cmUtils::getMin(0,totalStepsOnSingleCycle,P3);
+  double maxP3 = cmUtils::getMax(0,totalStepsOnSingleCycle,P3);
+  double minQ1 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q1);
+  double maxQ1 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q1);
+  double minQ2 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q2);
+  double maxQ2 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q2);
+  double minQ3 = cmUtils::getMin(0,totalStepsOnSingleCycle,Q3);
+  double maxQ3 = cmUtils::getMax(0,totalStepsOnSingleCycle,Q3);
+
+  // COPY FINAL RESULTS
+=======
   // Assign Results Based on Model Version
+>>>>>>> bbvi
   results.clear();
   // P_0 PRESSURE
   results.push_back(minP_0Press);
