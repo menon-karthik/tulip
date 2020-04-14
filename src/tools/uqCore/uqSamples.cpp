@@ -492,7 +492,6 @@ void uqSamples::generatePseudoRandomSamples(int numSamples, int seed){
   weights.clear();
 }
 
-
 // Prime Number Generator from table
 int getPrimeInteger(int n){
 
