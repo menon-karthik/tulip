@@ -10,7 +10,7 @@
 
 # define ARMA_DONT_USE_CXX11
 # include <armadillo>
-
+# include "sobol.h"   //This is new [Sean 12/2018].
 # include "pdflib.h"
 # include "rnglib.h"
 # include "uqTypes.h"
@@ -216,6 +216,8 @@ class uqSamples{
     // GENERATE SAMPLES ACCORDING TO VARIABLE INFORMATION
     // Generate Random Samples
     void generateRandomSamples(int numSamples, int seed = 0);
+    // Generate Random Samples with Sobol sampling
+    void generatePseudoRandomSamples(int numSamples, int seed = 0);
     // Generate Samples on a sparse Grid
     void generateSparseGrid(int gridOrder);
     // Generate a Cartesian Grid 

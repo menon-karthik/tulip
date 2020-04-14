@@ -451,6 +451,48 @@ void uqSamples::generateRandomSamples(int numSamples, int seed){
   weights.clear();
 }
 
+
+// ========================================================
+// GENERATE PSEUDO-RANDOM SAMPLES FROM VARIABLE INFORMATION
+// ========================================================
+void uqSamples::generatePseudoRandomSamples(int numSamples, int seed){
+  // Clear available samples
+  values.clear();
+  stdVec storeVec;
+  double storeArry[rvs.size()];
+  double currValue = 0.0;
+  // If required Init Library
+  if(seed > 0){
+    set_seed(seed,seed + 100);
+  }
+
+  long long int longseed = (long long int) seed; 
+
+  // Loop through the new samples
+  // For each sample, generate a new sobol vector. 
+  for(int loopA=0;loopA<numSamples;loopA++){
+    storeVec.clear();
+    i8_sobol(rvs.size(), &longseed, storeArry);  //Generates array of sobol samples on [0,1]^dim
+    // Loop through the variable types.
+    for(int loopB=0;loopB<rvs.size();loopB++){
+      switch(rvs[loopB].type){
+        case kSAMPLEUniform:
+          currValue = sobol_uniform(storeArry[loopB],rvs[loopB].parameter1,rvs[loopB].parameter2);
+          break;
+      }
+      storeVec.push_back(currValue);
+    }
+    // Add to existing samples
+    values.push_back(storeVec);
+  }
+  // Assign Samples and number of dimensions
+  totSamples = numSamples;
+  totDims = rvs.size();
+  // Reset Integration Weights: They are only for grids
+  weights.clear();
+}
+
+
 // Prime Number Generator from table
 int getPrimeInteger(int n){
 
