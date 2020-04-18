@@ -161,4 +161,14 @@ double sumvec(int num,double vec[]){
   return res;
 }
 
+void printTimestamp(){
+  static char time_buffer[40];
+  const struct tm *tm;
+  time_t now;
+  now = time(NULL);
+  tm = localtime(&now);
+  strftime ( time_buffer, 40, "%d %B %Y %I:%M:%S %p", tm );
+  cout << time_buffer << "\n";
+}
+
 }

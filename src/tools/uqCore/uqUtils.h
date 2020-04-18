@@ -3,10 +3,8 @@
 
 # define ARMA_DONT_USE_CXX11
 # include <armadillo>
+# include <chrono> 
 
-# include "uqSamples.h"
-# include "uqMWMatrix.h"
-# include "uqConstants.h"
 # include "uqException.h"
 # include "uqTypes.h"
 
@@ -99,6 +97,7 @@ namespace uqUtils{
 
   // Basic utilities
   double sumvec(int num,double vec[]);
+  void printTimestamp();
 
 }
 

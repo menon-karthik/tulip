@@ -12,15 +12,20 @@ class uqPDF{
   public:
     // Random number generator
     mt19937_64 mt;
+    unsigned long long int seed;
 
-    uqPDF(int seed = 0);
+    // Constructor and distructor
+    uqPDF(int seed = mt19937_64::default_seed);
     virtual ~uqPDF();
+    
     // Multiple realizations
-    stdVec evaluate(const stdVec& XVals);
-    stdVec sample(int num_samples);
+    stdVec evaluate(double par1, double par2, const stdVec& XVals);
+    stdVec sample(double par1, double par2, int num_samples);
+    unsigned long long int getSeed();
+    
     // Virtual Member Functions
-    virtual double evaluate(double XValue) = 0;
-    virtual double sample() = 0;
+    virtual double evaluate(double par1, double par2, double XValue) = 0;
+    virtual double sample(double par1, double par2) = 0;
 };
 
 // Gaussian PDF
@@ -28,15 +33,14 @@ class uqGaussianPDF: public uqPDF{
   public:
     // Distribution object
     normal_distribution<double>* dist;
-    // Parameters: TEMP
-    double mean;
-    double stdev; 
+
     // Constructor and Destructor
-    uqGaussianPDF(double mean, double stdev, int seed=0);
+    uqGaussianPDF(int seed=mt19937_64::default_seed);
     virtual ~uqGaussianPDF();
+
     // Member Functions
-    virtual double evaluate(double XValue);
-    virtual double sample();
+    virtual double evaluate(double par1, double par2, double XValue);
+    virtual double sample(double par1, double par2);
 };
 
 // Uniform PDF
@@ -44,15 +48,14 @@ class uqUniformPDF: public uqPDF{
   public:
     // Distribution object
     uniform_real_distribution<double>* dist;
-    // Parameters: TEMP
-    double a;
-    double b; 
+
     // Constructor and Destructor
-    uqUniformPDF(double a, double b, int seed=0);
+    uqUniformPDF(int seed=mt19937_64::default_seed);
     virtual ~uqUniformPDF();
+
     // Member Functions
-    virtual double evaluate(double XValue);
-    virtual double sample();
+    virtual double evaluate(double par1, double par2, double XValue);
+    virtual double sample(double par1, double par2);
 };
 
 
@@ -61,12 +64,14 @@ class uqTruncatedGaussianPDF: public uqGaussianPDF{
   public:
     // Parameters: TEMP
     double truncSigma;
+
     // Constructor and Destructor
     uqTruncatedGaussianPDF(double mean, double stdev, double trunc);
     virtual ~uqTruncatedGaussianPDF();
+
     // Member Functions
-    virtual double evaluate(double XValue);
-    virtual double sample();
+    virtual double evaluate(double par1, double par2, double XValue);
+    virtual double sample(double par1, double par2);
 };
 
 // Rescaled Truncated Gaussian PDF
@@ -74,12 +79,14 @@ class uqRescaledTruncatedGaussianPDF: public uqTruncatedGaussianPDF{
 public:
     // Data Members: TEMP
     double truncFactor;
+
     // Constructor and Destructor
     uqRescaledTruncatedGaussianPDF(double truncFactor);
     virtual ~uqRescaledTruncatedGaussianPDF();
+
     // Member Functions
-    virtual double evaluate(double XValue);
-    virtual double sample();
+    virtual double evaluate(double par1, double par2, double XValue);
+    virtual double sample(double par1, double par2);
 };
 
 #endif // UQPDF_H

@@ -411,7 +411,7 @@ void acActionOPT_RSSD::LPN_OPT_RSSD(){
 // =====================
 int acActionOPT_RSSD::go(){
 
-  timestamp ( );
+  uqUtils::printTimestamp();
   cout << "\n";
   cout << "OPT_NM:\n";
 
@@ -437,7 +437,7 @@ int acActionOPT_RSSD::go(){
   cout << "RSSD:\n";
   cout << "  Normal end of execution.\n";
   cout << "\n";
-  timestamp ( );
+  uqUtils::printTimestamp();
 
   return 0;
 }

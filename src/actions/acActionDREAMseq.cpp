@@ -429,10 +429,10 @@ void acActionDREAMseq::dream_algm_seq(int chain_num, int cr_num, double fit[], i
 
       zp_ratio = exp((zp_fit+log(pd1))-(zp_old_fit+log(pd2)));
 
-      zp_ratio = r8_min(zp_ratio, 1.0);
+      zp_ratio = min(zp_ratio, 1.0);
 
       //  Accept the candidate, or copy the value from the previous generation.
-      r = r8_uniform_01_sample();
+      r = uSampler->sample(0.0,1.0);
 
       if(r <= zp_ratio){
         for(i = 0; i < par_num; i++){
@@ -814,12 +814,20 @@ int acActionDREAMseq::go()
   stdVec prAv;
   stdVec prSd;
 
-  timestamp ( );
+  uqUtils::printTimestamp();
+
+  // Allocate Samplers
+  uSampler = new uqUniformPDF();
+  nSampler = new uqGaussianPDF();
 
   cout << "\n";
   cout << "DREAM\n";
   cout << "  C++ version\n";
   cout << "  MCMC acceleration by Differential Evolution.\n";
+  cout << "\n";
+  // Print sampler seeds
+  cout << "Uniform Sampler Seed: " << uSampler->getSeed() << endl;
+  cout << "Normal Sampler Seed: " << nSampler->getSeed() << endl;
 
   // Get the problem sizes.
   problem_size ( chain_num, cr_num, gen_num, pair_num, par_num );
@@ -970,6 +978,8 @@ int acActionDREAMseq::go()
   delete [] z;
   // Free Prior Params
   delete [] prPtr;
+  // Free random samplers
+  delete uSampler;
 //
 //  Terminate.
 //
@@ -977,7 +987,7 @@ int acActionDREAMseq::go()
   cout << "DREAM\n";
   cout << "  Normal end of execution.\n";
   cout << "\n";
-  timestamp ( );
+  uqUtils::printTimestamp();
 
   return 0;
 }

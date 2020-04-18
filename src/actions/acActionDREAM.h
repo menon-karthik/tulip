@@ -23,6 +23,7 @@
 # include <mpi.h>
 
 # include "acAction.h"
+# include "uqPDF.h"
 # include "cmUtils.h"
 # include "uqUtils.h"
 
@@ -61,6 +62,10 @@ class acActionDREAM: public acAction{
     bool usePriorFromFile;
     string priorFileName;
     int priorModelType;
+
+    // Uniform and Gaussian Random Sampler
+    uqUniformPDF*  uSampler;
+    uqGaussianPDF* nSampler;
     
     // Protected Functions
     void std_compute_ini (int chain_num, int gen_index, int gen_num, int par_num, 

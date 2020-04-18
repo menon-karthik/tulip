@@ -768,7 +768,7 @@ void acActionOPT_NM::setMessagesPrinting(bool flag){
 int acActionOPT_NM::go(){
 
   if(doPrintMessages){
-    timestamp ( );
+    uqUtils::printTimestamp();
     cout << "\n";
     cout << "OPT_NM:\n";
   }
@@ -792,7 +792,7 @@ int acActionOPT_NM::go(){
     cout << "OPT_NM:\n";
     cout << "  Normal end of execution.\n";
     cout << "\n";
-    timestamp ( );
+    uqUtils::printTimestamp();
   }
   
   return 0;
