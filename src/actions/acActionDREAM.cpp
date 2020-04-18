@@ -537,7 +537,7 @@ double* acActionDREAM::sample_candidate (int chain_index, int chain_num, double 
   return zp;
 }
 
-int acActionDREAM::cr_index_choose ( int cr_num, double cr_prob[] )
+int acActionDREAM::cr_index_choose (int cr_num, double cr_prob[])
 //
 //  Purpose:
 //
@@ -576,18 +576,16 @@ int acActionDREAM::cr_index_choose ( int cr_num, double cr_prob[] )
   int n;
   int *tmp_index;
 
-  if ( cr_num == 1 )
-  {
+  if (cr_num == 1){
+  
     cr_index = 0;
-  }
-  else
-  { 
+  
+  }else{ 
+  
     n = 1;
-    tmp_index = i4vec_multinomial_sample ( n, cr_prob, cr_num );
-    for ( i = 0; i < cr_num; i++ )
-    {
-      if ( tmp_index[i] == 1 )
-      {
+    tmp_index = i4vec_multinomial_sample(n, cr_prob, cr_num);
+    for(i = 0; i < cr_num; i++){
+      if(tmp_index[i] == 1){
         cr_index = i;
         break;
       }
