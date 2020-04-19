@@ -11,6 +11,7 @@
 # define ARMA_DONT_USE_CXX11
 # include <armadillo>
 # include "sobol.h"   //This is new [Sean 12/2018].
+# include "uqPDF.h"
 # include "uqTypes.h"
 # include "uqConstants.h"
 # include "uqPartitionBinaryTree.h"
@@ -88,6 +89,10 @@ class uqSamples{
     // Careful: Index from 0 to maxOrder included !!!
     stdMat weights;    
 
+    // Random Number generators
+    uqUniformPDF* uSampler;
+    uqGaussianPDF* nSampler;
+
   public:
     // Record of Random Variables
     bool areIndependent;
@@ -96,6 +101,7 @@ class uqSamples{
     stdMat corrCholFactor;
     
     // CONSTRUCTOR AND DISTRUCTOR
+    // Should be able to set a seed in the empty constructor !!!
     uqSamples();
     uqSamples(int dimNum);
     uqSamples(stdVec onePoint);

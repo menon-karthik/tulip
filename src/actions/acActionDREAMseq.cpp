@@ -819,6 +819,7 @@ int acActionDREAMseq::go()
   // Allocate Samplers
   uSampler = new uqUniformPDF();
   nSampler = new uqGaussianPDF();
+  catSampler = new uqCategoricalPMF();
 
   cout << "\n";
   cout << "DREAM\n";
@@ -828,6 +829,7 @@ int acActionDREAMseq::go()
   // Print sampler seeds
   cout << "Uniform Sampler Seed: " << uSampler->getSeed() << endl;
   cout << "Normal Sampler Seed: " << nSampler->getSeed() << endl;
+  cout << "Categorical Sampler Seed: " << catSampler->getSeed() << endl;
 
   // Get the problem sizes.
   problem_size ( chain_num, cr_num, gen_num, pair_num, par_num );

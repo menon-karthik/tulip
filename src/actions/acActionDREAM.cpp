@@ -582,17 +582,13 @@ int acActionDREAM::cr_index_choose (int cr_num, double cr_prob[])
   
   }else{ 
   
-    n = 1;
-    tmp_index = i4vec_multinomial_sample(n, cr_prob, cr_num);
-    for(i = 0; i < cr_num; i++){
-      if(tmp_index[i] == 1){
-        cr_index = i;
-        break;
-      }
+    // Need to test!!!!!
+    stdVec pmf;
+    for(int loopA=0;loopA<cr_num;loopA++){
+      pmf.push_back(cr_prob[loopA]);
     }
-    delete [] tmp_index;
+    return catSampler->sample(pmf);
   }
-  return cr_index;
 }
 
 void acActionDREAM::cr_init (double cr[], double cr_dis[], 

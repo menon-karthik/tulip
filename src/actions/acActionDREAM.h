@@ -66,6 +66,7 @@ class acActionDREAM: public acAction{
     // Uniform and Gaussian Random Sampler
     uqUniformPDF*  uSampler;
     uqGaussianPDF* nSampler;
+    uqCategoricalPMF* catSampler;
     
     // Protected Functions
     void std_compute_ini (int chain_num, int gen_index, int gen_num, int par_num, 

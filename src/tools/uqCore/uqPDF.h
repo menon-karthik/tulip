@@ -58,6 +58,21 @@ class uqUniformPDF: public uqPDF{
     virtual double sample(double par1, double par2);
 };
 
+// Categorical PMF
+class uqCategoricalPMF{
+  public:
+    // Distribution object
+    uqUniformPDF* uSampler;
+
+    // Constructor and Destructor
+    uqCategoricalPMF(int seed=mt19937_64::default_seed);
+    virtual ~uqCategoricalPMF();
+
+    // Member Functions
+    double evaluate(int xVal, const stdVec& pmf);
+    int sample(const stdVec& pmf);
+    unsigned long long int getSeed();
+};
 
 // Truncated Gaussian PDF
 class uqTruncatedGaussianPDF: public uqGaussianPDF{
@@ -66,7 +81,7 @@ class uqTruncatedGaussianPDF: public uqGaussianPDF{
     double truncSigma;
 
     // Constructor and Destructor
-    uqTruncatedGaussianPDF(double mean, double stdev, double trunc);
+    uqTruncatedGaussianPDF(double trunc, int seed=mt19937_64::default_seed);
     virtual ~uqTruncatedGaussianPDF();
 
     // Member Functions
@@ -81,7 +96,7 @@ public:
     double truncFactor;
 
     // Constructor and Destructor
-    uqRescaledTruncatedGaussianPDF(double truncFactor);
+    uqRescaledTruncatedGaussianPDF(double truncFactor, int seed=mt19937_64::default_seed);
     virtual ~uqRescaledTruncatedGaussianPDF();
 
     // Member Functions

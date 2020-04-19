@@ -1021,9 +1021,11 @@ int acActionDREAMmpi::go(){
   // Allocate Samplers
   uSampler = new uqUniformPDF(5*globRank+1);
   nSampler = new uqGaussianPDF(5*globRank+1);
+  catSampler = new uqCategoricalPMF(5*globRank+1);
   // Print sampler seeds
   cout << "Uniform Sampler Seed for processor " + to_string(globRank) + ": " << uSampler->getSeed() << endl;
   cout << "Normal Sampler Seed for processor " + to_string(globRank) + ": " << nSampler->getSeed() << endl;
+  cout << "Normal Sampler Seed for processor " + to_string(globRank) + ": " << catSampler->getSeed() << endl;
 
   // Get Info from global and local numbering
   int rank_sm = 0;
