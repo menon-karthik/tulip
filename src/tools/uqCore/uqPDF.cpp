@@ -30,11 +30,30 @@ bool checkNormalized(const stdVec& pmf){
     sum += pmf[loopA];
   }
   if(fabs(sum - 1.0) > 1.0e-8){
+    printf("Sequence: ");
+    for(size_t loopA=0;loopA<pmf.size();loopA++){
+      printf("%f ",pmf[loopA]);
+    }
+    printf("\n");
+    printf("Sum: %f\n",sum);
     return false;
   }else{
     return true;
   }
 }
+
+stdVec normalizePMF(const stdVec& pmf){
+  stdVec res;
+  double sum = 0.0;
+  for(size_t loopA=0;loopA<pmf.size();loopA++){
+    sum += pmf[loopA];
+  }
+  for(size_t loopA=0;loopA<pmf.size();loopA++){
+    res.push_back(pmf[loopA]/sum);
+  }
+  return res;
+}
+
 
 uqPDF::uqPDF(int seed){
   // Init random number generator with seed if available
@@ -181,30 +200,26 @@ uqCategoricalPMF::~uqCategoricalPMF(){
 
 // Here xVal is zero-based
 double uqCategoricalPMF::evaluate(int xVal, const stdVec& pmf){
-  if(!checkNormalized(pmf)){
-    throw uqException("ERROR: pmf not normalized.");
-  }
+  stdVec norm_pmf = normalizePMF(pmf);
   if((xVal >= 0)&&(xVal < pmf.size())){
-    return pmf[xVal];
+    return norm_pmf[xVal];
   }else{
     throw uqException("ERROR: invalid x value in uqCategoricalPMF::evaluate.");
   }
 }
 int uqCategoricalPMF::sample(const stdVec& pmf){
-  if(!checkNormalized(pmf)){
-    throw uqException("ERROR: pmf not normalized.");
-  }    
+  stdVec norm_pmf = normalizePMF(pmf);
   // Generate Random uniform number
   double uVal = uSampler->sample(0.0,1.0);
-  if(uVal < pmf[0]){
+  if(uVal < norm_pmf[0]){
     return 0;
   }
   int i = 1;
-  double cumPMF = pmf[0];
+  double cumPMF = norm_pmf[0];
   bool found = false;
-  while((!found)&&(i < pmf.size())){
-    found = (uVal > cumPMF)&&(uVal <= cumPMF + pmf[i]);
-    cumPMF += pmf[i];
+  while((!found)&&(i < norm_pmf.size())){
+    found = (uVal > cumPMF)&&(uVal <= cumPMF + norm_pmf[i]);
+    cumPMF += norm_pmf[i];
     if(!found){
       i++;  
     }
