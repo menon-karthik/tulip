@@ -5,7 +5,6 @@
 #include "cmModel.h"
 #include "cmConstants.h"
 #include "cmException.h"
-#include "cmUtils.h"
 #include "cmTutorial.h"
 #include "cmSobolFunction.h"
 #include "cmAnalyticalExpressionModel.h"
@@ -34,6 +33,7 @@
 #include "odeRCR.h"
 #include "odeRCRCR.h"
 #include "uqTypes.h"
+#include "cmUtils.h"
 %}
 
 %exception{
@@ -63,7 +63,6 @@
 %include "cmModel.h"
 %include "cmConstants.h"
 %include "cmException.h"
-%include "cmUtils.h"
 %include "cmTutorial.h"
 %include "cmSobolFunction.h"
 %include "cmAnalyticalExpressionModel.h"
@@ -92,6 +91,7 @@
 %include "odeRCR.h"
 %include "odeRCRCR.h"
 %include "uqTypes.h"
+%include "cmUtils.h"
 
 namespace std {
   typedef std::string String;

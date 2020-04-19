@@ -25,6 +25,9 @@ acActionDREAMseq::acActionDREAMseq(int totChains,
                  locDreamRestartWriteFileName,usePriorFromFile,priorFileName,priorModelType){
 }
 
+acActionDREAMseq::~acActionDREAMseq(){
+}
+
 void acActionDREAMseq::chain_init (int chain_num, double fit[], int gen_num, int par_num, 
                                    double z[], int prior_num, int* prPtr, 
                                    stdVec prAv, stdVec prSd)
@@ -820,6 +823,7 @@ int acActionDREAMseq::go()
   cout << "DREAM\n";
   cout << "  C++ version\n";
   cout << "  MCMC acceleration by Differential Evolution.\n";
+  cout << "  Sequential Algorithm.\n";
 
   // Get the problem sizes.
   problem_size ( chain_num, cr_num, gen_num, pair_num, par_num );

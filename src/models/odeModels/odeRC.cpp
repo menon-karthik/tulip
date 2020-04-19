@@ -82,7 +82,7 @@ void odeRC::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdMa
   double P_1 = Xk[0];
 
   // Compute other variables
-  double Q_1    = linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
+  double Q_1    = cmUtils::linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
   double Q_2    = (P_1 - P_D)/ R;
   double V_P1_t = (Q_1 - Q_2) / (double)C;
   
@@ -111,9 +111,9 @@ void odeRC::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalS
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = outVals[0][loopA];
   }
-  double minP_0Press = getMin(startLastCycle, stopLastCycle, output);
-  double maxP_0Press = getMax(startLastCycle, stopLastCycle, output);
-  double avP_0Press  = getMean(startLastCycle, stopLastCycle, output);
+  double minP_0Press = cmUtils::getMin(startLastCycle, stopLastCycle, output);
+  double maxP_0Press = cmUtils::getMax(startLastCycle, stopLastCycle, output);
+  double avP_0Press  = cmUtils::getMean(startLastCycle, stopLastCycle, output);
 
   // Assign Results Based on Model Version
   results.clear();

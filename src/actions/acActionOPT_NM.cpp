@@ -611,7 +611,7 @@ void acActionOPT_NM::setInitialParamGuess(bool localUseStartingParameterFromFile
       printf("\n");
       printf(" READING PARAMETERS FROM FILE: %s\n",initialPointFile.c_str());
     }
-    int error = cmUtils::ReadParamsFromFile(initialPointFile,optParams);
+    int error = cmUtils::readParamsFromFile(initialPointFile,optParams);
     if(error != 0){
       exit(1);
     }

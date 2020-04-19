@@ -106,7 +106,7 @@ void odeRCRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const st
   double P_2 = Xk[1];
 
   // Compute other variables
-  double Q_1    = linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
+  double Q_1    = cmUtils::linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
   double Q_2    = (P_1 - P_2)/ R_2;
   double Q_3    = (P_2 - P_D)/ R_3;
   double P_0    = P_1 + R_1*Q_1;
@@ -130,20 +130,23 @@ void odeRCRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const st
 void odeRCRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params,const stdMat& outVals,const stdMat& auxOutVals, stdVec& results){
 
   // DETERMINE START AND END OF LAST HEART CYCLE
-  double heartRate = 60.0/(totalStepsOnSingleCycle * timeStep);
+  double cycleTime = totalStepsOnSingleCycle * timeStep;
+  double heartRate = 60.0/cycleTime;
   int numCycles = totalSteps/totalStepsOnSingleCycle;
   int startLastCycle = (numCycles-1) * totalStepsOnSingleCycle;
   int stopLastCycle = numCycles * totalStepsOnSingleCycle;
   double output[totalSteps];
   double valveOpening[totalSteps];
+  double time[totalSteps];
 
   // P_0 PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[2][loopA];
+    time[totalSteps] = auxOutVals[0][loopA];
   }
   double minP_0Press = cmUtils::getMin(startLastCycle, stopLastCycle, output);
   double maxP_0Press = cmUtils::getMax(startLastCycle, stopLastCycle, output);          
-  double avP_0Press  = cmUtils::trapz(startLastCycle, stopLastCycle, output)/(double)cycleTime;
+  double avP_0Press  = cmUtils::trapz(startLastCycle, stopLastCycle, time, output)/(double)cycleTime;
 
   // Assign Results Based on Model Version
   results.clear();

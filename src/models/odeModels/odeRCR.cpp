@@ -88,7 +88,7 @@ void odeRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdM
   double P_1 = Xk[0];
 
   // Compute other variables
-  double Q_1    = linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
+  double Q_1    = cmUtils::linInterp(fn , 0, 1, fmod(t,fn[fn.size()-1][0]) );
   double P_0    = P_1 + R_1*Q_1;
   double Q_2    = (P_1 - P_D)/ R_2; // Q2 = delta(P) = P1 - P2, since P2 < P1 (P2 = P_D)
   double V_P1_t = (Q_1 - Q_2) / (double)C;

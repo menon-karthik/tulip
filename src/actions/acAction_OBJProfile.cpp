@@ -76,7 +76,7 @@ int acAction_OBJProfile::OBJ_Profile(){
   	// Read Parameters From File
   	printf("\n");
   	printf(" READING PARAMETERS FROM FILE: %s\n",initialPointFile.c_str());
-  	int error = cmUtils::ReadParamsFromFile(initialPointFile,start);
+  	int error = cmUtils::readParamsFromFile(initialPointFile,start);
     if(error != 0){
       exit(1);
     }
