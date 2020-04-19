@@ -25,6 +25,10 @@ acActionDREAMseq::acActionDREAMseq(int totChains,
                  locDreamRestartWriteFileName,usePriorFromFile,priorFileName,priorModelType){
 }
 
+acActionDREAMseq::~acActionDREAMseq(){
+
+}
+
 void acActionDREAMseq::chain_init (int chain_num, double fit[], int gen_num, int par_num, 
                                    double z[], int prior_num, int* prPtr, 
                                    stdVec prAv, stdVec prSd)

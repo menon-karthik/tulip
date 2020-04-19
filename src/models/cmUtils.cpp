@@ -1,9 +1,8 @@
 # include "cmUtils.h"
 
 using namespace std;
-
 namespace cmUtils{
-
+  
 double getMax(int start, int stop, const double* vector){
   double maxVal = -std::numeric_limits<double>::max();
   double currValue = 0.0;
@@ -42,6 +41,7 @@ double getMean(int start, int stop, const double* vector){
   }
   return result/(double)(stop - start);
 }
+
 double getMean(int start, int stop, const stdVec& vector){
   return getMean(start, stop, &vector[0]); //(double*)vector.data() changes vector from stdVec to double*
 }
@@ -88,7 +88,7 @@ double trapz(int start, int stop, const stdVec& xVals, const stdVec& yVals){
   return result;
 }
 
-void schSplit(string sentence,vector<string> &tokens,const char* separator){
+void schSplit(string sentence,stdStringVec& tokens,const char* separator){
   char* pch;
   tokens.clear();
   boost::algorithm::trim(sentence);
@@ -99,7 +99,23 @@ void schSplit(string sentence,vector<string> &tokens,const char* separator){
   }
 }
 
-int ReadParamsFromFile(std:: string inputFileName,double* params){
+void applyCircShift(int shift,int size,double* Qvp){
+  double temp[size];
+  int shiftedComp = 0;
+  // Copy to temporary vector
+  for(int loopA=0;loopA<size;loopA++){
+    shiftedComp = ((loopA + shift) % (size-1));
+    temp[shiftedComp] = Qvp[loopA];
+  }
+  // Periodicity: first and last components should be exactly the same
+  temp[size-1] = temp[0];
+  // Copy Back
+  for(int loopA=0;loopA<size;loopA++){
+    Qvp[loopA] = temp[loopA];
+  }
+}
+
+int readParamsFromFile(string inputFileName,double* params){
   // Open File
   ifstream myReadFile;
   string buffer;
@@ -171,7 +187,46 @@ int readPriorFromFile(string inputFileName,int &prior_num,stdVec& prAv,stdVec& p
   return 0;
 }
 
-void WriteResultsToFile(std::string debugFileName, int totalSteps, int totalStates, double* time, double** outVals){
+int readTableFromFile(string fileName,stdMat& samples){
+  // Open File
+  ifstream myReadFile;
+  string buffer;
+  int lineCount = 0;
+  int paramCount = 0;
+  std::vector<std::string> tokens;
+  std::vector<double> currParams;
+  myReadFile.open(fileName.c_str());
+  if (myReadFile.is_open()) {
+    // Loop through the File
+    while (!myReadFile.eof()){
+      // Read One Line of Input File
+      std::getline(myReadFile,buffer);
+      if(!buffer.empty()){
+        lineCount++;
+        schSplit(buffer,tokens);      
+        currParams.clear();
+        for(int loopA=0;loopA<tokens.size();loopA++){
+          try{
+            currParams.push_back(atof(tokens[loopA].c_str()));  
+          }catch(...){
+            printf("Invalid Table File. Exiting.\n");
+            return 1;
+          }        
+        }
+        samples.push_back(currParams);
+      }
+    }
+  }else{
+    printf("Cannot Open File. Exiting.\n");
+    return 1;
+  }
+  myReadFile.close();
+
+  // Return
+  return 0;
+}
+
+void writeResultsToFile(string debugFileName, int totalSteps, int totalStates, double* time, double** outVals){
   FILE* stateFile;
   stateFile = fopen(debugFileName.c_str(),"w");
   for(int loopA=0;loopA<totalSteps;loopA++){
@@ -198,136 +253,6 @@ void printCurvesAndPeaks(string fileName,int size,double* t,double* Q,
   }
   // CLOSE THE FILE
   fclose(outFile);
-}
-
-void getHeartStage12BlocksPriorMapping(int* prPtr){
-  prPtr[0] = 0;
-  prPtr[1] = 1;
-  prPtr[2] = 2;
-  prPtr[3] = 3;
-  prPtr[4] = 4;
-  prPtr[5] = 5;
-  prPtr[6] = 6;
-  prPtr[7] = 7;
-  prPtr[8] = 8;
-  prPtr[9] = 9;
-  prPtr[10] = 10;
-  prPtr[11] = 11;
-  prPtr[12] = 12;
-  prPtr[13] = 13;
-  prPtr[14] = 14;
-  prPtr[15] = 15;
-  prPtr[16] = 16;
-  prPtr[17] = -1;
-  prPtr[18] = -1;
-  prPtr[19] = 17;
-  prPtr[20] = 32;
-  prPtr[21] = 33;
-  prPtr[22] = 34;
-  prPtr[23] = 35;
-  prPtr[24] = 36;
-}
-
-void getHeartStage13BlocksPriorMapping(int* prPtr){
-  prPtr[0] = 0;
-  prPtr[1] = 1;
-  prPtr[2] = 2;
-  prPtr[3] = 3;
-  prPtr[4] = 4;
-  prPtr[5] = 5;
-  prPtr[6] = 6;
-  prPtr[7] = 7;
-  prPtr[8] = 8;
-  prPtr[9] = 9;
-  prPtr[10] = 10;
-  prPtr[11] = 11;
-  prPtr[12] = 12;
-  prPtr[13] = 13;
-  prPtr[14] = 14;
-  prPtr[15] = 15;
-  prPtr[16] = 16;
-  prPtr[17] = -1;
-  prPtr[18] = -1;
-  prPtr[19] = 17;
-  prPtr[20] = 38;
-  prPtr[21] = 39;
-  prPtr[22] = 40;
-  prPtr[23] = 41;
-  prPtr[24] = 42;
-}
-
-void getHeartStage2PriorMapping(int* prPtr){
-  prPtr[0] = 0;
-  prPtr[1] = 1;
-  prPtr[2] = 2;
-  prPtr[3] = 3;
-  prPtr[4] = 4;
-  prPtr[5] = 5;
-  prPtr[6] = 6;
-  prPtr[7] = 7;
-  prPtr[8] = 8;
-  prPtr[9] = 9;
-  prPtr[10] = 10;
-  prPtr[11] = 11;
-  prPtr[12] = 12;
-  prPtr[13] = 13;
-  prPtr[14] = 14;
-  prPtr[15] = 15;
-  prPtr[16] = 16;
-  prPtr[17] = -1;
-  prPtr[18] = -1;
-  prPtr[19] = 17;
-  prPtr[20] = 38;
-  prPtr[21] = 39;
-  prPtr[22] = 40;
-  prPtr[23] = 41;
-  prPtr[24] = 42;
-}
-
-void getHeartINDStage12BlocksINDPriorMapping(int* prPtr){
-  prPtr[0] = 0;
-  prPtr[1] = 1;
-  prPtr[2] = 2;
-  prPtr[3] = 3;
-  prPtr[4] = 4;
-  prPtr[5] = 5;
-  prPtr[6] = 6;
-  prPtr[7] = 7;
-  prPtr[8] = 8;
-  prPtr[9] = 9;
-  prPtr[10] = 10;
-  prPtr[11] = 11;
-  prPtr[12] = 12;
-  prPtr[13] = 13;
-  prPtr[14] = 14;
-  prPtr[15] = 15;
-  prPtr[16] = 16;
-  prPtr[17] = -1;
-  prPtr[18] = -1;
-  prPtr[19] = 17;
-  prPtr[20] = 32;
-  prPtr[21] = 33;
-  prPtr[22] = 34;
-  prPtr[23] = 35;
-  prPtr[24] = 36;
-  prPtr[25] = 38;
-  prPtr[26] = 46;
-}
-
-void applyCircShift(int shift,int size,double* Qvp){
-  double temp[size];
-  int shiftedComp = 0;
-  // Copy to temporary vector
-  for(int loopA=0;loopA<size;loopA++){
-    shiftedComp = ((loopA + shift) % (size-1));
-    temp[shiftedComp] = Qvp[loopA];
-  }
-  // Periodicity: first and last components should be exactly the same
-  temp[size-1] = temp[0];
-  // Copy Back
-  for(int loopA=0;loopA<size;loopA++){
-    Qvp[loopA] = temp[loopA];
-  }
 }
 
 /*
@@ -654,46 +579,7 @@ int detect_peak(int data_count, double* t, double* data,
     return retValue;
 }
 
-int readTableFromFile(std::string fileName,stdMat& samples){
-  // Open File
-  ifstream myReadFile;
-  string buffer;
-  int lineCount = 0;
-  int paramCount = 0;
-  std::vector<std::string> tokens;
-  std::vector<double> currParams;
-  myReadFile.open(fileName.c_str());
-  if (myReadFile.is_open()) {
-    // Loop through the File
-    while (!myReadFile.eof()){
-      // Read One Line of Input File
-      std::getline(myReadFile,buffer);
-      if(!buffer.empty()){
-        lineCount++;
-        schSplit(buffer,tokens);      
-        currParams.clear();
-        for(int loopA=0;loopA<tokens.size();loopA++){
-          try{
-            currParams.push_back(atof(tokens[loopA].c_str()));  
-          }catch(...){
-            printf("Invalid Table File. Exiting.\n");
-            return 1;
-          }        
-        }
-        samples.push_back(currParams);
-      }
-    }
-  }else{
-    printf("Cannot Open File. Exiting.\n");
-    return 1;
-  }
-  myReadFile.close();
-
-  // Return
-  return 0;
-}
-
-int readIntTableFromCSVFile(std::string fileName,stdIntMat &samples){
+int readIntTableFromCSVFile(string fileName,stdIntMat &samples){
   // Open File
   ifstream myReadFile;
   string buffer;
@@ -732,7 +618,7 @@ int readIntTableFromCSVFile(std::string fileName,stdIntMat &samples){
   return 0;
 }
 
-void writeTableToFile(std::string fileName,const stdMat& table){
+void writeTableToFile(string fileName,const stdMat& table){
   FILE* stateFile;
   stateFile = fopen(fileName.c_str(),"w");
   for(int loopA=0;loopA<table.size();loopA++){
@@ -746,7 +632,7 @@ void writeTableToFile(std::string fileName,const stdMat& table){
 }
 
 // Write Vector to Text File
-void writeVectorToFile(std::string fileName,const stdVec& vec){
+void writeVectorToFile(string fileName,const stdVec& vec){
   FILE* stateFile;
   stateFile = fopen(fileName.c_str(),"w");
   for(int loopA=0;loopA<vec.size();loopA++){
@@ -757,7 +643,7 @@ void writeVectorToFile(std::string fileName,const stdVec& vec){
 }
 
 // Write Vector from text file
-int readVectorFromFile(std::string fileName,int column,stdVec& vec){
+int readVectorFromFile(string fileName,int column,stdVec& vec){
   // Read the full Matrix
   stdMat fileTable;
   int error = readTableFromFile(fileName,fileTable);
@@ -922,7 +808,7 @@ string getPolyTypeString(int polyType){
   return result;
 }
 
-int readIntVectorFromFile(std::string fileName,stdIntVec& vec){
+int readIntVectorFromFile(string fileName,stdIntVec& vec){
   // Open File
   ifstream myReadFile;
   string buffer;
@@ -968,7 +854,7 @@ bool isParamNegative(int curr_par, const stdVec& limits){
   }
 }
 
-int readCSStringTableFromFile(std::string fileName,stdStringMat& table){
+int readCSStringTableFromFile(string fileName,stdStringMat& table){
   // Open File
   ifstream myReadFile;
   string buffer;

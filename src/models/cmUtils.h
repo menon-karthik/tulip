@@ -1,5 +1,5 @@
-#ifndef LPNUTILSHPP
-#define LPNUTILSHPP
+#ifndef CMUTILS_H
+#define CMUTILS_H
 
 # include <string.h>
 # include <vector>
@@ -104,7 +104,7 @@ No Reference
 \param[in] vector The vector whose maximum value needs to be found
 return Maximum value in the array in the index interval [start,stop]
 */
-double getMax(int start, int stop, double* vector);
+double getMax(int start, int stop, const double* vector);
 double getMax(int start, int stop, const stdVec& vector); // added so that it can take vector in standard vector form
 
 /*! 
@@ -129,8 +129,9 @@ No Reference
 \param[in] vector The vector whose minimum value needs to be found
 return Minimum value in the array in the index interval [start,stop]
 */
-double getMin(int start, int stop, double* vector);
-double getMin(int start, int stop, stdVec vector); // added so that it can take vector in standard vector form
+
+double getMin(int start, int stop, const double* vector);
+double getMin(int start, int stop, const stdVec& vector); // added so that it can take vector in standard vector form
 
 
 /*! 
@@ -155,8 +156,8 @@ No Reference
 \param[in] vector The vector whose average value needs to be found
 return Average value in the array in the index interval [start,stop]
 */
-double getMean(int start, int stop, double* vector);
-double getMean(int start, int stop, stdVec vector);
+double getMean(int start, int stop, const double* vector);
+double getMean(int start, int stop, const stdVec& vector);
 
 /*! 
 \verbatim embed:rst
@@ -180,8 +181,8 @@ No Reference
 \param[in] vector The vector whose summation needs to be found
 return Sum of array components in the index interval [start,stop]
 */
-double getSum(int start, int stop, double* vector);
-double getSum(int start, int stop, stdVec vector);
+double getSum(int start, int stop, const double* vector);
+double getSum(int start, int stop, const stdVec& vector);
 
 /*! 
 \verbatim embed:rst
@@ -205,7 +206,7 @@ No Reference
 \param[in] vector The vector whose summation needs to be found
 return The index of the maximum component in the array
 */
-int getMaxLoc(int start, int stop, double* vector);
+int getMaxLoc(int start, int stop, const double* vector);
 
 /*! 
 \verbatim embed:rst
@@ -250,7 +251,7 @@ No Reference
 \param[in] sentence The space-separated string to split
 \param[out] tokens the resultant string vector
 */
-void schSplit(string sentence,vector<string> &tokens,const char* separator = " ");
+void schSplit(string sentence,stdStringVec& tokens,const char* separator = " ");
 
 /*! 
 \verbatim embed:rst
@@ -298,7 +299,7 @@ No Reference
 \param[out] params the resultant parameter vector
 return Error code (if =0 execution OK)
 */
-int ReadParamsFromFile(string inputFileName,double* params);
+int readParamsFromFile(string inputFileName,double* params);
 
 /*! 
 \verbatim embed:rst
@@ -345,7 +346,7 @@ No Reference
 \param[in] samples std Matrix where to store the table
 return Error code
 */
-int readTableFromFile(std::string fileName,stdMat& samples);
+int readTableFromFile(string fileName,stdMat& samples);
 
 /*! 
 \verbatim embed:rst
@@ -367,7 +368,7 @@ No Reference
 \param[in] samples std Matrix where to store the table
 return Error code
 */
-int readIntTableFromCSVFile(std::string fileName,stdIntMat& samples);
+int readIntTableFromCSVFile(string fileName,stdIntMat& samples);
 
 /*! 
 \verbatim embed:rst
@@ -388,7 +389,7 @@ No Reference
 \param[out] vec The vector where the indexes read from a "fileName" will be stored
 return Error code
 */
-int readIntVectorFromFile(std::string fileName,stdIntVec& vec);
+int readIntVectorFromFile(string fileName,stdIntVec& vec);
 
 /*! 
 \verbatim embed:rst
@@ -408,7 +409,7 @@ No Reference
 \param[in] fileName Name of the file to be written
 \param[in] table std Matrix to print
 */
-void writeTableToFile(std::string fileName,const stdMat& table);
+void writeTableToFile(string fileName,const stdMat& table);
 
 /*! 
 \verbatim embed:rst
@@ -428,7 +429,7 @@ No Reference
 \param[in] fileName Name of the file to be written
 \param[in] vec vector to print
 */
-void writeVectorToFile(std::string fileName,stdVec vec);
+void writeVectorToFile(string fileName,const stdVec& vec);
 
 /*! 
 \verbatim embed:rst
@@ -450,7 +451,7 @@ No Reference
 \param[in] fileName Name of the file to be written
 \param[in] vec vector to print
 */
-int readVectorFromFile(std::string fileName,int column,stdVec& vec);
+int readVectorFromFile(string fileName,int column,stdVec& vec);
 
 /*! 
 \verbatim embed:rst
@@ -473,7 +474,7 @@ No Reference
 \param[in] time Array with simulation time for all time steps. 
 \param[in] outVals Matrix containing the LPN model results.
 */
-void WriteResultsToFile(std::string debugFileName, int totalSteps, int totalStates, double* time, double** outVals);
+void writeResultsToFile(string debugFileName, int totalSteps, int totalStates, double* time, double** outVals);
 
 /*! 
 \verbatim embed:rst
@@ -507,88 +508,10 @@ No Reference
 \param[in] t_A Simulation time for the second minimum value
 */
 void printCurvesAndPeaks(string fileName,int size,double* t,double* Q, 
-	                     double Q_S,double t_S,
-	                     double Q_M,double t_M,
-	                     double Q_D,double t_D,
-	                     double Q_A,double t_A);
-/*! 
-\verbatim embed:rst
-**Purpose**
-Function to map full and reduced circulation models
-
-**Discussion**
-None
-
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] prPtr Vector with correspondence between full and reduced circulation models
-*/
-void getHeartStage12BlocksPriorMapping(int* prPtr);
-
-/*! 
-\verbatim embed:rst
-**Purpose**
-Function to map full and reduced circulation models
-
-**Discussion**
-None
-
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] prPtr Vector with correspondence between full and reduced circulation models
-*/
-void getHeartStage13BlocksPriorMapping(int* prPtr);
-
-
-/*! 
-\verbatim embed:rst
-**Purpose**
-Function to map full and reduced circulation models
-
-**Discussion**
-None
-
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] prPtr Vector with correspondence between full and reduced circulation models
-*/
-void getHeartStage2PriorMapping(int* prPtr);
-
-/*! 
-\verbatim embed:rst
-**Purpose**
-Function to map full and reduced circulation models
-
-**Discussion**
-None
-
-**Modified**
-2 May 2015 - DES
-    
-**Reference**
-No Reference
-\endverbatim
-
-\param[in] prPtr Vector with correspondence between full and reduced circulation models
-*/
-void getHeartINDStage12BlocksINDPriorMapping(int* prPtr);
-
-
+	                       double Q_S,double t_S,
+	                       double Q_M,double t_M,
+	                       double Q_D,double t_D,
+	                       double Q_A,double t_A);
 /*! 
 \verbatim embed:rst
 **Purpose**
@@ -680,7 +603,7 @@ No Reference
 \param[out] model Model data that need to be filled with the information contained in the 3D Surrogate Model file
 \param[in] printReport Print a brief report with the summary of the acquired model
 */
-void read3DModelSurrogateFromFile(string fileName,model3DRecord &model,bool printReport);
+void read3DModelSurrogateFromFile(string fileName,model3DRecord& model,bool printReport);
 
 /*! 
 \verbatim embed:rst
@@ -724,7 +647,7 @@ No Reference
 result true if the parameters are both positive, false otherwise.
 
 */
-bool isParamPositive(int curr_par, stdVec limits);
+bool isParamPositive(int curr_par, const stdVec& limits);
 
 /*! 
 \verbatim embed:rst
@@ -745,7 +668,7 @@ No Reference
 \param[in] limits parameter limit array 
 result true if the parameters are inside the admissible ranges, false otherwise.
 */
-bool isParamNegative(int curr_par, stdVec limits);
+bool isParamNegative(int curr_par, const stdVec& limits);
 
 /*! 
 \verbatim embed:rst
@@ -767,7 +690,7 @@ No Reference
 \param[in] table String Matrix where to store the values.
 return Error code.
 */
-int readCSStringTableFromFile(string fileName,vector<vector<string> > &table);
+int readCSStringTableFromFile(string fileName,stdStringMat& table);
 
 /*! 
 \verbatim embed:rst
@@ -984,4 +907,4 @@ No Reference
 void getAirProps(double alt,double& airTemperature,double& airPressure,double& airDensity);
 
 }
-#endif // LPNUTILSHPP
+#endif // CMUTILS_H
