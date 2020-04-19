@@ -142,11 +142,11 @@ void odeRCRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int tot
   // P_0 PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[2][loopA];
-    time[totalSteps] = auxOutVals[0][loopA];
+    time[loopA] = auxOutVals[0][loopA];
   }
   double minP_0Press = cmUtils::getMin(startLastCycle, stopLastCycle, output);
   double maxP_0Press = cmUtils::getMax(startLastCycle, stopLastCycle, output);          
-  double avP_0Press  = cmUtils::trapz(startLastCycle, stopLastCycle, time, output)/(double)cycleTime;
+  double avP_0Press  = cmUtils::trapz(startLastCycle, stopLastCycle, time, output)/double(cycleTime);
 
   // Assign Results Based on Model Version
   results.clear();

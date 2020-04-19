@@ -521,10 +521,10 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
         pd2 = prior_density(par_num, zp_old, prior_num, prPtr, prAv, prSd);
 
         zp_ratio = exp( (received_LH + log (pd1) ) - ( fit_old + log (pd2) ) );
-        zp_ratio = r8_min (zp_ratio, 1.0);
+        zp_ratio = min(zp_ratio, 1.0);
 
         //  Accept this candidate, or copy value from previous generation
-        r = r8_uniform_01_sample ( );
+        r = uSampler->sample(0.0,1.0);
 
         if(r<=zp_ratio){
           for(i=0;i<par_num;i++){
@@ -972,8 +972,8 @@ void acActionDREAMmpi::chain_init ( int chain_num, double fit[], int gen_num, in
   return;
 }
 
-int acActionDREAMmpi::go()
-{
+int acActionDREAMmpi::go(){
+
   string chain_filename = "";
   int chain_num;
   int cr_num;
@@ -1006,24 +1006,28 @@ int acActionDREAMmpi::go()
 
   // Write Time stamp and Header
   if(globRank == 0){
-  	timestamp ( );
+  	uqUtils::printTimestamp();
     cout << "\n";
     cout << "DREAM\n";
     cout << "  C++ version\n";
     cout << "  MCMC acceleration by Differential Evolution.\n";
   }
-//
-//  Set the random generator seed different for each processor
-//
+
+  //  Set the random generator seed different for each processor
   if(globRank == 0){
     printf("   SETTING RANDOM GENERATOR SEED FOR ALL PROCESSES.\n");
     fflush(stdout);
   }
-  initialize();
-  set_initial_seed(globRank+1,5*globRank+1);
-//
-// Get Info from global and local numbering
-//
+  // Allocate Samplers
+  uSampler = new uqUniformPDF(5*globRank+1);
+  nSampler = new uqGaussianPDF(5*globRank+1);
+  catSampler = new uqCategoricalPMF(5*globRank+1);
+  // Print sampler seeds
+  cout << "Uniform Sampler Seed for processor " + to_string(globRank) + ": " << uSampler->getSeed() << endl;
+  cout << "Normal Sampler Seed for processor " + to_string(globRank) + ": " << nSampler->getSeed() << endl;
+  cout << "Normal Sampler Seed for processor " + to_string(globRank) + ": " << catSampler->getSeed() << endl;
+
+  // Get Info from global and local numbering
   int rank_sm = 0;
   int size_sm = 0;
   int totGroups = 0;  
@@ -1264,7 +1268,7 @@ int acActionDREAMmpi::go()
     cout << "DREAM\n";
     cout << "  Normal end of execution.\n";
     cout << "\n";
-    timestamp ( );
+    uqUtils::printTimestamp();
     // Print Final time
     cout << "Total Time: " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << " s" << endl;
   }

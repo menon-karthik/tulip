@@ -10,21 +10,17 @@ uqSamples::uqSamples(){
 }
 
 // CONSTRUCTOR
-uqSamples::uqSamples(int dimNum){
-  totSamples = 0;
+uqSamples::uqSamples(int dimNum):uqSamples(){
   totDims = dimNum;
-  areIndependent = true;
 }
 
-uqSamples::uqSamples(stdVec onePoint){
-  totSamples = 0;
+uqSamples::uqSamples(stdVec onePoint):uqSamples(){
   totDims = onePoint.size();
   addOneSample(onePoint);
-  areIndependent = true;
 }
 
 // COPY CONSTRUCTOR
-uqSamples::uqSamples(uqSamples* sample){
+uqSamples::uqSamples(uqSamples* sample):uqSamples(){
 
   // Copy samples and dimensionality
   this->totSamples = sample->totSamples;
@@ -83,6 +79,14 @@ uqSamples::~uqSamples(){
   rvs.clear();
   covCholFactor.clear();
   corrCholFactor.clear();
+  // Delete Random Number generators
+  if(uSampler != NULL){
+    delete uSampler;  
+  }
+  if(nSampler != NULL){
+    delete nSampler;
+  }
+
 }
 
 // COPY VALUE MATRIX
@@ -407,9 +411,12 @@ void uqSamples::generateRandomSamples(int numSamples, int seed){
   double lnAV = 0.0;
   double lnSD = 0.0;
 
-  // If required Init Library
-  if(seed > 0){
-    set_seed(seed,seed + 100);
+  // Allocate random samplers
+  if(uSampler == NULL){
+    uSampler = new uqUniformPDF(seed);  
+  }
+  if(nSampler == NULL){
+    nSampler = new uqGaussianPDF(seed);  
   }
 
   // Loop through the new samples
@@ -420,10 +427,10 @@ void uqSamples::generateRandomSamples(int numSamples, int seed){
       // Generate new value
       switch(rvs[loopB].type){
         case kSAMPLEUniform:
-          currValue = r8_uniform_sample(rvs[loopB].parameter1,rvs[loopB].parameter2);
+          currValue = uSampler->sample(rvs[loopB].parameter1,rvs[loopB].parameter2);
           break;
         case kSAMPLEGaussian:
-          currValue = r8_normal_sample(rvs[loopB].parameter1,rvs[loopB].parameter2);
+          currValue = nSampler->sample(rvs[loopB].parameter1,rvs[loopB].parameter2);
           break;
         case kSAMPLELognormal:
           // Store parameters
@@ -432,7 +439,7 @@ void uqSamples::generateRandomSamples(int numSamples, int seed){
           // Get lognormal parameters
           lnAV = log(m2Val/(sqrt(vVal + m2Val)));
           lnSD = sqrt(log(1.0 + (vVal/m2Val)));
-          currValue = exp(r8_normal_sample(lnAV,lnSD));
+          currValue = exp(nSampler->sample(lnAV,lnSD));
           break;
         case kSAMPLEConstant:
           currValue = rvs[loopB].parameter1;
@@ -461,10 +468,6 @@ void uqSamples::generatePseudoRandomSamples(int numSamples, int seed){
   stdVec storeVec;
   double storeArry[rvs.size()];
   double currValue = 0.0;
-  // If required Init Library
-  if(seed > 0){
-    set_seed(seed,seed + 100);
-  }
 
   long long int longseed = (long long int) seed; 
 
@@ -1444,7 +1447,7 @@ void uqSamples::addUniformSamplesFromPartition(int samplesToAdd, stdVec limits){
     storeVec.clear();
     // Loop through the variable types
     for(int loopB=0;loopB<getTotDims();loopB++){
-      currValue = r8_uniform_sample(limits[2*loopB + 0],limits[2*loopB + 1]);
+      currValue = uSampler->sample(limits[2*loopB + 0],limits[2*loopB + 1]);
       // Add value to vector
       storeVec.push_back(currValue);
     }

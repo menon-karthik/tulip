@@ -9,8 +9,8 @@
 
 # include "acAction.h"
 # include "cmModel.h"
-# include "rnglib.h"
 # include "cmUtils.h"
+# include "uqUtils.h"
 
 /*! 
 This class performs Nelder-Mead optimization on the generic cmModel.

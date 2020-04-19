@@ -145,7 +145,7 @@ int acAction_OBJProfile::OBJ_Profile(){
 // =====================
 int acAction_OBJProfile::go(){
 
-  timestamp ( );
+  uqUtils::printTimestamp();
   cout << "\n";
   cout << "OBJ_Profiling:\n";
 
@@ -167,7 +167,7 @@ int acAction_OBJProfile::go(){
   cout << "OBJ_Profiling:\n";
   cout << "  Normal end of execution.\n";
   cout << "\n";
-  timestamp ( );
+  uqUtils::printTimestamp ( );
 
   return 0;
 }

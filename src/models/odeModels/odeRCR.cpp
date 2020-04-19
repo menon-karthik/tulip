@@ -108,20 +108,23 @@ void odeRCR::evalDeriv(double t,const stdVec& Xk,const stdVec& params,const stdM
 void odeRCR::postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params,const stdMat& outVals,const stdMat& auxOutVals, stdVec& results){
 
   // DETERMINE START AND END OF LAST HEART CYCLE
-  double heartRate = 60.0/(totalStepsOnSingleCycle * timeStep);
+  double cycletime = totalStepsOnSingleCycle * timeStep;
+  double heartRate = 60.0/(cycletime);
   int numCycles = totalSteps/totalStepsOnSingleCycle;
   int startLastCycle = (numCycles-1) * totalStepsOnSingleCycle;
   int stopLastCycle = numCycles * totalStepsOnSingleCycle;
   double output[totalSteps];
+  double time[totalSteps];
   double valveOpening[totalSteps];
 
   // P_0 PRESSURE
   for(int loopA=0;loopA<totalSteps;loopA++){
     output[loopA] = auxOutVals[2][loopA];
+    time[loopA] = auxOutVals[0][loopA];
   }
   double minP_0Press  = cmUtils::getMin(startLastCycle, stopLastCycle, output);
   double maxP_0Press  = cmUtils::getMax(startLastCycle, stopLastCycle, output);
-  double avP_0Press   = cmUtils::getMean(startLastCycle, stopLastCycle, output);
+  double avP_0Press   = cmUtils::trapz(startLastCycle, stopLastCycle, time, output)/double(cycletime);
 
   // Assign Results Based on Model Version
   results.clear();
@@ -143,9 +146,9 @@ void odeRCR::getResultKeys(stdStringVec& keys){
 void odeRCR::getFinalOutputs(const stdVec& outputs,stdVec& outs){
   // COMPUTED VALUES
   outs.clear();
-  outs.push_back(outputs[ip_min_P_0]/1333.22);
-  outs.push_back(outputs[ip_max_P_0]/1333.22);
-  outs.push_back(outputs[ip_av_P_0]/1333.22);
+  outs.push_back(outputs[0]/1333.22);
+  outs.push_back(outputs[1]/1333.22);
+  outs.push_back(outputs[2]/1333.22);
 }
 
 void odeRCR::getDataSTD(stdVec& stds){

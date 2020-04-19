@@ -7,8 +7,8 @@
 # include <iomanip>
 # include "acAction.h"
 # include "cmModel.h"
-# include "rnglib.h"
 # include "cmUtils.h"
+# include "uqUtils.h"
 
 // GENERIC CLASS FOR SAMPLES
 class acAction_OBJProfile: public acAction{

@@ -470,9 +470,9 @@ double* acActionDREAM::sample_candidate (int chain_index, int chain_num, double 
   {
     while ( 1 )
     {
-      r2 = r8_uniform_01_sample ( );
+      r2 = uSampler->sample(0.0,1.0);
       pair[0] = ( int ) ( r2 * ( double ) chain_num );
-      r2 = r8_uniform_01_sample ( );
+      r2 = uSampler->sample(0.0,1.0);
       pair[1] = ( int ) ( r2 * ( double ) chain_num );
 
       if ( pair[0] != pair[1] &&
@@ -492,25 +492,19 @@ double* acActionDREAM::sample_candidate (int chain_index, int chain_num, double 
 
   jumprate_choose ( cr, cr_index, cr_num, gen_index, jump_dim, jump_num, 
     jumprate, jumprate_table, jumpstep, par_num );
-//
-//  Calculate E in equation 4 of Vrugt.
-//
+
+  //  Calculate E in equation 4 of Vrugt.
   noise_e = new double[par_num];
-
-  for ( i = 0; i < par_num; i++ )
-  {
-    noise_e[i] = b * ( 2.0 * r8_uniform_01_sample ( ) - 1.0 );
+  for(i = 0; i < par_num; i++){
+    noise_e[i] = b * ( 2.0 * uSampler->sample(0.0,1.0) - 1.0 );
   }
-//
-//  Get epsilon value from multinormal distribution                      
-//
-  eps = new double[par_num];
 
+  //  Get epsilon value from multinormal distribution
+  eps = new double[par_num];
   av = 0.0;
   sd = 1.0E-10;
-  for ( i = 0; i < par_num; i++ )
-  {
-    eps[i] = r8_normal_sample ( av, sd );
+  for(i = 0; i < par_num; i++){
+    eps[i] = nSampler->sample(av,sd);
   }
 //
 //  Generate the candidate sample ZP based on equation 4 of Vrugt.
@@ -543,7 +537,7 @@ double* acActionDREAM::sample_candidate (int chain_index, int chain_num, double 
   return zp;
 }
 
-int acActionDREAM::cr_index_choose ( int cr_num, double cr_prob[] )
+int acActionDREAM::cr_index_choose (int cr_num, double cr_prob[])
 //
 //  Purpose:
 //
@@ -582,25 +576,19 @@ int acActionDREAM::cr_index_choose ( int cr_num, double cr_prob[] )
   int n;
   int *tmp_index;
 
-  if ( cr_num == 1 )
-  {
+  if (cr_num == 1){
+  
     cr_index = 0;
-  }
-  else
-  { 
-    n = 1;
-    tmp_index = i4vec_multinomial_sample ( n, cr_prob, cr_num );
-    for ( i = 0; i < cr_num; i++ )
-    {
-      if ( tmp_index[i] == 1 )
-      {
-        cr_index = i;
-        break;
-      }
+  
+  }else{ 
+  
+    // Need to test!!!!!
+    stdVec pmf;
+    for(int loopA=0;loopA<cr_num;loopA++){
+      pmf.push_back(cr_prob[loopA]);
     }
-    delete [] tmp_index;
+    return catSampler->sample(pmf);
   }
-  return cr_index;
 }
 
 void acActionDREAM::cr_init (double cr[], double cr_dis[], 
@@ -966,7 +954,7 @@ double acActionDREAM::prior_density(int par_num, double zp[],
     currComponent = prPtr[loopA];
     if(currComponent>=0){
       if(prSd[loopA]>0.0){
-        priorValue = priorValue * r8_normal_pdf(prAv[loopA],prSd[loopA],zp[currComponent]);  
+        priorValue = priorValue * nSampler->evaluate(prAv[loopA],prSd[loopA],zp[currComponent]);  
       }else{
         priorValue = priorValue * 1.0;
       }
@@ -1738,7 +1726,7 @@ void acActionDREAM::jumprate_choose (double cr[], int cr_index, int cr_num, int 
   }
 
   for(i = 0; i < par_num; i++){
-    r = r8_uniform_01_sample ( );
+    r = uSampler->sample(0.0,1.0);
 
     if(1.0 - cr[cr_index] < r){
       jump_dim[jump_num] = i;
@@ -1995,11 +1983,7 @@ double* acActionDREAM::prior_sample ( int par_num, int prior_num, int* prPtr, co
 
   // GENERATE INITIAL SAMPLES
   for (int loopA=0;loopA<par_num;loopA++){
-    zp[loopA] = r8_uniform_sample(limits[0+loopA*2],limits[1+loopA*2]);
-//    zp[loopA] = startingParams[loopA];
-    //zp[loopA] = startingParams[loopA];
-    //currRange = (limits[1+loopA*2] - limits[0+loopA*2]);
-    //zp[loopA] = r8_uniform_sample(startingParams[loopA]-0.1*currRange,startingParams[loopA]+0.1*currRange);
+    zp[loopA] = uSampler->sample(limits[0+loopA*2],limits[1+loopA*2]);
   }
 
   // GENERATE FROM PRIOR
@@ -2009,7 +1993,7 @@ double* acActionDREAM::prior_sample ( int par_num, int prior_num, int* prPtr, co
     if(currComponent>=0){
       // Sample From Prior
       if(prSd[loopA]>0.0){
-        zp[currComponent] = r8_normal_sample(prAv[loopA],prSd[loopA]);  
+        zp[currComponent] = nSampler->sample(prAv[loopA],prSd[loopA]);  
       }else{
         zp[currComponent] = prAv[loopA];
       }        
