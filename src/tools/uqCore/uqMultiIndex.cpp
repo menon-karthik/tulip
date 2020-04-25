@@ -85,7 +85,6 @@ void uqMultiIndex::printToFile(string outMatFile,bool printTitle){
   fclose(f);
 }
 
-
 // ===========
 // CONSTRUCTOR
 // ===========
@@ -95,6 +94,10 @@ uqMultiIndex::uqMultiIndex(int dim, int order, int miType){
   }else{
     generateMultiIndex_Full(dim,order);
   }
+}
+
+uqMultiIndex::~uqMultiIndex(){
+
 }
 
 // ================
@@ -118,7 +121,6 @@ double uqMultiIndex::getMultiIndexAt(const int nRow, const int nCol){
 void uqMultiIndex::getMultiIndex(stdIntMat& res){
   res = this->multiIndex;
 }
-
 
 // =========================================
 // CHECK IF A CERTAIN COMPONENT IS CONTAINED

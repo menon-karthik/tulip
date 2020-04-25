@@ -1,6 +1,9 @@
 #ifndef CMUTILS_H
 #define CMUTILS_H
 
+# define ARMA_DONT_USE_CXX11
+# include <armadillo>
+
 # include <string.h>
 # include <vector>
 # include <boost/algorithm/string.hpp>

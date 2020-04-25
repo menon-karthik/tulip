@@ -7,11 +7,11 @@
 # include "uqMultiIndex.h"
 
 // MATRIX CONSTRUCTOR
-uqPolyMatrix::uqPolyMatrix(uqSamples xValues, int maxOrder, int polyType, int completeOrderType){
+uqPolyMatrix::uqPolyMatrix(uqSamples* xValues, int maxOrder, int polyType, int completeOrderType){
 
   // Get Dimensions and Number of Samples from xValues
-  int totSamples = xValues.getTotSamples();	
-  int totDims = xValues.getTotDims();
+  int totSamples = xValues->getTotSamples();	
+  int totDims = xValues->getTotDims();
 
   // Generate the multi-index
   uqMultiIndex mi(totDims,maxOrder,completeOrderType);
@@ -39,7 +39,7 @@ uqPolyMatrix::uqPolyMatrix(uqSamples xValues, int maxOrder, int polyType, int co
       values[loopA][loopB] = 1.0;
       for(int loopC=0;loopC<totDims;loopC++){
         // Copy X Value
-        xValue = xValues(loopA,loopC);        
+        xValue = xValues->getValuesAt(loopA,loopC);
         // Eval Order from multi-index
         currPolyOrder = mi(loopB,loopC);
         // Eval function Value
@@ -49,4 +49,10 @@ uqPolyMatrix::uqPolyMatrix(uqSamples xValues, int maxOrder, int polyType, int co
       }
     }
   }
+  // Free allocated objects
+  delete myInterp;
+}
+
+uqPolyMatrix::~uqPolyMatrix(){
+
 }

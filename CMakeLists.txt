@@ -44,7 +44,8 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # DEFINE SOURCE FILES
 # ===================
 # ADD SOURCES IN CURRENT FOLDER
-FILE(GLOB UQ_SRC_C "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/*.cpp" 
+FILE(GLOB UQ_SRC_C "${CMAKE_CURRENT_SOURCE_DIR}/src/nets/*.cpp" 
+                   "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/*.cpp" 
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/odeModels/*.cpp"  
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/odeIntegrators/*.cpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/*.cpp"                    
@@ -54,7 +55,8 @@ FILE(GLOB UQ_SRC_C "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/*.cpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/tools/uqCore/*.cpp")
 
 # LIST OF HEADER FILES
-FILE(GLOB UQ_SRC_H "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/*.h"
+FILE(GLOB UQ_SRC_H "${CMAKE_CURRENT_SOURCE_DIR}/src/nets/*.h"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/*.h"
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/odeModels/*.h"
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/odeIntegrators/*.h"
                    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/*.h"
@@ -90,6 +92,9 @@ FILE(GLOB PY_I_AC "${CMAKE_CURRENT_SOURCE_DIR}/src/actions/tulipAC.i")
 
 # DA functionalities - Data structures
 FILE(GLOB PY_I_DA "${CMAKE_CURRENT_SOURCE_DIR}/src/data/tulipDA.i")
+
+# NT functionalities - Inference Networks
+FILE(GLOB PY_I_NT "${CMAKE_CURRENT_SOURCE_DIR}/src/nets/tulipNT.i")
 
 # COPY TEST FOLDER
 file(COPY "${CMAKE_SOURCE_DIR}/test/." DESTINATION "${CMAKE_BINARY_DIR}/test/.")
@@ -143,6 +148,7 @@ ADD_DEFINITIONS("-g -m64 -O3 -std=c++0x -fPIC -Werror")
 # INCLUDE FOLDERS
 INCLUDE_DIRECTORIES(
   "${CMAKE_SOURCE_DIR}/src/"
+  "${CMAKE_SOURCE_DIR}/src/nets/"
   "${CMAKE_SOURCE_DIR}/src/actions/"
   "${CMAKE_SOURCE_DIR}/src/models/odeModels/"
   "${CMAKE_SOURCE_DIR}/src/models/odeIntegrators/"

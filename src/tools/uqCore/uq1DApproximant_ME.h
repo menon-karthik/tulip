@@ -14,16 +14,9 @@ class uq1DApproximant_ME: public uq1DApproximant{
     
     // Constructor and Destructor        
     uq1DApproximant_ME();
+    uq1DApproximant_ME(vector<uq1DApproximant_SE*> locApprox);
     virtual ~uq1DApproximant_ME();
 
-    uq1DApproximant_ME(vector<uq1DApproximant_SE*> locApprox);
-    
-    virtual double evaluate(double XValue);
-    virtual void exportToTextFile(string fileName, bool append = false);
-    virtual int  importFromTextFile(string fileName, bool startFromTop = true,int startLine = 0);
-    virtual void normalizeByConstant(double normValue);
-    virtual void getExtremes(stdVec& result);
-    
     /*! 
     \verbatim embed:rst
     **Purpose**
@@ -41,8 +34,13 @@ class uq1DApproximant_ME: public uq1DApproximant{
     \param[in] value an abscissa that corresponds to the element whose ID you would like to retrieve
     \return Element number at the specified abscissa
     */
-    int getElementID(double value);
-
+    int getElementID(double value);    
+    
+    virtual double evaluate(double XValue);
+    virtual void exportToTextFile(string fileName, bool append = false);
+    virtual int  importFromTextFile(string fileName, bool startFromTop = true,int startLine = 0);
+    virtual void normalizeByConstant(double normValue);
+    virtual void getLimits(stdVec& res);
 };
 
 #endif // UQ1DMWAPPROXIMANT_H

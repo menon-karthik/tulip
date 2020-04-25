@@ -237,8 +237,8 @@ void uq1DApproximant_SE::normalizeByConstant(double normValue){
 }
 
 // Get Extremes of the approximant
-void uq1DApproximant_SE::getExtremes(stdVec& result){
-  result.clear();
-  result.push_back(limits[0]);
-  result.push_back(limits[1]);
+void uq1DApproximant_SE::getLimits(stdVec& res){
+  res.clear();
+  res.push_back(limits[0]);
+  res.push_back(limits[1]);
 }

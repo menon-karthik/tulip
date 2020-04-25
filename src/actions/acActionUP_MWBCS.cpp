@@ -43,9 +43,21 @@ void performMWOrthogonalityTest(uqSamples* grid, uqMatrix* mwMat, stdMat measure
   printf("\n");
 }
 
-// ===================
-// SET DEFAULT OPTIONS
-// ===================
+/*! 
+\verbatim embed:rst
+**Purpose**
+Set default values for the options
+
+**Discussion**
+None
+
+**Modified**
+Aug 2016 - DES
+    
+**Reference**
+No Reference
+\endverbatim
+*/
 void acActionUP_MWBCS::setDefaultOptions(){
   
   // Set Default Values for options
@@ -1663,9 +1675,9 @@ int acActionUP_MWBCS::go(){
     }
 
     // Store Statistics
-    stats.push_back(constTerm);
-    stats.push_back(msVariance);
-    stats.push_back(mwVariance);
+    // stats.push_back(constTerm);
+    // stats.push_back(msVariance);
+    // stats.push_back(mwVariance);
 
     // Compute the Error Metrics
     if(opts.computeErrorMetrics){
@@ -1759,12 +1771,17 @@ int acActionUP_MWBCS::go(){
     if(opts.printProgress){
       printf("%15d %15d %15.6e %15.6e %15.6e %15.6e %15.6e\n",itCount,totPartitions,avgVarianceRatio,maxRedisualNorm,totAV,totSD,currVolume);
     }
-    //getchar();
   }
 
   // Save Total Statistics
   globalAVG = totAV;
   globalSTD = totSD;
+
+  // Add to stats
+  stdVec tempStats;
+  tempStats.push_back(globalAVG);
+  tempStats.push_back(globalSTD);
+  stats.push_back(tempStats);
 
   // Delete the outputs
   delete outputs;
@@ -1774,7 +1791,23 @@ int acActionUP_MWBCS::go(){
   return result;
 }
 
-// Eval Surrogate at a number of pre-defined sampling locations
+/*! 
+\verbatim embed:rst
+**Purpose**
+Evaluate the surrogate at a number of parameter realizations
+
+**Discussion**
+None
+
+**Modified**
+Jan 2016 - DES
+    
+**Reference**
+No Reference
+\endverbatim
+\param[in] params Matrix with multi-dimensional inputs.
+\param[out] surrogate Vector with surrogate evaluations.
+*/
 void acActionUP_MWBCS::evalSurrogate(stdMat params,stdVec& surrogate){
   
   // Set Options for MW Matrix
@@ -1895,7 +1928,25 @@ void acActionUP_MWBCS::evalSurrogate(stdMat params,stdVec& surrogate){
   delete sampleLocations;
 }
 
-// Eval the marginal distribution once the regression has been performed
+/*! 
+\verbatim embed:rst
+**Purpose**
+Evaluate the marginal distribution at the provided sampling locations.
+
+**Discussion**
+None
+
+**Modified**
+Jan 2016 - DES
+    
+**Reference**
+No Reference
+\endverbatim
+\param[in] inputs The samples where to evaluate the marginal through regression. 
+\param[out] marginals A matrix with the marginals. The rows store the value of the marginal
+            at the various sample locations (in increasing order), while the columns store the 
+            various dimensions.
+*/
 void acActionUP_MWBCS::evalMarginals(uqSamples* inputs,stdMat& marginals){
 
   // Set Options for MW Matrix
@@ -2149,6 +2200,21 @@ void normalizeApproximant(uq1DApproximant_ME* meApprox){
   meApprox->normalizeByConstant(currIntegral);
 }
 
+/*! 
+\verbatim embed:rst
+**Purpose**
+Generate A Multi-element approximant
+
+**Discussion**
+None
+
+**Modified**
+Aug 2016 - DES
+    
+**Reference**
+No Reference
+\endverbatim
+*/
 // If the inputs are one-dimensional, generate a multi-element approximant
 uq1DApproximant_ME* acActionUP_MWBCS::generate1DMEApproximant(bool normalize){
 
@@ -2214,4 +2280,91 @@ uq1DApproximant_ME* acActionUP_MWBCS::generate1DMEApproximant(bool normalize){
   
   // Return Multi-element approximant
   return result;
+}
+
+uqApproximant* acActionUP_MWBCS::getApproximant(){
+
+  // Get total partitions
+  int totPartitions = partitionTree->getLeafCount();
+  
+  // Get list with the partition limits
+  stdIntVec leafIndex;
+  leafIndex = partitionTree->getLeafIndex();
+
+  // Loop on Partitions
+  uqPartitionNode* currPartition;
+  vector<uqApproximant_SE*> seApprox;
+  int currLeafIndex = 0;
+  for(int loopA=0;loopA<totPartitions;loopA++){
+
+    // Get Leaf Index
+    currLeafIndex = leafIndex[loopA];
+
+    // Get Current Partition
+    currPartition = partitionTree->getAllNodes(currLeafIndex);      
+
+    // Get all the quantities required
+    int locBasisOrder = 0;
+    int locQuadOrder = 0;
+    stdVec locCoeffs;
+    stdMat allCoeffs;
+    stdMat locMeasure;
+    currPartition->getMSTotBasis(locBasisOrder);
+    currPartition->getMWQuadOrder(locQuadOrder);
+    currPartition->getMeasure(locMeasure);
+    currPartition->getChaosCoefficients(locCoeffs);
+    allCoeffs.push_back(locCoeffs);
+    stdVec locLimits = currPartition->getLimits();
+
+    if(false){
+      printf("Basis Order: %d\n",locBasisOrder);
+      printf("Basis Quadrature Order: %d\n",locQuadOrder);
+      printf("Size of Coeff: %d\n",(int)locCoeffs.size());
+      printf("Size of Limits: %d\n",(int)locLimits.size());
+      printf("Size of Measure: %d\n",(int)locMeasure.size());
+      printf("\n");
+    }
+
+    // Construct each single-element approximant
+    // ONLY UNIFORM MEASURE FOR NOW!!!
+    uqApproximant_SE* currApprox = new uqApproximant_SE(atMW,kPolyLegendre,locBasisOrder,allCoeffs,locLimits);
+
+    // Add to the array of SE approximants
+    seApprox.push_back(currApprox);
+  }
+
+  // Create Multiwavelet approximant from array for SE
+  uqApproximant_ME* result = new uqApproximant_ME(seApprox);
+  
+  // Return Multi-element approximant
+  return result;
+}
+
+/*! 
+\verbatim embed:rst
+**Purpose**
+Gather the best estimate of the function volume: the integration constant.
+
+**Discussion**
+None
+
+**Modified**
+Jan 2016 - DES
+    
+**Reference**
+No Reference
+\endverbatim
+return Best estimate of the function volume.
+*/
+double acActionUP_MWBCS::getVolume(){
+  return globalVolume;
+};
+
+stdMat acActionUP_MWBCS::getStatistics(){
+  stdMat res;
+  stdVec temp;
+  temp.push_back(globalAVG);
+  temp.push_back(globalSTD);
+  res.push_back(temp);
+  return res;
 }

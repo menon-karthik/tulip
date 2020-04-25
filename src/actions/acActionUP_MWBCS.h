@@ -2,7 +2,6 @@
 #define ACACTIONUP_MWBCS_H
 
 # include <math.h>
-# include <chrono>
 
 # include "acActionUP.h"
 # include "acException.h"
@@ -12,9 +11,15 @@
 # include "uqMWMatrix.h"
 # include "uqPartitionBinaryTree.h"
 # include "uqUtils.h"
+// Response Approximant
+# include "uqApproximant.h"
+# include "uqApproximant_SE.h"
+# include "uqApproximant_ME.h"
+// Density Approximant
 # include "uq1DApproximant.h"
 # include "uq1DApproximant_SE.h"
 # include "uq1DApproximant_ME.h"
+
 # include "cmUtils.h"
 
 // Execution Modes
@@ -123,107 +128,23 @@ class acActionUP_MWBCS: public acActionUP{
 
     // Constructor
   	acActionUP_MWBCS(uqSamples* locInputs=NULL,uqSamples* locOutputs=NULL);
-    
-    // Constructor for arbitrarily and dependent samples
+    // Arbitrary and dependent samples
     acActionUP_MWBCS(uqSamples* locInputs,uqSamples* locOutputs,stdVec betaCoeffs,vector<uq1DApproximant*> marginals);
-
     //Destructor
     ~acActionUP_MWBCS();
 
-  	// Perform Action
-  	virtual int go();
-
-    /*! 
-    \verbatim embed:rst
-    **Purpose**
-    Evaluate the surrogate at a number of parameter realizations
-
-    **Discussion**
-    None
-
-    **Modified**
-    Jan 2016 - DES
-        
-    **Reference**
-    No Reference
-    \endverbatim
-    \param[in] params Matrix with multi-dimensional inputs.
-    \param[out] surrogate Vector with surrogate evaluations.
-    */
     void evalSurrogate(stdMat params,stdVec& surrogate);
-
-    /*! 
-    \verbatim embed:rst
-    **Purpose**
-    Gather the best estimate of the function volume: the integration constant.
-
-    **Discussion**
-    None
-
-    **Modified**
-    Jan 2016 - DES
-        
-    **Reference**
-    No Reference
-    \endverbatim
-    return Best estimate of the function volume.
-    */
-    double getVolume(){return globalVolume;};
-
-    /*! 
-    \verbatim embed:rst
-    **Purpose**
-    Evaluate the marginal distribution at the provided sampling locations.
-
-    **Discussion**
-    None
-
-    **Modified**
-    Jan 2016 - DES
-        
-    **Reference**
-    No Reference
-    \endverbatim
-    \param[in] inputs The samples where to evaluate the marginal through regression. 
-    \param[out] marginals A matrix with the marginals. The rows store the value of the marginal
-                at the various sample locations (in increasing order), while the columns store the 
-                various dimensions.
-    */
+    double getVolume();
     void evalMarginals(uqSamples* inputs,stdMat& marginals);
-
-    /*! 
-    \verbatim embed:rst
-    **Purpose**
-    Set default values for the options
-
-    **Discussion**
-    None
-
-    **Modified**
-    Aug 2016 - DES
-        
-    **Reference**
-    No Reference
-    \endverbatim
-    */
     void setDefaultOptions();
+    uq1DApproximant_ME* generate1DMEApproximant(bool normalize = true);    
 
-    /*! 
-    \verbatim embed:rst
-    **Purpose**
-    Generate A Multi-element approximant
-
-    **Discussion**
-    None
-
-    **Modified**
-    Aug 2016 - DES
-        
-    **Reference**
-    No Reference
-    \endverbatim
-    */
-    uq1DApproximant_ME* generate1DMEApproximant(bool normalize = true);
+    // Construct stochastic approximation or evaluate samples
+    virtual int go();
+    // Get Approximant
+    virtual uqApproximant* getApproximant();
+    // Get Statistics
+    virtual stdMat getStatistics();
 };
 
 #endif //ACACTIONUP_MWBCS_H

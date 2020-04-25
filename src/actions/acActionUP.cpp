@@ -7,3 +7,7 @@ acActionUP::acActionUP(uqSamples* locInputs,uqSamples* locOutputs){
   // Assign Outputs
   outputs = locOutputs;
 }
+
+acActionUP::~acActionUP(){	
+}
+

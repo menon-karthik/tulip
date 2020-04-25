@@ -104,7 +104,9 @@ class uqSamples{
     // Should be able to set a seed in the empty constructor !!!
     uqSamples();
     uqSamples(int dimNum);
-    uqSamples(stdVec onePoint);
+    uqSamples(const stdVec& onePoint);
+    // Create uqSamples from Matrix of n-dimensional realizations
+    uqSamples(const stdMat& samples);
     uqSamples(uqSamples* sample);
     virtual ~uqSamples();
     // GETTER AND SETTERS
@@ -112,6 +114,9 @@ class uqSamples{
     int    getTotSamples(){return totSamples;}
     int    getTotDims(){return totDims;}
     void   getValues(stdMat& copyVals);
+    stdMat getValues(){return values;};
+    stdVec getSample(int sID){return values[sID];};
+    stdVec getColumn(int dim);
     stdMat getCorrelatedValues(){return corrValues;}
     double getValuesAt(int sample, int dim){return values[sample][dim];};
     double getCorrelatedValues(int sample, int dim){return corrValues[sample][dim];}
@@ -133,7 +138,7 @@ class uqSamples{
     // =======================================
     // SAMPLE ADDITION OR CREATION FROM MATRIX
     // =======================================
-    void   addOneSample(stdVec sample);
+    void   addOneSample(const stdVec& sample);
 
     /*! 
     \verbatim embed:rst
@@ -203,7 +208,7 @@ class uqSamples{
 
     // NORMALIZE VARIABLES
     double denormalizeRV(double value, int dimId);
-    void   rescaleOnHypercube(stdVec currLimits);
+    void   rescaleOnHypercube(const stdVec& currLimits);
     void   rescaleFromHypercubeToPartition(stdVec currLimits);
 
     // ADD VARIABLE DEFINITION
@@ -236,7 +241,7 @@ class uqSamples{
     // EXTRACT RESULTS FOR ROW INDEX AND SPECIFIED COLUMN
     void extractSampleColumnWithIndex(stdIntVec Indexes,int outCol,stdVec& rhs);
     // EXTRACT SAMPLES FROM PARTITION LIMITS
-    void extractPartitionSamples(uqSamples* samples,stdVec limits,stdIntVec& ind);
+    void extractPartitionSamples(uqSamples* samples,const stdVec& limits,stdIntVec& ind);
 
     /*! 
     \verbatim embed:rst

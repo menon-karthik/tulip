@@ -4,28 +4,28 @@
 # include "acAction.h"
 # include "acException.h"
 # include "uqSamples.h"
+# include "uqApproximant.h"
 
-// GENERIC CLASS FOR UNCERTAINTY PROPAGATION ACTION
 class acActionUP: public acAction{
   protected:
   	// Input Samples
   	uqSamples* inputs;
-
     // Output Samples
     uqSamples* outputs;
-
   	// Output Statistics Vector
-    stdVec stats;
+    stdMat stats;
+
   public:
-
-  	// Constructor
   	acActionUP(uqSamples* locInputs=NULL,uqSamples* locOutputs=NULL);
+    virtual ~acActionUP();
 
-  	// Get Statistics
-  	double getStats(int index){return stats[index];}
+  	// Construct stochastic approximation or evaluate samples
+  	virtual int go() = 0;
+    // Get Approximant
+    virtual uqApproximant* getApproximant() = 0;
+    // Get Statistics
+    virtual stdMat getStatistics() = 0;
 
-  	// Perform Action
-  	virtual int go(){throw new acException("Not Implemented");}
 };
 
-# endif //ACACTIONUP_H
+# endif // ACACTIONUP_H

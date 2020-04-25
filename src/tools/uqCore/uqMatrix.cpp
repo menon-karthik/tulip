@@ -34,7 +34,7 @@ void uqMatrix::printToFile(string outMatFile,bool printTitle){
 // ===========================
 // APPLY TO COEFFICIENT VECTOR
 // ===========================
-stdVec uqMatrix::applyTo(stdVec coeff){
+stdVec uqMatrix::applyTo(const stdVec& coeff){
   stdVec result;
   double currVal = 0.0;
   for(int loopA=0;loopA<rowCount;loopA++){

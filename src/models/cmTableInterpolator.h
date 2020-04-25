@@ -1,9 +1,6 @@
 #ifndef CMTABLEINTERPOLATOR_H
 #define CMTABLEINTERPOLATOR_H
 
-# define ARMA_DONT_USE_CXX11
-# include <armadillo>
-
 # include <string>
 # include "uqTypes.h"
 # include "uqConstants.h"

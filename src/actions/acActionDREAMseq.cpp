@@ -247,6 +247,10 @@ void acActionDREAMseq::cr_dis_update (int chain_index, int chain_num, double cr_
       cr_dis[cr_index] = cr_dis[cr_index] + pow ( ( z[i1] - z[i2] ) / std[i], 2 );  
     }
   }
+
+  // free
+  delete [] std;
+
   return;
 }
 

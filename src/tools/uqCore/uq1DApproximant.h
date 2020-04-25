@@ -4,9 +4,6 @@
 # include "uqBasis.h"
 # include "uqTypes.h"
 
-// Types of Approximants
-enum approxTypes{atPoly,atOrthoPoly,atMW};
-
 // General class for one-dimensional approximants
 class uq1DApproximant{
   public:
@@ -108,7 +105,7 @@ class uq1DApproximant{
     \param[out] result min and max real values defining the support of 
                 a local approximant
     */
-    virtual void getExtremes(stdVec& result) = 0;
+    virtual void getLimits(stdVec& limits) = 0;
 
     /*! 
     \verbatim embed:rst

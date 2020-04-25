@@ -93,7 +93,7 @@ double cm3DPQSurrogateModel::evalModelError(const stdVec& inputs,stdVec& outputs
   }
 
   // Create One Sample with input Data
-  uqSamples sample(normInputs);
+  uqSamples* sample = new uqSamples(normInputs);
   
   // Build a Polynomial Matrix 
   uqPolyMatrix uqPolyMat(sample,polyOrder,polyType,kMIPartialOrder);
@@ -112,6 +112,9 @@ double cm3DPQSurrogateModel::evalModelError(const stdVec& inputs,stdVec& outputs
     res = uqPolyMat.applyTo(temp);
     outputs.push_back(res[0]);
   }
+
+  // free
+  delete sample;
 
   // Return
   errorCodes.push_back(0);

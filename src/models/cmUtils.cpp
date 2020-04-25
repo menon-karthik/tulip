@@ -1,6 +1,7 @@
 # include "cmUtils.h"
 
 using namespace std;
+
 namespace cmUtils{
   
 double getMax(int start, int stop, const double* vector){
