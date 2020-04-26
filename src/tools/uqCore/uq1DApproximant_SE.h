@@ -5,6 +5,8 @@
 # include "uqMWBasis.h"
 # include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 // APPROXIMANT ON A SINGLE ELEMENT
 class uq1DApproximant_SE: public uq1DApproximant{
   public:

@@ -1,5 +1,5 @@
-# ifndef ACACTIONUP_PCBCS_H
-# define ACACTIONUP_PCBCS_H
+# ifndef ACACTIONUP_PC_H
+# define ACACTIONUP_PC_H
 
 # include "acActionUP.h"
 # include "acException.h"
@@ -10,7 +10,7 @@
 # include "uqPolyMatrix.h"
 # include "uqAlgorithmBCS.h"
 
-class acActionUP_PCBCS: public acActionUP{
+class acActionUP_PC: public acActionUP{
   protected:
   	int order;
   	int polyType;
@@ -21,8 +21,8 @@ class acActionUP_PCBCS: public acActionUP{
     stdVec limits;
 
   public:
-  	acActionUP_PCBCS(uqSamples* in, uqSamples* out, int order, int polyType, int completeOrderType);
-    virtual ~acActionUP_PCBCS();
+  	acActionUP_PC(uqSamples* in, uqSamples* out, int order, int polyType, int completeOrderType);
+    virtual ~acActionUP_PC();
 
   	// Construct stochastic approximation or evaluate samples
   	virtual int go();
@@ -33,4 +33,4 @@ class acActionUP_PCBCS: public acActionUP{
 
 };
 
-# endif // ACACTIONUP_PCBCS_H
+# endif // ACACTIONUP_PC_H

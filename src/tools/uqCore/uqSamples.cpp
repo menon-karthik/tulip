@@ -7,6 +7,8 @@ uqSamples::uqSamples(){
   totSamples = 0;
   totDims = 0;
   areIndependent = true;
+  uSampler = NULL;
+  nSampler = NULL;
 }
 
 // CONSTRUCTOR

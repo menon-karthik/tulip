@@ -5,6 +5,8 @@
 # include "uq1DApproximant_SE.h"
 # include "uqMWBasis.h"
 
+using namespace std;
+
 // Class for Multi-Element Approximants
 class uq1DApproximant_ME: public uq1DApproximant{
   public:

@@ -53,6 +53,7 @@
 /* Parse the header file to generate wrappers */
 
 %include <typemaps.i>
+%include <cstring.i>
 %include <std_string.i>
 %include <std_vector.i>
 %include <std_map.i>

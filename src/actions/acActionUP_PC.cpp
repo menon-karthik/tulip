@@ -1,6 +1,6 @@
-# include "acActionUP_PCBCS.h"
+# include "acActionUP_PC.h"
 
-acActionUP_PCBCS::acActionUP_PCBCS(uqSamples* in, uqSamples* out, int order, int polyType, int completeOrderType){
+acActionUP_PC::acActionUP_PC(uqSamples* in, uqSamples* out, int order, int polyType, int completeOrderType){
   // Number of samples should be the same 
   if(in->getTotSamples() != out->getTotSamples()){
     throw acException("ERROR: Different number of input and output samples.");
@@ -17,15 +17,22 @@ acActionUP_PCBCS::acActionUP_PCBCS(uqSamples* in, uqSamples* out, int order, int
   this->polyType = polyType;
   this->completeOrderType = completeOrderType;
 
+  //for(int loopA=0;loopA<inputs->getTotSamples();loopA++){
+  //	for(int loopB=0;loopB<inputs->getTotDims();loopB++){
+  //    printf("%f ",inputs->getValuesAt(loopA,loopB));
+  //	}
+  //	printf("\n");
+  //}
+
 }
 
-acActionUP_PCBCS::~acActionUP_PCBCS(){
+acActionUP_PC::~acActionUP_PC(){
   delete inputs;
   delete outputs;
 }
 
 // Construct stochastic approximation or evaluate samples
-int acActionUP_PCBCS::go(){
+int acActionUP_PC::go(){
 
   uqMatrix* mat;
   uqAlgorithmBCS* bcs;
@@ -77,14 +84,14 @@ int acActionUP_PCBCS::go(){
 }
 
 // Get Approximant
-uqApproximant* acActionUP_PCBCS::getApproximant(){
+uqApproximant* acActionUP_PC::getApproximant(){
   // Create Approximant
   uqApproximant* approx = new uqApproximant_SE(atPoly,polyType,order,coeffs,limits);
   return approx;
 }
 
 // Get Statistics
-stdMat acActionUP_PCBCS::getStatistics(){
+stdMat acActionUP_PC::getStatistics(){
   // Compute the Statistics through the coefficients
   stdMat res;
   stdVec tempStats;

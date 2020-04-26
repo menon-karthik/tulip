@@ -4,6 +4,8 @@
 # include "uqApproximant.h"
 # include "uqApproximant_SE.h"
 
+using namespace std;
+
 // Class for Multi-Element Approximants
 class uqApproximant_ME: public uqApproximant{
   public:
@@ -17,8 +19,8 @@ class uqApproximant_ME: public uqApproximant{
     virtual ~uqApproximant_ME();
     
     virtual stdMat evaluate(const stdMat& XValue);
-    virtual void   exportToTextFile(string fileName, bool append = false);
-    virtual int    importFromTextFile(string fileName, bool startFromTop = true,int startLine = 0);
+    virtual int importFromFile(string fileName, bool startFromTop = true, int startLine = 0);
+    virtual void exportToFile(string fileName, bool append = false);
     virtual stdVec getLimits();
 };
 

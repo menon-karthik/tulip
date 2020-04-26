@@ -1,8 +1,9 @@
 # include "uqApproximant_SE.h"
 
+using namespace std;
+using namespace boost::algorithm;
 
 uqApproximant_SE::uqApproximant_SE(){
-
 }
 
 uqApproximant_SE::uqApproximant_SE(approxTypes approxType,
@@ -10,7 +11,6 @@ uqApproximant_SE::uqApproximant_SE(approxTypes approxType,
 	                                 int order,
 	                                 const stdMat& coeffs,
 	                                 const stdVec& limits){
-
   this->approxType = approxType;
   // Type of Polynomials 
   this->polyType = polyType;
@@ -27,7 +27,7 @@ uqApproximant_SE::~uqApproximant_SE(){
 }
    
 stdMat uqApproximant_SE::evaluate(const stdMat& XVals){
-  
+
   // Create Sample
   uqSamples* samples = new uqSamples(XVals);
   
@@ -90,16 +90,95 @@ stdMat uqApproximant_SE::evaluate(const stdMat& XVals){
   return res;
 }
 
-int uqApproximant_SE::importFromTextFile(string fileName, bool startFromTop,int startLine){
+int uqApproximant_SE::importFromFile(string fileName, bool startFromTop, int startLine){
+  // Open File
+  ifstream myReadFile;
+  string buffer;
+  int numOutputs = 0;
+  int numCoeff = 0;
+  stdStringVec stringVector;
+  stdVec tmpVec;
+
+  // Open file and get to the point
+  myReadFile.open(fileName.c_str());
+  if (myReadFile.is_open()){
+    if(!startFromTop){
+      for(int loopA=0;loopA<startLine;loopA++){
+        getline(myReadFile,buffer);
+      }    
+    }
+
+    // Check you started from a new model
+    getline(myReadFile,buffer);
+    trim(buffer);
+    if(buffer != "START"){
+      throw uqException("ERROR: Mismatch in reading approximant file.");
+    }
+    
+    // Read type of approximantion
+    getline(myReadFile,buffer);
+    trim(buffer);
+    approxType = approxTypes(atoi(buffer.c_str()));
+
+    // Read type of polynomial
+    getline(myReadFile,buffer);
+    trim(buffer);
+    polyType = atoi(buffer.c_str());
+
+    // Read polynomial order
+    getline(myReadFile,buffer);
+    trim(buffer);
+    order = atoi(buffer.c_str());
+
+    // Read size of expansion coefficient matrix
+    getline(myReadFile,buffer);
+    trim(buffer);    
+    split(stringVector,buffer,boost::is_any_of(" "));
+    numOutputs = atoi(stringVector[0].c_str());
+    numCoeff = atoi(stringVector[1].c_str());
+
+    // Read expansion coefficients for all outputs
+    this->coeffs.clear();
+    for(int loopA=0;loopA<numOutputs;loopA++){
+     
+      getline(myReadFile,buffer);
+      trim(buffer);    
+      split(stringVector,buffer,boost::is_any_of(" "));
+      
+      tmpVec.clear();
+      for(int loopB=0;loopB<numCoeff;loopB++){
+        tmpVec.push_back(atof(stringVector[loopB].c_str()));        
+      }
+      this->coeffs.push_back(tmpVec);
+    }
+
+    // Read polynomial order
+    getline(myReadFile,buffer);
+    trim(buffer);
+    boost::split(stringVector,buffer,boost::is_any_of(" "));
+    limits.clear();
+    for(int loopB=0;loopB<stringVector.size();loopB++){
+        limits.push_back(atof(stringVector[loopB].c_str()));        
+    }
+
+  }else{
+    throw uqException("ERROR: Cannot Open Parameter File.\n");
+    myReadFile.close();
+    return 1;
+  }
+  myReadFile.close();
 }
 
-void uqApproximant_SE::exportToTextFile(string fileName, bool append){
+void uqApproximant_SE::exportToFile(string fileName, bool append){
   FILE* outFile;
   if(append){
     outFile = fopen(fileName.c_str(),"a");
   }else{
     outFile = fopen(fileName.c_str(),"w");
   }
+
+  // Save Approx Types: atPoly,atOrthoPoly,atMW
+  fprintf(outFile,"START\n");
 
   // Save Approx Types: atPoly,atOrthoPoly,atMW
   fprintf(outFile,"%d\n",(int)approxType);
@@ -120,7 +199,6 @@ void uqApproximant_SE::exportToTextFile(string fileName, bool append){
   }
 
   // Save the Limits of the single-element approximant
-  fprintf(outFile,"%ld\n",limits.size());
   for(int loopA=0;loopA<limits.size();loopA++){
     fprintf(outFile,"%e ",limits[loopA]);
   }

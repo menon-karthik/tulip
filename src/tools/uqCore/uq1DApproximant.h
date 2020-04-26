@@ -4,6 +4,8 @@
 # include "uqBasis.h"
 # include "uqTypes.h"
 
+using namespace std;
+
 // General class for one-dimensional approximants
 class uq1DApproximant{
   public:

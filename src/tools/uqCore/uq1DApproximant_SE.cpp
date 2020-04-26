@@ -1,5 +1,7 @@
 # include "uq1DApproximant_SE.h"
 
+using namespace std;
+
 // Default Constructor
 uq1DApproximant_SE::uq1DApproximant_SE(){
   basis = NULL;

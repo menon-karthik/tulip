@@ -1,5 +1,7 @@
 #include "uq1DApproximant_ME.h"
 
+using namespace std;
+
 // Default Constructor
 uq1DApproximant_ME::uq1DApproximant_ME(){
 }

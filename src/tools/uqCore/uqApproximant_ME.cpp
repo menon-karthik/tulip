@@ -1,5 +1,7 @@
 #include "uqApproximant_ME.h"
 
+using namespace std;
+
 // Default Constructor
 uqApproximant_ME::uqApproximant_ME(){
 }
@@ -75,26 +77,26 @@ stdVec uqApproximant_ME::getLimits(){
 }
 
 // Export Multi-element Approximant to File
-void uqApproximant_ME::exportToTextFile(string fileName, bool append){
+void uqApproximant_ME::exportToFile(string fileName, bool append){
   // Open and close new file
   FILE* outFile;
   outFile = fopen(fileName.c_str(),"w");
   fclose(outFile);
   // Write content
   for(int loopA=0;loopA<approxList.size();loopA++){
-    approxList[loopA]->exportToTextFile(fileName,true);
+    approxList[loopA]->exportToFile(fileName,true);
   }
 }
 
 // Import Multi-element Approximant from file
-int uqApproximant_ME::importFromTextFile(string fileName, bool startFromTop, int startLine){
+int uqApproximant_ME::importFromFile(string fileName, bool startFromTop, int startLine){
   int numElements = uqUtils::countLinesInFile(fileName)/8 + 1;
   int line = 0;
   int error = 0;
   approxList.clear();
   for(int loopA=0;loopA<numElements;loopA++){
     uqApproximant_SE* currApprox = new uqApproximant_SE();
-    error = currApprox->importFromTextFile(fileName,false,line);
+    error = currApprox->importFromFile(fileName,false,line);
     if(error != 0){
       uqException("ERROR. Cannot Read Multi-element approximant from file.\n");
     }

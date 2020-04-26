@@ -27,17 +27,12 @@ class uqApproximant_SE: public uqApproximant{
     // CONSTRUCTOR AND DESTRUCTOR
     uqApproximant_SE();
     // Construct Ortho Poly or MW Approximant
-    uqApproximant_SE(approxTypes approxType,
-                     int polyType,
-                     int order,
-                     const stdMat& coeffs,
-                     // compact limit representation in a single vector: min d1,max d1,min d2,max d2,...
-                     const stdVec& limits);    
+    uqApproximant_SE(approxTypes approxType,int polyType,int order,const stdMat& coeffs,const stdVec& limits);
     virtual ~uqApproximant_SE();
    
     virtual stdMat evaluate(const stdMat& XValue);
-    virtual int    importFromTextFile(string fileName, bool startFromTop = true,int startLine = 0);
-    virtual void   exportToTextFile(string fileName, bool append = false);
+    virtual int importFromFile(string fileName, bool startFromTop = true, int startLine = 0);
+    virtual void exportToFile(string fileName, bool append = false);
     virtual stdVec getLimits();
 };
 

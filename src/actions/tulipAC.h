@@ -26,6 +26,7 @@
 // Uncertainty Propagation
 # include "acActionUP.h"
 # include "acActionUP_MC.h"
+# include "acActionUP_PC.h"
 # include "acActionUP_MWBCS.h"
 
 // Black-Box Variational Inference

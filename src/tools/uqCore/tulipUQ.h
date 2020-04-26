@@ -4,9 +4,9 @@
 // One-dimensional approximant
 # include "uq1DApproximant.h"
 // Global approximant on a single element
-# include "uq1DSEApproximant.h"
+# include "uq1DApproximant_SE.h"
 // One-dimensional multi-element approximant
-# include "uq1DMEApproximant.h"
+# include "uq1DApproximant_ME.h"
 
 // Numerical quadrature
 # include "uq1DQuadratureRule.h"
@@ -14,6 +14,14 @@
 # include "uq1DQuadratureRule_Regular.h"
 // Clenshaw Curtis quadrature
 # include "uq1DQuadratureRule_CC.h"
+
+// N-dim Approximant
+# include "uqApproximant.h"
+// Single Element Approximant
+# include "uqApproximant_SE.h"
+// Multi Element Approximant
+# include "uqApproximant_ME.h"
+
 
 // Algoritmhs
 # include "uqAlgorithm.h"
