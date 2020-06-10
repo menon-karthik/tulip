@@ -8,16 +8,11 @@ class ntEdge{
 
     // Store direct incidence
     int nodes[2];
-
-    // Store non-parametric messages, i.e., samples
-    stdMat directMessage;
-    stdMat inverseMessage;
-
+ 
   public:
 
   	//! Default Constructor
-  	ntEdge();
-    
+  	ntEdge();    
     //! Virtual Destructor
     virtual ~ntEdge();
   

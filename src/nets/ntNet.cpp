@@ -33,23 +33,10 @@ void ntNet::createNetworkEntities(ntNetIO* netInfo){
   // Create Nodes
   ntNode* node;
   ntEdge* edge;
+
   for(size_t loopA=0;loopA<netInfo->nodeID.size();loopA++){
-    if(netInfo->nodeType[loopA] == ntRoot){
-      
-      // Add root node
-      node = new ntRootNode(loopA,netInfo);
-
-    }else if(netInfo->nodeType[loopA] == ntDeterministic){
-      
-      // Add deterministic node
-      node = new ntDeterministicNode(loopA,netInfo);
-
-    }else if(netInfo->nodeType[loopA] == ntProbabilistic){
-      
-      // Add probabilistic node
-      node = new ntProbabilisticNode(loopA,netInfo);
-
-    }
+    // Add root node
+    node = new ntNode(loopA,netInfo);
     // Add to the list of Nodes
     nodeList.push_back(node);
   }
@@ -72,30 +59,43 @@ void ntNet::assignNodeApproximants(ntNetIO* netInfo){
 }
 
 // Perform Belief Propagation
-int ntNet::propagateBeliefs(){
-	
-  // // Propagate Forward Root Nodes and Nodes with Evidence
-  // for(int loopA=0;loopA<nodeList.size();loopA++){
-  //   if(nodeList[loopA]->isRoot()||nodeList[loopA]->hasEvidence()){
-  //     nodeList[loopA]->propagate();
-  //   }
-  // }
+int ntNet::runBP(){
 
-  // // Iterative complete message passing for the other nodes
-  // bool finishedNodeProcessing = false;
-  // while(!finishedNodeProcessing){
-  //   // Complete another loop through all the nodes
-  //   for(int loopA=0;loopA<nodeList.size();loopA++){
-  //     // Propagate nodes that are not processed
-  //     if(!nodeList[loopA]->processed){
-  //       nodeList[loopA]->propagate();
-  //     }
-  //   }
-  //   // Update finished: is finished when no more nodes to be processed
-  //   finishedNodeProcessing = true;
-  //   for(int loopA=0;loopA<nodeList.size();loopA++){
-  //     finishedNodeProcessing = finishedNodeProcessing && nodeList[loopA]->processedcq;
-  //   }
-  // }
+  // Initialize processing bookmarks for nodes and edges
+  for(int loopA=0;loopA<nodeList.size();loopA++){
+    nodeList[loopA]->processed = false;
+  }
+  for(int loopA=0;loopA<factorList.size();loopA++){
+    factorList[loopA]->processed = false;
+  }
+  
+  // Iterative complete message passing for the other nodes
+  bool finished = false;
+  while(!finished){
+    // Propagate messages from nodes to factors
+    for(int loopA=0;loopA<nodeList.size();loopA++){
+      // Propagate nodes that are not processed
+      if(!nodeList[loopA]->processed){
+        nodeList[loopA]->sendMsgToFactors();
+        nodeList[loopA]->processed = true;
+      }
+    }
+    // Propagate messages from factors to nodes
+    for(int loopA=0;loopA<factorList.size();loopA++){
+      // Propagate nodes that are not processed
+      if(!factorList[loopA]->processed){
+        factorList[loopA]->sendMsgToNodes();
+        factorList[loopA]->processed = true;
+      }
+    }
+    // Update finished: is finished when no more nodes or edges are to be processed
+    finished = true;
+    for(int loopA=0;loopA<nodeList.size();loopA++){
+      finished = finished && nodeList[loopA]->processed;
+    }
+    for(int loopA=0;loopA<factorList.size();loopA++){
+      finished = finished && factorList[loopA]->processed;
+    }
+  }
 }
 

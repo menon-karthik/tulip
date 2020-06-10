@@ -1,14 +1,14 @@
 #ifndef TULIPNT_H
 #define TULIPNT_H
 
-#include "ntNode.h"
-#include "ntRootNode.h"
-#include "ntDeterministicNode.h"
-#include "ntProbabilisticNode.h"
 #include "ntNetIO.h"
-#include "ntEdge.h"
-#include "ntException.h"
 #include "ntNet.h"
+#include "ntNode.h"
+#include "ntEdge.h"
+#include "ntFactor.h"
+#include "ntMessage.h"
+#include "ntUtils.h"
 #include "ntConstants.h"
+#include "ntException.h"
 
 #endif // TULIPNT_H

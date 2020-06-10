@@ -1,15 +1,15 @@
 %module tulipNT
 %{
 /* Includes the header in the wrapper code */
-#include "ntNode.h"
-#include "ntRootNode.h"
-#include "ntDeterministicNode.h"
-#include "ntProbabilisticNode.h"
 #include "ntNetIO.h"
-#include "ntEdge.h"
-#include "ntException.h"
 #include "ntNet.h"
+#include "ntNode.h"
+#include "ntEdge.h"
+#include "ntFactor.h"
+#include "ntMessage.h"
+#include "ntUtils.h"
 #include "ntConstants.h"
+#include "ntException.h"
 #include "uqTypes.h"
 %}
 
@@ -37,15 +37,15 @@
 %apply const int & { int & }; 
 %apply const double & { double & }; 
 
-%include "ntNode.h"
-%include "ntRootNode.h"
-%include "ntDeterministicNode.h"
-%include "ntProbabilisticNode.h"
 %include "ntNetIO.h"
-%include "ntEdge.h"
-%include "ntException.h"
 %include "ntNet.h"
+%include "ntNode.h"
+%include "ntEdge.h"
+%include "ntFactor.h"
+%include "ntMessage.h"
+%include "ntUtils.h"
 %include "ntConstants.h"
+%include "ntException.h"
 %include "uqTypes.h"
 
 namespace std {

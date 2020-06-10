@@ -3,16 +3,13 @@
 
 # include "ntNetIO.h"
 # include "ntNode.h"
-# include "ntRootNode.h"
-# include "ntProbabilisticNode.h"
-# include "ntDeterministicNode.h"
 # include "ntEdge.h"
 
 /*! 
 Abstract parent class for probabilistic networks in UQ
 */
 class ntNet{
-  protected:
+  public:
 
     // Information on the network from file
     ntNetIO* netIO;
@@ -20,9 +17,9 @@ class ntNet{
     //! List of nodes
     vector<ntNode*> nodeList;
     //! List of edges
+    vector<ntFactor*> factorList;
+    //! List of edges
     vector<ntEdge*> edgeList;
-
-  public:
 
   	//! Default Constructor
   	ntNet(string netFile);
@@ -38,7 +35,7 @@ class ntNet{
     void assignEvidence();
 
     // Perform Belief Propagation
-    int propagateBeliefs();
+    int runBP();
 
   
 };
