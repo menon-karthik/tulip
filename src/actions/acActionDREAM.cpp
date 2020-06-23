@@ -579,6 +579,7 @@ int acActionDREAM::cr_index_choose (int cr_num, double cr_prob[])
   if (cr_num == 1){
   
     cr_index = 0;
+    return cr_index;
   
   }else{ 
   
