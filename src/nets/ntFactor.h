@@ -26,6 +26,10 @@ class ntFactor{
     //! Virtual Destructor
     virtual ~ntFactor();
 
+    void setFactorID(int factorID);
+
+    void appendToFactorNodes(const vector<ntNode*>& nodes,const stdBoolVec& isDownNode);
+
     stdMat getMsg(int targetNodeID);
 
     void updateMsg(int factorID,const stdMat& msg);

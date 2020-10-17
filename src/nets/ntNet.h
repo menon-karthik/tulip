@@ -5,6 +5,8 @@
 # include "ntNode.h"
 # include "ntEdge.h"
 
+using namespace std;
+
 /*! 
 Abstract parent class for probabilistic networks in UQ
 */
@@ -26,13 +28,23 @@ class ntNet{
     //! Virtual Destructor
     virtual ~ntNet();
 
+    // Create the network and its topology
     void createNetworkEntities(ntNetIO* netInfo);
-    void assignEdgeRootSamples(ntNetIO* netInfo);
-    void assignNodeApproximants(ntNetIO* netInfo);
-
+    void createFactorGraph();
 
     // Assign Evidence
-    void assignEvidence();
+    void assignEvidence(string fileName);
+    void assignEvidence(int nodeID,const stdIntVec& varIDs,const stdVec& varVals,const stdVec& varStd);
+    void removeEvidence(int nodeID);
+    void removeEvidence();
+    void printEvidence();
+
+    // Utils
+    int getNodeListOrder(int nodeID);
+    stdIntVec getUpsteamNodeList(int nodeListID);
+
+    // Debug
+    void checkFactorGraphTopology(string fileName);
 
     // Perform Belief Propagation
     int runBP();

@@ -23,7 +23,8 @@ class ntNetIO{
     // Evidence for each node
     stdIntVec evidenceNodeID;
     stdIntMat evidenceVarID;
-    stdMat evidenceVarValue;
+    stdMat evidenceVarAvg;
+    stdMat evidenceVarStd;
 
   	//! Default Constructor
   	ntNetIO();
@@ -32,11 +33,29 @@ class ntNetIO{
 
     // Read Network Information from file
     void readFromFile(string fileName);
-    void readVariableFile(int nodeID,
+    // Read file for root nodes
+    void readRootNodeFile(string fileName,
                           int& numVariables,
+                          int& NumSamples,
                           stdStringVec& varNames,
                           stdVec& varSTD,
+                          stdVec& limits,
                           stdMat& varSamples);
+    // Read file for deterministic nodes
+    void readDeterministicNodeFile(string fileName,
+                                   int& numVariables,
+                                   int& NumSamples,
+                                   stdStringVec& varNames,
+                                   stdVec& varSTD,
+                                   vector<modelTypes>& detVarTypes,
+                                   stdStringVec& detModelNames);
+    void readProbabilisticNodeFile(string fileName,
+                                   int& numVariables,
+                                   int& NumSamples,
+                                   stdStringVec& varNames,
+                                   stdVec& varSTD,
+                                   vector<modelTypes>& detVarTypes,
+                                   stdStringVec& detModelNames);
 };
 
 #endif // NTNETIO_H

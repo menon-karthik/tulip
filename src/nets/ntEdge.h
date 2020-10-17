@@ -4,15 +4,13 @@
 # include "uqTypes.h"
 
 class ntEdge{
-  protected:
+  public:
 
     // Store direct incidence
     int nodes[2];
- 
-  public:
-
+    
   	//! Default Constructor
-  	ntEdge();    
+  	ntEdge(int node1,int node2);
     //! Virtual Destructor
     virtual ~ntEdge();
   

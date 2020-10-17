@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '../../../bin/py')
+sys.path.insert(0, '../../../../bin/py')
 import numpy as np
 import matplotlib.pyplot as plt
 # Import tulip UQ library

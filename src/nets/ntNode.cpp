@@ -1,25 +1,76 @@
 # include "ntNode.h"
 
-ntNode::ntNode(int nodeID,ntNetIO* netIO){
+ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
+
+  int numVariables;
+  int numSamples;
+  stdStringVec varNames;
+  stdVec varSTD;
+  stdVec limits;
+  stdMat varSamples;
+  vector<modelTypes> detVarTypes;
+  stdStringVec detModelNames;
+
   // Assign Node ID
-  this->nodeID;
+  this->nodeID = netIO->nodeID[nodeIndex];
   // The node has not been processed yet
   this->processed = false;
-
-  // Read veriable names and samples
-  stdStringVec varNames;
-  stdMat varSamples;
-  stdVec varSTD;
-  netIO->readVariableFile(nodeID,numVariables,varNames,varSTD,varSamples);
-
-  // In a processed node the messages have been propagated
-  processed = false;
-
+  // Look at the node Type 
+  this->nodeType = netIO->nodeType[nodeIndex];
   // Init Gaussian sampler
   uqPDF* nSampler = new uqGaussianPDF();
   // Init Uniform sampler
   uqPDF* uSampler = new uqUniformPDF();
 
+  // Read Node Information based on type
+  if(this->nodeType == ntRoot){
+
+    netIO->readRootNodeFile(netIO->nodeFile[nodeIndex],
+                            numVariables,
+                            numSamples,
+                            varNames,
+                            varSTD,
+                            limits,
+                            varSamples);
+
+    // Assign to Node Variable
+    this->numVariables = numVariables;
+    this->numSamples = numSamples;
+    this->varNames = varNames;
+    this->varSTD = varSTD;
+    this->limits = limits;
+    this->varSamples = varSamples;
+
+  }else if(this->nodeType == ntDeterministic){
+
+    netIO->readDeterministicNodeFile(netIO->nodeFile[nodeIndex],
+                                     numVariables,
+                                     numSamples,
+                                     varNames,
+                                     varSTD,
+                                     detVarTypes,
+                                     detModelNames);
+    // Assign to Node Variable
+    this->numVariables = numVariables;
+    this->numSamples = numSamples;
+    this->varNames = varNames;
+    this->varSTD = varSTD;
+    this->detVarTypes = detVarTypes;
+    this->detModelNames = detModelNames;
+
+  }else if(this->nodeType == ntProbabilistic){
+
+    netIO->readProbabilisticNodeFile(netIO->nodeFile[nodeIndex],
+                                     numVariables,
+                                     numSamples,
+                                     varNames,
+                                     varSTD,
+                                     detVarTypes,
+                                     detModelNames);
+
+  }else{
+    throw ntException("ERROR: Invalid node type in ntNode Constructor.");
+  }
 }
 
 ntNode::~ntNode(){
@@ -49,13 +100,29 @@ bool ntNode::hasEvidence(){
   }
 }
 
+void ntNode::appendToNodeFactors(const vector<ntFactor*>& factors,const stdBoolVec& isDownFactor){
+  if(factors.size() != isDownFactor.size()){
+    throw ntException("ERROR: Invalid factor list in appendToNodeFactors.\n");
+  }
+  // Append nodes
+  for(size_t loopA=0;loopA<factors.size();loopA++){
+    this->nodeFactors.push_back(factors[loopA]);
+  }
+  // Append downstream nodes
+  for(size_t loopA=0;loopA<isDownFactor.size();loopA++){
+    this->isDownstreamFactor.push_back(isDownFactor[loopA]);
+  }
+}
+
 // Propagate messages from nodes to factors
 void ntNode::sendMsgToFactors(){
 
-  int varID     = 0;
+  int    varID  = 0;
   double varVal = 0.0;
   double std    = 0.0;
   double noise  = 0.0;
+
+  printf("Sending message from node %d to neighbor factors\n",this->nodeID);
 
   // Loop on all factor connected to the node
   for(int loopA=0;loopA<nodeFactors.size();loopA++){
@@ -64,6 +131,7 @@ void ntNode::sendMsgToFactors(){
     stdMat currMsg;
     for(int loopB=0;loopB<nodeFactors.size();loopB++){
       if(loopB != loopA){
+        printf("Gather message from neighbor factor %d\n",nodeFactors[loopB]->factorID);
         ntUtils::aggregateMsgs(currMsg,nodeFactors[loopB]->getMsg(nodeID));
       } 
     }
@@ -73,8 +141,8 @@ void ntNode::sendMsgToFactors(){
       // If there is evidence for certain variables, replace these variables with the evidence
       for(int loopA=0;loopA<evidenceVarID.size();loopA++){
         varID = evidenceVarID[loopA];
-        varVal = evidenceVarValue[loopA];
-        std = varSTD[varID];
+        varVal = evidenceVarAvg[loopA];
+        std = evidenceVarStd[loopA];
         for(int loopB=0;loopB<numSamples;loopB++){
           noise = nSampler->sample(0.0,std);
           currMsg[loopB][varID] = varVal + noise;
@@ -191,7 +259,7 @@ stdMat ntNode::uniformSampleUnobserved(const stdMat& msg){
       
       // Get Limits
       currMin = limits[2*loopA + 0];
-      currMax = limits[2*loopA + 0];
+      currMax = limits[2*loopA + 1];
 
       for(int loopB=0;loopB<msg.size();loopB++){
         res[loopB][loopA] = uSampler->sample(currMin,currMax);

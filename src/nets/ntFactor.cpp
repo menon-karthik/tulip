@@ -3,9 +3,28 @@
 using namespace std;
 
 ntFactor::ntFactor(){
+  this->processed = false;
 }
 
 ntFactor::~ntFactor(){
+}
+
+void ntFactor::setFactorID(int factorID){
+  this->factorID = factorID;
+}
+
+void ntFactor::appendToFactorNodes(const vector<ntNode*>& nodes,const stdBoolVec& isDownNode){
+  if(nodes.size() != isDownNode.size()){
+    throw ntException("ERROR: Invalid node list in appendToFactorNodes.\n");
+  }
+  // Append nodes
+  for(size_t loopA=0;loopA<nodes.size();loopA++){
+    this->factorNodes.push_back(nodes[loopA]);
+  }
+  // Append downstream nodes
+  for(size_t loopA=0;loopA<isDownNode.size();loopA++){
+    this->isDownstreamNode.push_back(isDownNode[loopA]);
+  }
 }
 
 stdMat ntFactor::getMsg(int targetNodeID){

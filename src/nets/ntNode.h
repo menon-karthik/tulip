@@ -2,12 +2,17 @@
 #define NTNODE_H
 
 # include "uqTypes.h"
+# include "uqPDF.h"
+
 # include "ntNetIO.h"
 # include "ntFactor.h"
 # include "ntMessage.h"
 # include "ntUtils.h"
-# include "uqPDF.h"
+# include "ntConstants.h"
+# include "ntException.h"
+
 # include "cmApproximant.h"
+
 # include "acActionUP.h"
 # include "acActionUP_MC.h"
 # include "acActionDREAMseq.h"
@@ -21,12 +26,14 @@ Abstract parent class for probabilistic networks in UQ
 */
 class ntNode{
   public:
-     // Nodes ID
-    bool nodeID;
+    // Nodes ID
+    int nodeID;
     // Has the node been processed
     bool processed;
     // Number of variables
     int numVariables;
+    // Type of dependence encoded in the node
+    nodeDependenceTypes nodeType;
     // Number of variables
     int numSamples;
     // Variables Name strings
@@ -37,15 +44,19 @@ class ntNode{
     stdVec limits;
     // Variable realizations
     stdMat varSamples;
+    // Models for deterministic nodes
+    vector<modelTypes> detVarTypes;
+    stdStringVec detModelNames;
     // Evidence: variable ID and evidence value
     stdIntVec evidenceVarID;
-    stdVec evidenceVarValue;
+    stdVec evidenceVarAvg;
+    stdVec evidenceVarStd;
     // List of pointers to the factors
     vector<ntFactor*> nodeFactors;
     stdBoolVec isDownstreamFactor;
     // List of messages to factors
     vector<ntMessage*> messages;
-    // Gaussian sampler
+    // Gaussian and uniform samplers
     uqPDF* nSampler;
     uqPDF* uSampler;
 
@@ -74,6 +85,9 @@ class ntNode{
 
     // Random sample the unobserved variables from the limits
     stdMat uniformSampleUnobserved(const stdMat& msg);
+
+    // Utilities
+    void appendToNodeFactors(const vector<ntFactor*>& factors,const stdBoolVec& isDownFactor);
 
     // Propagate from the node to the factors that are connected
     virtual void sendMsgToFactors();

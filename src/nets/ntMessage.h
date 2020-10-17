@@ -12,7 +12,6 @@ class ntMessage{
   	messageTypes messageType;
   	// Source Entity that sent the message
     int sourceID;
-
     // Target Entity that received the message
     int targetID;
     // Samples forming the message
