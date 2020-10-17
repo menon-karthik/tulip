@@ -16,5 +16,17 @@ void aggregateMsgs(stdMat& Msg,const stdMat& addMsg){
   }
 }
 
+stdMat copySamples(const stdMat& samples){
+  stdMat copy;
+  stdVec tmp;
+  for(int loopA=0;loopA<samples.size();loopA++){
+    for(int loopB=0;loopB<samples[loopA].size();loopB++){
+      tmp.push_back(samples[loopA][loopB]);
+    }
+    copy.push_back(tmp);
+  }
+  return copy;
+}
+
 }
 

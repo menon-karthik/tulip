@@ -23,6 +23,10 @@ class ntNet{
     //! List of edges
     vector<ntEdge*> edgeList;
 
+    // Gaussian and uniform samplers
+    uqPDF* nSampler;
+    uqPDF* uSampler;
+
   	//! Default Constructor
   	ntNet(string netFile);
     //! Virtual Destructor
@@ -31,6 +35,7 @@ class ntNet{
     // Create the network and its topology
     void createNetworkEntities(ntNetIO* netInfo);
     void createFactorGraph();
+    void initMsgsOnRootFactorsLeafNodes();
 
     // Assign Evidence
     void assignEvidence(string fileName);

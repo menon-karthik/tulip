@@ -11,16 +11,17 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
   vector<modelTypes> detVarTypes;
   stdStringVec detModelNames;
 
+  // Init Gaussian sampler
+  uqPDF* nSampler = new uqGaussianPDF();
+  // Init Uniform sampler
+  uqPDF* uSampler = new uqUniformPDF();
+
   // Assign Node ID
   this->nodeID = netIO->nodeID[nodeIndex];
   // The node has not been processed yet
   this->processed = false;
   // Look at the node Type 
   this->nodeType = netIO->nodeType[nodeIndex];
-  // Init Gaussian sampler
-  uqPDF* nSampler = new uqGaussianPDF();
-  // Init Uniform sampler
-  uqPDF* uSampler = new uqUniformPDF();
 
   // Read Node Information based on type
   if(this->nodeType == ntRoot){
@@ -57,6 +58,38 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
     this->varSTD = varSTD;
     this->detVarTypes = detVarTypes;
     this->detModelNames = detModelNames;
+
+    // Assign Node Model and retrieve limits
+    cmModel* mdl
+    for(int loopA=0;loopA<numVariables;loopA++){
+      if(detVarTypes[loopA] == mtModel){
+        // These are just the Darpa model, other can be added
+        if(to_upper_copy(detModelNames[loopA]) == string("DARPASIMPLECODE1")){
+
+          mdl = new cm_darpaSimple_code1();
+
+        }else if(to_upper_copy(detModelNames[loopA]) == string("DARPASIMPLECODE2")){
+
+          mdl = new cm_darpaSimple_code2();
+
+        }else if(to_upper_copy(detModelNames[loopA]) == string("DARPASIMPLECODE3")){
+
+          mdl = new cm_darpaSimple_code3();
+
+        }else{
+          throw ntException("ERROR: Model not supported in ntNode Constructor.");
+        }
+
+      }else if(detVarTypes[loopA] == mtApproximant){
+        
+        mdl = new cmApproximant(detModelNames[loopA]);
+
+      }
+    }
+    
+    // Get parameter limits
+    this->limits = mdl->getDefaultParameterLimits();
+
 
   }else if(this->nodeType == ntProbabilistic){
 

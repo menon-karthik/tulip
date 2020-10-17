@@ -2,6 +2,7 @@
 #define NTMESSAGE_H
 
 # include "uqTypes.h"
+# include "ntUtils.h"
 
 enum messageTypes{mtFactorToNode,mtNodeToFactor};
 
@@ -18,7 +19,7 @@ class ntMessage{
     stdMat msg;
 
   	//! Default Constructor
-  	ntMessage();    
+  	ntMessage(messageTypes messageType,int sourceID,int targetID,const stdMat& msg);
     //! Virtual Destructor
     virtual ~ntMessage();
   

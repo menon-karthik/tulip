@@ -5,7 +5,7 @@
 
 # include "cmModel.h"
 # include "uqTypes.h"
-# include "uqApproximant_SE.h"
+# include "uqApproximant_ME.h"
 
 using namespace std;
 
@@ -13,17 +13,11 @@ using namespace std;
 class cmApproximant: public cmModel{
   public:
 
-    // Single element approximant 
-    uqApproximant_SE* approx;
-    // Standard deviations for all outputs
-    stdVec varSTD;
-    // Matrix with output data realizations
-    stdMat data;
+    // Multielement Approximant
+    uqApproximant_ME* approx;
 
   	//! Default constructor
-  	cmApproximant(uqApproximant_SE* approx,
-                  const stdVec& varSTD,
-                  stdMat& data);
+  	cmApproximant(string fileName);
     //! Virtual destructor
     virtual ~cmApproximant();
 

@@ -56,12 +56,13 @@ class ntNode{
     stdBoolVec isDownstreamFactor;
     // List of messages to factors
     vector<ntMessage*> messages;
+
     // Gaussian and uniform samplers
     uqPDF* nSampler;
     uqPDF* uSampler;
 
     // Approximant 
-    cmModel* nodeApproximant;
+    vector<cmModel*> nodeModels;
 
   	//! Default Constructor
   	ntNode(int nodeID,ntNetIO* netIO);

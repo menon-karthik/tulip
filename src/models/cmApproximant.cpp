@@ -2,10 +2,10 @@
 
 using namespace std;
 
-cmApproximant::cmApproximant(uqApproximant_SE* approx,
-                             const stdVec& varSTD,
-                             stdMat& data){
-  this->approx = approx;
+cmApproximant::cmApproximant(string fileName){
+  // Construct approximant
+  approx = new uqApproximant_ME();
+  approx->importFromFile(fileName)
 }
 
 cmApproximant::~cmApproximant(){
@@ -13,72 +13,55 @@ cmApproximant::~cmApproximant(){
 }
 
 int cmApproximant::getParameterTotal(){
-  return int(approx->limits.size()/2);
+  stdVec limits = approx->getLimits();
+  return limits.size()/2;
 }
 
 int cmApproximant::getStateTotal(){
   return 0;
 }
+
 int cmApproximant::getResultTotal(){
-  return approx->coeffs.size();
+  return approx->coeff[0].size();
 }
 
 void cmApproximant::getDefaultParams(stdVec& params){
-  params.resize(getParameterTotal());
-  for(int loopA=0;loopA<getParameterTotal();loopA++){
-    params[loopA] = 0.5*(approx->limits[2*loopA + 0] + approx->limits[2*loopA + 1]);
+  stdVec limits = approx->getLimits();
+  params.clear();
+  for(int loopA=0;loopA<limits/2;loopA++){
+    params.push_back(0.5*(limits[loopA*2]+limits[loopA*2+1]));
   }
 }
 
 void cmApproximant::getDefaultParameterLimits(stdVec& limits){
-  limits.resize(2*getParameterTotal());
-  for(int loopA=0;loopA<2*getParameterTotal();loopA++){
-    limits.push_back(approx->limits[loopA]);
-  }
+  virtual stdVec getLimits();
 }
 
 void cmApproximant::getPriorMapping(int priorModelType,int* prPtr){
-  throw cmException("cmApproximant::getPriorMapping not Implemented.");
 }
 
 string cmApproximant::getParamName(int parID){
-  return string("par_") + to_string(parID);
+  if(parID<0)&&(parID>=getParameterTotal()){
+    throw cmException("ERROR: Invalid parameter ID.\n");
+  }
+  return string("p") + to_string(parID);
 }
-
 string cmApproximant::getResultName(int resID){
-  return string("res_") + to_string(resID);
+  if(parID<0)&&(parID>=getResultTotal()){
+    throw cmException("ERROR: Invalid parameter ID.\n");
+  }
+  return string("r") + to_string(parID);
 }
 
 double cmApproximant::evalModelError(const stdVec& inputs,stdVec& outputs,stdIntVec& errorCode){
-  stdMat inputMat;
-  stdMat outputMat;
-
-  inputMat.push_back(inputs);
-  outputMat = approx->evaluate(inputMat);
-
+  stdMat xValues;
+  stdMat res;
+  xValues.push_back(inputs);
+  // Evaluate Surrogate
+  res = evaluate(xValues);
   outputs.clear();
-  for(int loopA=0;loopA<outputMat[0].size();loopA++){
-    outputs.push_back(outputMat[0][loopA]);
-  }
-
-  // Save error codes
+  outputs = res[0];
+  // Error Code
   errorCode.clear();
   errorCode.push_back(0);
-
-  // Eval Negative log-likelihood
-  double result = 0.0;
-
-  for(int loopA=0;loopA<data.size();loopA++){
-    for(int loopB=0;loopB<getResultTotal();loopB++){
-      result += (data[loopA][loopB] - outputs[loopB])*(data[loopA][loopB] - outputs[loopB])/(varSTD[loopB]*varSTD[loopB]);
-    }
-  }
-
-  // Return
-  return result;
 }
-
-
-
-
-

@@ -3,6 +3,12 @@
 using namespace std;
 
 ntNet::ntNet(string netFile){
+
+  // Init Gaussian sampler
+  uqPDF* nSampler = new uqGaussianPDF();
+  // Init Uniform sampler
+  uqPDF* uSampler = new uqUniformPDF();
+
   // Create network information
   netIO = new ntNetIO();
   
@@ -15,16 +21,23 @@ ntNet::ntNet(string netFile){
   printf("--- Done Creating Network Entities.\n");
 
   // Create Factor Graph for Messgae Passing
-  printf("Creating Factor Graph...");
+  printf("--- Creating Factor Graph...");
   createFactorGraph();
   printf("Done.\n");
 
   // Generate dot file for graphviz graphical representation
   // checkFactorGraphTopology("factorGraphTopology.txt");
+
+  // Initialize the Messages on root and leaf nodes
+  printf("--- Initializing Root Factors and Leaf Nodes...");
+  initMsgsOnRootFactorsLeafNodes();
+  printf("Done.\n");
 }
 
 ntNet::~ntNet(){
   delete netIO;
+  delete nSampler;
+  delete uSampler;
 }
 
 // Assign Single-node Evidence
@@ -101,6 +114,59 @@ void ntNet::checkFactorGraphTopology(string fileName){
   // Close File
   fprintf(f,"}\n");
   fclose(f);
+}
+
+void ntNet::initMsgsOnRootFactorsLeafNodes(){
+  
+  stdMat currMessage;
+  stdVec tmpSample;
+  ntMessage* msg;
+  double currSample;
+
+  // Initialize Root Factor Messages with Priors
+  for(int loopA=0;loopA<factorList.size();loopA++){
+    if(factorList[loopA]->factorNodes.size() == 1){
+      if(factorList[loopA]->isDownstreamNode[0]){
+        // Copy samples from downstream node
+        currMessage = ntUtils::copySamples(factorList[loopA]->factorNodes[0]->varSamples);
+        // Create New Message
+        msg = new ntMessage(mtFactorToNode,
+                            factorList[loopA]->factorID,
+                            factorList[loopA]->factorNodes[0]->nodeID,
+                            currMessage);
+        factorList[loopA]->messages.push_back(msg);
+        factorList[loopA]->processed = true;
+      }
+    }
+  }
+
+  // Initialize Leaf Nodes with Uniform Distributions
+  for(int loopA=0;loopA<nodeList.size();loopA++){
+    if(nodeList[loopA]->nodeFactors.size() == 1){
+      if(!nodeList[loopA]->isDownstreamFactor[0]){        
+        // Loop on number of samples
+        currMessage.clear();
+        for(int loopB=0;loopB<nodeList[loopA]->numSamples;loopB++){
+          tmpSample.clear();
+          for(int loopC=0;loopC<nodeList[loopA]->numVariables;loopC++){
+            // Generate a random sample for this variable in the range
+            currSample = uSampler->sample(nodeList[loopA]->limits[loopC*2],nodeList[loopA]->limits[loopC*2+1]);
+            // Add to temporary sample
+            tmpSample.push_back(currSample);
+          }
+          currMessage.push_back(tmpSample);
+        }
+        // Add to message to single factor
+        // Create New Message
+        msg = new ntMessage(mtNodeToFactor,
+                            nodeList[loopA]->nodeID,
+                            nodeList[loopA]->nodeFactors[0]->factorID,
+                            currMessage);
+        nodeList[loopA]->messages.push_back(msg);
+        nodeList[loopA]->processed = true;        
+      }
+    }
+  }
 }
 
 // Assign Evidence for multiple nodes by reading it from a file

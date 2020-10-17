@@ -7,6 +7,8 @@
 namespace ntUtils{
 
 void aggregateMsgs(stdMat& Msg,const stdMat& addMsg);
+
+stdMat copySamples(const stdMat& samples);
   
 }
 
