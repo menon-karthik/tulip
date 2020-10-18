@@ -281,6 +281,7 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
                                         int& numSamples,
                                         stdStringVec& varNames,
                                         stdVec& varSTD,
+                                        stdVec& limits,
                                         modelTypes& detVarType,
                                         string& detModelName){
   // Message
@@ -289,6 +290,8 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
   // Declare
   stdStringVec tokenizedString;
   stdVec       tmpVec;
+  stdVec       minLimits;
+  stdVec       maxLimits;
   bool doInclude = false;
   int auxCount = 0;
 
@@ -353,6 +356,28 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
         lineCount++;
       }else if(lineCount == 4){
         try{
+          minLimits.clear();
+          for(int loopA=0;loopA<tokenizedString.size();loopA++){
+            minLimits.push_back(atof(tokenizedString[loopA].c_str()));
+          }
+        }catch(...){
+          throw ntException("ERROR: Invalid ROOT NODE file.\n");
+        }
+        // Increment Line Count
+        lineCount++;
+      }else if(lineCount == 5){
+        try{
+          maxLimits.clear();
+          for(int loopA=0;loopA<tokenizedString.size();loopA++){
+            maxLimits.push_back(atof(tokenizedString[loopA].c_str()));
+          }
+        }catch(...){
+          throw ntException("ERROR: Invalid ROOT NODE file.\n");
+        }
+        // Increment Line Count
+        lineCount++;
+      }else if(lineCount == 6){
+        try{
           if(to_upper_copy(tokenizedString[0]) == string("MODEL")){
             detVarType = mtModel;
           }else if(to_upper_copy(tokenizedString[0]) == string("FILE")){
@@ -365,14 +390,12 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
         }
         // Increment Line Count
         lineCount++;
-      }else if(lineCount == 5){
+      }else if(lineCount == 7){
         try{
           detModelName = tokenizedString[0];
         }catch(...){
           throw ntException("ERROR: Invalid deterministic node model name.\n");
-        }
-        // Increment Line Count
-        break;
+        }      
       }else if((tokenizedString.size() == 0)||(tokenizedString[0].at(0) == '#')||(tokenizedString[0].find_first_not_of(' ') == std::string::npos)){
         // COMMENT OR BLANK LINE: DO NOTHING
       }else{
@@ -380,6 +403,17 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
         throw ntException("ERROR: Invalid Token in input file.\n");
       }
     }
+  }
+
+  // Assemble Limits in unique std vector
+  if(minLimits.size() != maxLimits.size()){
+    throw ntException("ERROR: Limits array not compatible in readDeterministicNodeFile.\n");
+  }
+
+  limits.clear();
+  for(int loopA=0;loopA<minLimits.size();loopA++){
+    limits.push_back(minLimits[loopA]);
+    limits.push_back(maxLimits[loopA]);
   }
 
   // Close File

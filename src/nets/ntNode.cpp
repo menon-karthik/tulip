@@ -51,6 +51,7 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
                                      numSamples,
                                      varNames,
                                      varSTD,
+                                     limits,
                                      detVarType,
                                      detModelName);
     // Assign to Node Variable
@@ -58,6 +59,7 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
     this->numSamples = numSamples;
     this->varNames = varNames;
     this->varSTD = varSTD;
+    this->limits = limits;
     this->detVarType = detVarType;
     this->detModelName = detModelName;
 
@@ -89,8 +91,6 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
       throw ntException("ERROR: Invalid node model type in ntNode Constructor.");
     }
     
-    // Get parameter limits
-    mdl->getDefaultParameterLimits(this->limits);
     // Add model to node
     nodeModel = mdl;
 

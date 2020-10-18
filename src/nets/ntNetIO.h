@@ -49,6 +49,7 @@ class ntNetIO{
                                         int& numSamples,
                                         stdStringVec& varNames,
                                         stdVec& varSTD,
+                                        stdVec& limits,
                                         modelTypes& detVarType,
                                         string& detModelName);
 

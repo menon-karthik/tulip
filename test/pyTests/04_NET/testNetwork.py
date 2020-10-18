@@ -85,6 +85,9 @@ def prepareDeterministicNodeFiles():
   file.write('pressure,heatflux\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
   file.write('1000.0,0.10e6\n') # Pressure [Pa], Heat Flux [W/m2]
+  # Limits of all variables: first row min and second row max
+  file.write('1.0e2,1.0e2\n') 
+  file.write('1.0e6,1.0e7\n') 
   # Approximant Type for each variable
   file.write('model\n') # can be MODEL, FILE
   # Approximant Name or file name for each variable
@@ -99,7 +102,10 @@ def prepareDeterministicNodeFiles():
   # Name of variables 
   file.write('sigma_vm,temperature\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
-  file.write('0.01e6,50.0\n') # Stress [Pa], Temperature [W/m2]
+  file.write('0.01e6,50.0\n') # Stress [Pa], Temperature [K]
+    # Limits of all variables: first row min and second row max
+  file.write('1.0e2,300.0\n') 
+  file.write('1.0e6,5000.0\n') 
   # Approximant Type for each variable
   file.write('model\n') # can be MODEL, FILE
   # Approximant Name or file name for each variable
@@ -114,7 +120,10 @@ def prepareDeterministicNodeFiles():
   # Name of variables 
   file.write('failure_ratio\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
-  file.write('0.1\n') # Stress [Pa], Temperature [W/m2]
+  file.write('0.1\n') # Failure ratio
+    # Limits of all variables: first row min and second row max
+  file.write('0.0\n') 
+  file.write('10.0\n') 
   # Approximant Type for each variable
   file.write('model\n') # can be MODEL, FILE
   # Approximant Name or file name for each variable

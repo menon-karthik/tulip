@@ -5,9 +5,9 @@ using namespace std;
 ntNet::ntNet(string netFile){
 
   // Init Gaussian sampler
-  uqPDF* nSampler = new uqGaussianPDF();
+  nSampler = new uqGaussianPDF();
   // Init Uniform sampler
-  uqPDF* uSampler = new uqUniformPDF();
+  uSampler = new uqUniformPDF();
 
   // Create network information
   netIO = new ntNetIO();
@@ -138,12 +138,12 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
         factorList[loopA]->processed = true;
       }
     }
-  }
+  }  
 
   // Initialize Leaf Nodes with Uniform Distributions
   for(int loopA=0;loopA<nodeList.size();loopA++){
     if(nodeList[loopA]->nodeFactors.size() == 1){
-      if(!nodeList[loopA]->isDownstreamFactor[0]){        
+      if(!nodeList[loopA]->isDownstreamFactor[0]){                
         // Loop on number of samples
         currMessage.clear();
         for(int loopB=0;loopB<nodeList[loopA]->numSamples;loopB++){
