@@ -86,9 +86,9 @@ def prepareDeterministicNodeFiles():
   # Standard Deviation of all variables
   file.write('1000.0,0.10e6\n') # Pressure [Pa], Heat Flux [W/m2]
   # Approximant Type for each variable
-  file.write('model,model\n') # can be MODEL, FILE
+  file.write('model\n') # can be MODEL, FILE
   # Approximant Name or file name for each variable
-  file.write('darpaSimpleCode1,darpaSimpleCode1\n') # name of the model/file
+  file.write('darpaSimpleCode1\n') # name of the model/file
   file.close()
 
   ### Thermo Mechanical Stress and Temperature
@@ -101,9 +101,9 @@ def prepareDeterministicNodeFiles():
   # Standard Deviation of all variables
   file.write('0.01e6,50.0\n') # Stress [Pa], Temperature [W/m2]
   # Approximant Type for each variable
-  file.write('model,model\n') # can be MODEL, FILE
+  file.write('model\n') # can be MODEL, FILE
   # Approximant Name or file name for each variable
-  file.write('darpaSimpleCode2,darpaSimpleCode2\n') # name of the model/file
+  file.write('darpaSimpleCode2\n') # name of the model/file
   file.close()
 
   ### Thermo Mechanical Stress and Temperature

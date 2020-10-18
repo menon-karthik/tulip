@@ -1,6 +1,8 @@
 #ifndef NTNODE_H
 #define NTNODE_H
 
+# include <boost/algorithm/string.hpp>
+
 # include "uqTypes.h"
 # include "uqPDF.h"
 
@@ -16,6 +18,10 @@
 # include "acActionUP.h"
 # include "acActionUP_MC.h"
 # include "acActionDREAMseq.h"
+
+# include "cm_darpaSimple_code1.h"
+# include "cm_darpaSimple_code2.h"
+# include "cm_darpaSimple_code3.h"
 
 using namespace std;
 
@@ -45,8 +51,8 @@ class ntNode{
     // Variable realizations
     stdMat varSamples;
     // Models for deterministic nodes
-    vector<modelTypes> detVarTypes;
-    stdStringVec detModelNames;
+    modelTypes detVarType;
+    string detModelName;
     // Evidence: variable ID and evidence value
     stdIntVec evidenceVarID;
     stdVec evidenceVarAvg;
@@ -62,7 +68,7 @@ class ntNode{
     uqPDF* uSampler;
 
     // Approximant 
-    vector<cmModel*> nodeModels;
+    cmModel* nodeModel;
 
   	//! Default Constructor
   	ntNode(int nodeID,ntNetIO* netIO);

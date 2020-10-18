@@ -33,6 +33,7 @@ class ntNetIO{
 
     // Read Network Information from file
     void readFromFile(string fileName);
+
     // Read file for root nodes
     void readRootNodeFile(string fileName,
                           int& numVariables,
@@ -41,21 +42,24 @@ class ntNetIO{
                           stdVec& varSTD,
                           stdVec& limits,
                           stdMat& varSamples);
+
     // Read file for deterministic nodes
     void readDeterministicNodeFile(string fileName,
-                                   int& numVariables,
-                                   int& NumSamples,
-                                   stdStringVec& varNames,
-                                   stdVec& varSTD,
-                                   vector<modelTypes>& detVarTypes,
-                                   stdStringVec& detModelNames);
+                                        int& numVariables,
+                                        int& numSamples,
+                                        stdStringVec& varNames,
+                                        stdVec& varSTD,
+                                        modelTypes& detVarType,
+                                        string& detModelName);
+
+    // Read file for probabilistic nodes
     void readProbabilisticNodeFile(string fileName,
                                    int& numVariables,
                                    int& NumSamples,
                                    stdStringVec& varNames,
                                    stdVec& varSTD,
-                                   vector<modelTypes>& detVarTypes,
-                                   stdStringVec& detModelNames);
+                                   modelTypes& detVarType,
+                                   string& detModelName);
 };
 
 #endif // NTNETIO_H

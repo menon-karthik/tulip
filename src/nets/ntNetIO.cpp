@@ -281,8 +281,8 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
                                         int& numSamples,
                                         stdStringVec& varNames,
                                         stdVec& varSTD,
-                                        vector<modelTypes>& detVarTypes,
-                                        stdStringVec& detModelNames){
+                                        modelTypes& detVarType,
+                                        string& detModelName){
   // Message
   printf("Reading deterministic node file: %s ... \n",fileName.c_str());
 
@@ -353,34 +353,23 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
         lineCount++;
       }else if(lineCount == 4){
         try{
-          detVarTypes.clear();
-          for(int loopA=0;loopA<tokenizedString.size();loopA++){
-            if(to_upper_copy(tokenizedString[loopA]) == string("MODEL")){
-
-              detVarTypes.push_back(mtModel);
-
-            }else if(to_upper_copy(tokenizedString[loopA]) == string("FILE")){
-
-              detVarTypes.push_back(mtApproximant);
-
-            }else{
-              throw ntException("ERROR: Invalid node model type.\n");
-            }
-            
+          if(to_upper_copy(tokenizedString[0]) == string("MODEL")){
+            detVarType = mtModel;
+          }else if(to_upper_copy(tokenizedString[0]) == string("FILE")){
+            detVarType = mtApproximant;
+          }else{
+            throw ntException("ERROR: Invalid node model type.\n");
           }
         }catch(...){
-          throw ntException("ERROR: Invalid ROOT NODE file.\n");
+          throw ntException("ERROR: Invalid deterministic node model type.\n");
         }
         // Increment Line Count
         lineCount++;
       }else if(lineCount == 5){
         try{
-          detModelNames.clear();
-          for(int loopA=0;loopA<tokenizedString.size();loopA++){
-            detModelNames.push_back(tokenizedString[loopA]);
-          }
+          detModelName = tokenizedString[0];
         }catch(...){
-          throw ntException("ERROR: Invalid ROOT NODE file.\n");
+          throw ntException("ERROR: Invalid deterministic node model name.\n");
         }
         // Increment Line Count
         break;
@@ -403,8 +392,8 @@ void ntNetIO::readProbabilisticNodeFile(string fileName,
                                         int& NumSamples,
                                         stdStringVec& varNames,
                                         stdVec& varSTD,
-                                        vector<modelTypes>& detVarTypes,
-                                        stdStringVec& detModelNames){
+                                        modelTypes& detVarType,
+                                        string& detModelName){
   throw ntException("ERROR: readProbabilisticNodeFile not implemented.\n");
 }
 

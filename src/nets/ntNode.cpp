@@ -1,5 +1,7 @@
 # include "ntNode.h"
 
+using namespace boost::algorithm;
+
 ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
 
   int numVariables;
@@ -8,8 +10,8 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
   stdVec varSTD;
   stdVec limits;
   stdMat varSamples;
-  vector<modelTypes> detVarTypes;
-  stdStringVec detModelNames;
+  modelTypes detVarType;
+  string detModelName;
 
   // Init Gaussian sampler
   uqPDF* nSampler = new uqGaussianPDF();
@@ -49,47 +51,48 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
                                      numSamples,
                                      varNames,
                                      varSTD,
-                                     detVarTypes,
-                                     detModelNames);
+                                     detVarType,
+                                     detModelName);
     // Assign to Node Variable
     this->numVariables = numVariables;
     this->numSamples = numSamples;
     this->varNames = varNames;
     this->varSTD = varSTD;
-    this->detVarTypes = detVarTypes;
-    this->detModelNames = detModelNames;
+    this->detVarType = detVarType;
+    this->detModelName = detModelName;
 
     // Assign Node Model and retrieve limits
-    cmModel* mdl
-    for(int loopA=0;loopA<numVariables;loopA++){
-      if(detVarTypes[loopA] == mtModel){
-        // These are just the Darpa model, other can be added
-        if(to_upper_copy(detModelNames[loopA]) == string("DARPASIMPLECODE1")){
+    cmModel* mdl;
+    if(detVarType == mtModel){
+      // These are just the Darpa model, other can be added
+      if(to_upper_copy(detModelName) == string("DARPASIMPLECODE1")){
 
-          mdl = new cm_darpaSimple_code1();
+        mdl = new cm_darpaSimple_code1();
 
-        }else if(to_upper_copy(detModelNames[loopA]) == string("DARPASIMPLECODE2")){
+      }else if(to_upper_copy(detModelName) == string("DARPASIMPLECODE2")){
 
-          mdl = new cm_darpaSimple_code2();
+        mdl = new cm_darpaSimple_code2();
 
-        }else if(to_upper_copy(detModelNames[loopA]) == string("DARPASIMPLECODE3")){
+      }else if(to_upper_copy(detModelName) == string("DARPASIMPLECODE3")){
 
-          mdl = new cm_darpaSimple_code3();
+        mdl = new cm_darpaSimple_code3();
 
-        }else{
-          throw ntException("ERROR: Model not supported in ntNode Constructor.");
-        }
-
-      }else if(detVarTypes[loopA] == mtApproximant){
-        
-        mdl = new cmApproximant(detModelNames[loopA]);
-
+      }else{
+        throw ntException("ERROR: Model not supported in ntNode Constructor.");
       }
+
+    }else if(detVarType == mtApproximant){
+        
+      mdl = new cmApproximant(detModelName);
+
+    }else{
+      throw ntException("ERROR: Invalid node model type in ntNode Constructor.");
     }
     
     // Get parameter limits
-    this->limits = mdl->getDefaultParameterLimits();
-
+    mdl->getDefaultParameterLimits(this->limits);
+    // Add model to node
+    nodeModel = mdl;
 
   }else if(this->nodeType == ntProbabilistic){
 
@@ -98,8 +101,8 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
                                      numSamples,
                                      varNames,
                                      varSTD,
-                                     detVarTypes,
-                                     detModelNames);
+                                     detVarType,
+                                     detModelName);
 
   }else{
     throw ntException("ERROR: Invalid node type in ntNode Constructor.");
@@ -208,7 +211,7 @@ stdMat ntNode::forwardUQ(const stdMat& msg){
   uqSamples* samples = new uqSamples(msg);
   // Initialize 
   acActionUP_MC* mc = new acActionUP_MC(samples);
-  mc->setModel(nodeApproximant);
+  mc->setModel(nodeModel);
   mc->opts.numberOfRepeats = 1;
   mc->opts.sampleGroups.push_back(msg.size());
   mc->opts.storeSamples = true;
@@ -249,7 +252,7 @@ stdMat ntNode::inverseUQ(const stdMat& msg){
                                                 dreamJumpStep,dreamGRPrintStep,
                                                 dreamRestartReadFileName,dreamRestartWriteFileName,
                                                 usePriorFromFile, priorFileName, priorModelType);
-  mcmc->setModel(nodeApproximant);
+  mcmc->setModel(nodeModel);
   // Run MCMC Simulation
   mcmc->go();
 
