@@ -43,6 +43,8 @@ string cm_darpaSimple_code2::getParamName(int parID){
     return string("pressure");
   }else if(parID == 1){
     return string("heatflux");
+  }else if(parID == 2){
+    return string("el_modulus");    
   }else{
     throw cmException("ERROR: invalid parameter ID.\n");
   }

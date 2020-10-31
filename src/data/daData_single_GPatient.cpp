@@ -73,7 +73,7 @@ double daData_single_GPatient::evalOBJ(const stdStringVec& keys,const stdVec& va
   return result;
 }
 
-double daData_single_GPatient::evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+double daData_single_GPatient::evalLogLikelihood(const stdStringVec& keys,const stdVec& avValues,const stdVec& stdFactors,const stdVec& weights){
   
   // Check The Size of keys and values
   if((keys.size() != avValues.size())||(keys.size() != stdFactors.size())||(keys.size() != weights.size())){
@@ -115,12 +115,12 @@ double daData_single_GPatient::evalLogLikelihood(stdStringVec keys,stdVec avValu
   return result;
 }
 
-double daData_single_GPatient::evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+double daData_single_GPatient::evalLikelihood(const stdStringVec& keys,const stdVec& avValues,const stdVec& stdFactors,const stdVec& weights){
   double ll = evalLogLikelihood(keys,avValues,stdFactors,weights);
   return log(ll);
 }
 
-void daData_single_GPatient::printAndCompare(stdStringVec keys,stdVec values,stdVec weigths){
+void daData_single_GPatient::printAndCompare(const stdStringVec& keys,const stdVec& values,const stdVec& weigths){
   
   // Check The Size of keys and values
   if((keys.size() != values.size())||(keys.size() != weigths.size())){
@@ -164,7 +164,7 @@ void daData_single_GPatient::printAndCompare(stdStringVec keys,stdVec values,std
   fclose(fp);
 }
 
-int daData_single_GPatient::getPatientValue(string key,double &result){
+int daData_single_GPatient::getPatientValue(string key,double& result){
   int retVal = 0;
   if(dict.find(key) != dict.end()){
     try{

@@ -155,9 +155,9 @@ void restart_write ( int chain_num, double fit[], int gen_num, int par_num,
     restart.open ( restart_write_filename.c_str ( ) );   
 
     if (!restart){    
-      cerr << "\n";
-      cerr << "RESTART_WRITE - Fatal error!\n";
-      cerr << "  Could not open \"" << restart_write_filename << "\".\n";
+      cout << "\n";
+      cout << "RESTART_WRITE - Fatal error!\n";
+      cout << "  Could not open \"" << restart_write_filename << "\".\n";
       exit ( 1 );
     }
 
@@ -1078,41 +1078,41 @@ int acActionDREAMmpi::go(){
 //
   if(chain_num < 3){
     if(globRank == 0){
-      cerr << "\n";
-      cerr << "DREAM - Fatal error!\n";
-      cerr << "  CHAIN_NUM < 3. Please use the serial version of DREAM instead.\n";
+      cout << "\n";
+      cout << "DREAM - Fatal error!\n";
+      cout << "  CHAIN_NUM < 3. Please use the serial version of DREAM instead.\n";
     }
     exit(1);
   }
   if (cr_num < 1){
     if(globRank == 0){
-      cerr << "\n";
-      cerr << "DREAM - Fatal error!\n";
-      cerr << "  CR_NUM < 1.\n";
+      cout << "\n";
+      cout << "DREAM - Fatal error!\n";
+      cout << "  CR_NUM < 1.\n";
     }
     exit(1);
   }
   if(gen_num < 2){
     if(globRank == 0){
-      cerr << "\n";
-      cerr << "DREAM - Fatal error!\n";
-      cerr << "  GEN_NUM < 2.\n";
+      cout << "\n";
+      cout << "DREAM - Fatal error!\n";
+      cout << "  GEN_NUM < 2.\n";
     }
     exit(1);
   }
   if(pair_num < 0){
     if(globRank == 0){
-      cerr << "\n";
-      cerr << "DREAM - Fatal error!\n";
-      cerr << "  PAIR_NUM < 0.\n";
+      cout << "\n";
+      cout << "DREAM - Fatal error!\n";
+      cout << "  PAIR_NUM < 0.\n";
     }
     exit(1);
   }
   if(par_num < 1){
     if(globRank == 0){
-      cerr << "\n";
-      cerr << "DREAM - Fatal error!\n";
-      cerr << "  PAR_NUM < 1.\n";
+      cout << "\n";
+      cout << "DREAM - Fatal error!\n";
+      cout << "  PAR_NUM < 1.\n";
     }
     exit(1);
   }

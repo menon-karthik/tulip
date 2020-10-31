@@ -48,13 +48,15 @@ class ntNet{
     int getNodeListOrder(int nodeID);
     stdIntVec getUpsteamNodeList(int nodeListID);
 
-    // Debug
+    // Debug: Print a graphviz file to show the network topology
     void checkFactorGraphTopology(string fileName);
+    // Debug: Print a graphviz file to the number of messages in te network
+    void checkFactorGraphMessages(string fileName);
+
+    void printAllMessages();
 
     // Perform Belief Propagation
     int runBP();
-
-  
 };
 
 #endif // NTNET_H

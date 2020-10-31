@@ -14,28 +14,37 @@ class ntFactor{
 
     int factorID;
 
-    bool processed;
-
     vector<ntNode*> factorNodes;
     stdBoolVec isDownstreamNode;
 
-    vector<ntMessage*> messages;
+    vector<ntMessage*> inMsgs;
 
   	//! Default Constructor
   	ntFactor();
     //! Virtual Destructor
     virtual ~ntFactor();
 
+    // Find incoming message for a given factor ID
+    bool findInMsg(int nodeID);
+    // Check if the factor is ready to send messages to node nodeID
+    bool messagesAreReadyFor(int nodeID);
+    // Check that all incoming messages are present
+    bool hasProcessedAllMsgs();
+
     void setFactorID(int factorID);
 
     void appendToFactorNodes(const vector<ntNode*>& nodes,const stdBoolVec& isDownNode);
 
-    stdMat getMsg(int targetNodeID);
+    ntMessage* copyInMsg(int nodeID);
 
-    void updateMsg(int factorID,const stdMat& msg);
+    void updateMsg(int nodeID,ntMessage* currMsg);
 
     // Propagate from the node to the factors that are connected
-    virtual void sendMsgToNodes();
+    void sendMsgToNodes();
+
+    void printMessages();
+
+    int getDownstreamDetNodeID();
 
 };
 

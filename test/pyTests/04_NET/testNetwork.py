@@ -15,12 +15,12 @@ def prepareRootNodeFiles():
   # Number of Variables, Number of Samples
   file.write('1,'+str(numSamples) + '\n') 
   # Name of variables 
-  file.write('Vehicle velocity\n') 
+  file.write('velocity\n') 
   # Standard Deviation of all variables
   file.write('500.0\n') 
   # Limits of all variables: first row min and second row max
-  file.write('4000.0\n') 
   file.write('800.0\n') 
+  file.write('4000.0\n') 
   # Matrix of variable realizations
   theta1Samples = np.random.normal(loc=6000.0,scale=500.0,size=(numSamples,1))
   for loopA in range(numSamples):
@@ -33,7 +33,7 @@ def prepareRootNodeFiles():
   # Number of Variables, Number of Samples
   file.write('1,'+str(numSamples) + '\n') 
   # Name of variables 
-  file.write('TPS Elastic module\n') 
+  file.write('el_modulus\n') 
   # Standard Deviation of all variables
   file.write('10.0e6\n') 
   # Limits of all variables: first row min and second row max
@@ -51,7 +51,7 @@ def prepareRootNodeFiles():
   # Number of Variables, Number of Samples
   file.write('1,'+str(numSamples) + '\n') 
   # Name of variables 
-  file.write('TPS Max allowable temperature\n') 
+  file.write('temperature_limit\n') 
   # Standard Deviation of all variables
   file.write('100.0\n') 
   # Limits of all variables: first row min and second row max

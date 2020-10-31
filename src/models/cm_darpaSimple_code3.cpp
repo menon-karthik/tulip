@@ -35,7 +35,7 @@ void cm_darpaSimple_code3::getPriorMapping(int priorModelType,int* prPtr){
 }
 string cm_darpaSimple_code3::getParamName(int parID){
   if(parID == 0){
-    return string("sigma");
+    return string("sigma_vm");
   }else if(parID == 1){
     return string("temperature");
   }else if(parID == 2){
@@ -85,7 +85,7 @@ double cm_darpaSimple_code3::evalModelError(const stdVec& inputs,stdVec& outputs
   // Eval the log-likelihood
   double result = 0.0;
   if(data != NULL){
-    result = data->evalLogLikelihood(keys,outputs,stds,weights);
+    result = data->evalLogLikelihood(keys,outputs,stds,weights);    
   }
 
   // Return 

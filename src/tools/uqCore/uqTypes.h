@@ -33,5 +33,6 @@ typedef vector<vector<string> > stdStringMat;
 
 //! Patient data map
 typedef map< string, stdStringVec > dataMap;
+typedef map< string, double > doubleMap;
 
 #endif // UQTYPES

@@ -27,11 +27,6 @@ ntNet::ntNet(string netFile){
 
   // Generate dot file for graphviz graphical representation
   // checkFactorGraphTopology("factorGraphTopology.txt");
-
-  // Initialize the Messages on root and leaf nodes
-  printf("--- Initializing Root Factors and Leaf Nodes...");
-  initMsgsOnRootFactorsLeafNodes();
-  printf("Done.\n");
 }
 
 ntNet::~ntNet(){
@@ -116,6 +111,57 @@ void ntNet::checkFactorGraphTopology(string fileName){
   fclose(f);
 }
 
+void ntNet::checkFactorGraphMessages(string fileName){
+  // Create a dot file with the graph topology
+
+  FILE* f;
+  f = fopen(fileName.c_str(),"w");
+  
+  fprintf(f,"digraph factorGraph {\n");
+
+  fprintf(f,"ratio=\"fill\";\n");
+  fprintf(f,"size=\"4.0,4.0!\";\n");
+  fprintf(f,"margin=0;\n");
+
+  // Write all nodes
+  for(size_t loopA=0;loopA<nodeList.size();loopA++){
+    if(nodeList[loopA]->nodeType == ntRoot){
+      fprintf(f,"N%d [shape=circle]\n",int(nodeList[loopA]->nodeID));
+    }else if(nodeList[loopA]->nodeType == ntDeterministic){
+      fprintf(f,"N%d [shape=doublecircle]\n",int(nodeList[loopA]->nodeID));
+    }else if(nodeList[loopA]->nodeType == ntProbabilistic){
+      fprintf(f,"N%d [shape=diamond]\n",int(nodeList[loopA]->nodeID));
+    }
+  }
+
+  // Write all factors
+  for(size_t loopA=0;loopA<factorList.size();loopA++){
+    fprintf(f,"F%d [shape=square,color=red]\n",int(factorList[loopA]->factorID));
+  }
+
+  // Write factor to node messages
+  for(size_t loopA=0;loopA<nodeList.size();loopA++){
+    for(size_t loopB=0;loopB<nodeList[loopA]->inMsgs.size();loopB++){
+      fprintf(f,"F%d -> N%d [color=red,labelfontcolor=red,label = """"%d""""]\n",nodeList[loopA]->inMsgs[loopB]->sourceID,
+                                                                             nodeList[loopA]->inMsgs[loopB]->targetID,
+                                                                             int(nodeList[loopA]->inMsgs[loopB]->varLabels.size()));
+    }
+  }
+
+  // Write factor links to node
+  for(size_t loopA=0;loopA<factorList.size();loopA++){
+    for(size_t loopB=0;loopB<factorList[loopA]->inMsgs.size();loopB++){      
+      fprintf(f,"N%d -> F%d [label = """"%d""""]\n",int(factorList[loopA]->inMsgs[loopB]->sourceID),
+                                                int(factorList[loopA]->inMsgs[loopB]->targetID),
+                                                int(factorList[loopA]->inMsgs[loopB]->varLabels.size()));
+    }
+  }
+
+  // Close File
+  fprintf(f,"}\n");
+  fclose(f);
+}
+
 void ntNet::initMsgsOnRootFactorsLeafNodes(){
   
   stdMat currMessage;
@@ -127,15 +173,18 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
   for(int loopA=0;loopA<factorList.size();loopA++){
     if(factorList[loopA]->factorNodes.size() == 1){
       if(factorList[loopA]->isDownstreamNode[0]){
+        printf("Initializing Factor %d\n",factorList[loopA]->factorID);
         // Copy samples from downstream node
         currMessage = ntUtils::copySamples(factorList[loopA]->factorNodes[0]->varSamples);
         // Create New Message
         msg = new ntMessage(mtFactorToNode,
                             factorList[loopA]->factorID,
                             factorList[loopA]->factorNodes[0]->nodeID,
+                            factorList[loopA]->factorNodes[0]->varNames,
+                            factorList[loopA]->factorNodes[0]->varSTD,
+                            factorList[loopA]->factorNodes[0]->limits,                            
                             currMessage);
-        factorList[loopA]->messages.push_back(msg);
-        factorList[loopA]->processed = true;
+        factorList[loopA]->factorNodes[0]->inMsgs.push_back(msg);
       }
     }
   }  
@@ -144,6 +193,7 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
   for(int loopA=0;loopA<nodeList.size();loopA++){
     if(nodeList[loopA]->nodeFactors.size() == 1){
       if(!nodeList[loopA]->isDownstreamFactor[0]){                
+        printf("Initializing Node %d\n",nodeList[loopA]->nodeID);
         // Loop on number of samples
         currMessage.clear();
         for(int loopB=0;loopB<nodeList[loopA]->numSamples;loopB++){
@@ -161,9 +211,12 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
         msg = new ntMessage(mtNodeToFactor,
                             nodeList[loopA]->nodeID,
                             nodeList[loopA]->nodeFactors[0]->factorID,
+                            nodeList[loopA]->varNames,
+                            nodeList[loopA]->varSTD,
+                            nodeList[loopA]->limits,
                             currMessage);
-        nodeList[loopA]->messages.push_back(msg);
-        nodeList[loopA]->processed = true;        
+        // Provide the message as an incoming message to the factor
+        nodeList[loopA]->nodeFactors[0]->inMsgs.push_back(msg);
       }
     }
   }
@@ -316,68 +369,116 @@ void ntNet::createFactorGraph(){
       }
     }
   }
-  
-  // Add Factor index to nodes
-  //for(size_t loopA=0;loopA<factorList.size();loopA++){
-  //  for(size_t loopB=0;loopB<factorList[loopA]->factorNodes.size();loopB++){
-  //    factorList[loopA]->factorNodes[loopB]->nodeFactors.push_back(factorList[loopA]);
-  //    factorList[loopA]->factorNodes[loopB]->isDownstreamFactor.push_back(!factorList[loopA]->isDownstreamNode[loopB]);
-  //  }
-  //}
+}
+
+void ntNet::printAllMessages(){
+
+  printf("#################################\n");
+  printf("#### Messages In the Network ####\n");
+  printf("#################################\n");
+
+  // Propagate messages from nodes to factors
+  for(int loopA=0;loopA<nodeList.size();loopA++){
+    // Propagate nodes that are not processed
+    nodeList[loopA]->printMessages();        
+  }
+
+  // Propagate messages from factors to nodes
+  for(int loopA=0;loopA<factorList.size();loopA++){
+    // Propagate nodes that are not processed
+    factorList[loopA]->printMessages();
+  }
 }
 
 // Perform Belief Propagation
 int ntNet::runBP(){
 
-  // Initialize processing bookmarks for nodes and edges
-  for(int loopA=0;loopA<nodeList.size();loopA++){
-    nodeList[loopA]->processed = false;
-  }
-  for(int loopA=0;loopA<factorList.size();loopA++){
-    factorList[loopA]->processed = false;
-  }
+  bool sentOK;
+
+  printf("\n");
+  printf("--- Running BP Iterations\n");
+  printf("\n");
+
+  // Initialize messages on root and leaf nodes
+  printf("- Initializing Root Factors and Leaf Nodes...\n");
+  initMsgsOnRootFactorsLeafNodes();
+
+  // Initialize for evidence???
   
   // Iterative complete message passing for the other nodes
   bool finished = false;
-  int iterCount = 0;
+  int iterCount = 0;  
   while(!finished){
 
-    printf("Running BP Iteration %d\n",iterCount+1);
+    printf("\n");
+    printf("- Running BP Iteration Number %d\n",iterCount+1);
+    printf("\n");
 
     // Propagate messages from nodes to factors
     for(int loopA=0;loopA<nodeList.size();loopA++){
+      
+      // Check if the node has sent all its messages
       // Propagate nodes that are not processed
-      if(!nodeList[loopA]->processed){
+      if(!nodeList[loopA]->hasProcessedAllMsgs()){
+        printf("\n");
+        printf("+ Processing Node %d\n",nodeList[loopA]->nodeID);
+        printf("\n");
         nodeList[loopA]->sendMsgToFactors();
-        nodeList[loopA]->processed = true;
-      }
+        // Print Messages in the whole network
+        printAllMessages();
+      }      
     }
-
-    printf("Eccolo 2\n");
 
     // Propagate messages from factors to nodes
     for(int loopA=0;loopA<factorList.size();loopA++){
-      // Propagate nodes that are not processed
-      if(!factorList[loopA]->processed){
+
+      // Send Messages from Factors to Nodes
+      if(!factorList[loopA]->hasProcessedAllMsgs()){
+        printf("\n");
+        printf("+ Processing Factor %d\n",factorList[loopA]->factorID);
+        printf("\n");
         factorList[loopA]->sendMsgToNodes();
-        factorList[loopA]->processed = true;
+        // Print Messages in the whole network
+        printAllMessages();
       }
     }
 
-    printf("Eccolo 3\n");
-
     // Update finished: is finished when no more nodes or edges are to be processed
     finished = true;
+    printf("---Node and Factor Status---\n");
+    printf("----------------------------\n");
     for(int loopA=0;loopA<nodeList.size();loopA++){
-      finished = finished && nodeList[loopA]->processed;
+      finished = finished && nodeList[loopA]->hasProcessedAllMsgs();
+      if(nodeList[loopA]->hasProcessedAllMsgs()){
+        printf("Node %d completed!\n",nodeList[loopA]->nodeID);
+      }
     }
     for(int loopA=0;loopA<factorList.size();loopA++){
-      finished = finished && factorList[loopA]->processed;
+      finished = finished && factorList[loopA]->hasProcessedAllMsgs();
+      if(factorList[loopA]->hasProcessedAllMsgs()){
+        printf("Factor %d completed!\n",factorList[loopA]->factorID);
+      }      
     }
+    printf("----------------------------\n");
 
     // Update Iteration Count
     iterCount++;
-
+    string pbFile("BP_it_"+to_string(iterCount)+".txt");
+    checkFactorGraphMessages(pbFile);
   }
+
+  // BP Iterations competed: need to aggregate node incoming messages 
+  printf("Computing Node Marginals...");
+  ntMessage* nodeMarginal;
+  for(int loopA=0;loopA<nodeList.size();loopA++){
+    nodeMarginal = nodeList[loopA]->computeMarginal();
+    //nodeMarginal->show();
+    nodeMarginal->writeToFile(string("node_" + to_string(nodeList[loopA]->nodeID) + "_marginal.txt"));
+  }
+  printf("DONE.\n");
+
+  // !!! COMPLETE !!!
+  printf("BP COMPLETED!\n");
+
 }
 

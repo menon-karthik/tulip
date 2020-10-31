@@ -466,19 +466,16 @@ double* acActionDREAM::sample_candidate (int chain_index, int chain_num, double 
 //
   r = new int[2*pair_num];
 
-  for ( i = 0; i < pair_num; i++ )
-  {
-    while ( 1 )
-    {
+  for ( i = 0; i < pair_num; i++ ){
+    
+    while ( 1 ){
+    
       r2 = uSampler->sample(0.0,1.0);
       pair[0] = ( int ) ( r2 * ( double ) chain_num );
       r2 = uSampler->sample(0.0,1.0);
       pair[1] = ( int ) ( r2 * ( double ) chain_num );
 
-      if ( pair[0] != pair[1] &&
-           pair[0] != chain_index && 
-           pair[1] != chain_index )
-      {
+      if ( pair[0] != pair[1] && pair[0] != chain_index && pair[1] != chain_index ){
         break;
       }
     }
@@ -696,9 +693,9 @@ void acActionDREAM::restart_read(int chain_num, double fit[], int gen_num, int p
   restart.open ( restart_read_filename.c_str ( ) );
 
   if(!restart){
-    cerr << "\n";
-    cerr << "RESTART_READ - Fatal error!\n";
-    cerr << "  Could not open the file \"" 
+    cout << "\n";
+    cout << "RESTART_READ - Fatal error!\n";
+    cout << "  Could not open the file \"" 
          << restart_read_filename << "\".\n";
     exit ( 1 );
   }
@@ -1171,9 +1168,9 @@ void acActionDREAM::chain_write (string chain_filename, int chain_num, double fi
     chain.open ( chain_filename2.c_str ( ) );
 
     if(!chain){
-      cerr << "\n";
-      cerr << "CHAIN_WRITE - Fatal error!\n";
-      cerr << "  Could not open file \"" << chain_filename2 << "\".\n";
+      cout << "\n";
+      cout << "CHAIN_WRITE - Fatal error!\n";
+      cout << "  Could not open file \"" << chain_filename2 << "\".\n";
       exit ( 1 );
     }
 
@@ -1389,9 +1386,9 @@ void acActionDREAM::filename_inc ( string *filename )
 
   if ( lens <= 0 )
   {
-    cerr << "\n";
-    cerr << "FILENAME_INC - Fatal error!\n";
-    cerr << "  The input string is empty.\n";
+    cout << "\n";
+    cout << "FILENAME_INC - Fatal error!\n";
+    cout << "  The input string is empty.\n";
     exit ( 1 );
   }
 
@@ -1628,9 +1625,9 @@ void acActionDREAM::gr_write(double gr[], string gr_filename, int gr_num, int pa
 
   if ( ! gr_unit )
   {
-    cerr << "\n";
-    cerr << "GR_WRITE - Fatal error!\n";
-    cerr << "  Could not open the file \"" << gr_filename << "\"\n";
+    cout << "\n";
+    cout << "GR_WRITE - Fatal error!\n";
+    cout << "  Could not open the file \"" << gr_filename << "\"\n";
     exit ( 1 );
   }
 
@@ -1793,9 +1790,9 @@ void acActionDREAM::sample_limits(double limits[], int par_num, double zp[])
       // Fix Parameter
       zp[i] = limits[i*2 + 0];
     }else if ( w < 0.0 ){
-      cerr << "\n";
-      cerr << "SAMPLE_LIMITS - Fatal error!\n";
-      cerr << "  Upper limit less than lower limit.\n";
+      cout << "\n";
+      cout << "SAMPLE_LIMITS - Fatal error!\n";
+      cout << "  Upper limit less than lower limit.\n";
       exit ( 1 );
     }else{
       while ( zp[i] < limits[0+i*2] ){

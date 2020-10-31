@@ -19,9 +19,13 @@
 # include "acActionUP_MC.h"
 # include "acActionDREAMseq.h"
 
+# include "daData_multiple_Table.h"
+
 # include "cm_darpaSimple_code1.h"
 # include "cm_darpaSimple_code2.h"
 # include "cm_darpaSimple_code3.h"
+
+# include "cmCombineInputOutput.h"
 
 using namespace std;
 
@@ -34,8 +38,6 @@ class ntNode{
   public:
     // Nodes ID
     int nodeID;
-    // Has the node been processed
-    bool processed;
     // Number of variables
     int numVariables;
     // Type of dependence encoded in the node
@@ -60,8 +62,8 @@ class ntNode{
     // List of pointers to the factors
     vector<ntFactor*> nodeFactors;
     stdBoolVec isDownstreamFactor;
-    // List of messages to factors
-    vector<ntMessage*> messages;
+    // List of incoming messages for factor
+    vector<ntMessage*> inMsgs;
 
     // Gaussian and uniform samplers
     uqPDF* nSampler;
@@ -75,17 +77,27 @@ class ntNode{
     //! Virtual Destructor
     virtual ~ntNode();
 
-    stdMat getMsg(int targetFactorID);
+    // Find incoming message for a given factor ID
+    bool findInMsg(int factorID);
+    // Check that all messages are present to send a message to factor factorID
+    bool messagesAreReadyFor(int factorID);
+    // Check that all incoming messages are present
+    bool hasProcessedAllMsgs();
+
+    // Get message from node
+    ntMessage* copyInMsg(int targetFactorID);
 
     // Check if the node has evidence
     bool hasEvidence();
 
     // Forward and inverse Uncertainty Propagation
-    stdMat forwardUQ(const stdMat& msg);
-    stdMat inverseUQ(const stdMat& msg);
-
+    ntMessage* forwardUQ(ntMessage* currMsg);
+    ntMessage* inverseUQ(const stdStringVec& upNames,
+                         const stdVec& upSTD,
+                         const stdVec& upLimits,
+                         ntMessage* currMsg);
     // Update message 
-    void updateMsg(int factorID,const stdMat& msg);
+    void updateMsg(int nodeID,ntMessage* currMsg);
 
     // Check if variable is unobserved
     bool varIsUnobserved(int varID);
@@ -97,7 +109,12 @@ class ntNode{
     void appendToNodeFactors(const vector<ntFactor*>& factors,const stdBoolVec& isDownFactor);
 
     // Propagate from the node to the factors that are connected
-    virtual void sendMsgToFactors();
+    // Return false if 
+    void sendMsgToFactors();
+
+    void printMessages();
+
+    ntMessage* computeMarginal();
 
 };
 

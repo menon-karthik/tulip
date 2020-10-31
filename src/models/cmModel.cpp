@@ -45,8 +45,14 @@ void cmModel::freezeModelParameters(const stdIntVec& localParamIDX,const stdVec&
 }
 
 void cmModel::getParameterLimits(stdVec& limits){
-  // Get Default Parameters
-  getDefaultParameterLimits(limits);
+  if(userLimits.size() == 0){
+    // Get Default Parameters
+    getDefaultParameterLimits(limits);
+  }else{
+    // Get User-defined limits
+    limits = userLimits;
+  }
+
   // Change the limits bases on the Fixed Parameter List
   int currParam = 0;
   for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
@@ -54,9 +60,15 @@ void cmModel::getParameterLimits(stdVec& limits){
     // Assign the new lower and upper bounds to the center
     limits[currParam*2]     = frozenParamVAL[loopA];
     limits[currParam*2 + 1] = frozenParamVAL[loopA];
-  } 
+  }  
 }
 
-
-
+void cmModel::setParameterLimits(const stdVec& limits){
+  // Check Compatibility
+  if(limits.size() != getParameterTotal()*2){
+    throw cmException("ERROR: Invalid limits in cmModel::setParameterLimits.\n");
+  }else{
+    userLimits = limits;
+  }
+}
 

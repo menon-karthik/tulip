@@ -404,11 +404,11 @@ void acActionDREAMseq::dream_algm_seq(int chain_num, int cr_num, double fit[], i
   cr_prob = new double[cr_num];
   cr_ups = new int[cr_num];
 
-  cr_init ( cr, cr_dis, cr_num, cr_prob, cr_ups );
+  cr_init ( cr, cr_dis, cr_num, cr_prob, cr_ups );  
 
   for(gen_index = 1; gen_index < gen_num; gen_index++){
     for(chain_index = 0; chain_index < chain_num; chain_index++){
-
+      
       //  Choose CR_INDEX, the index of a CR.
       cr_index = cr_index_choose(cr_num, cr_prob);
 
@@ -428,7 +428,7 @@ void acActionDREAMseq::dream_algm_seq(int chain_num, int cr_num, double fit[], i
       zp_old_fit = fit[chain_index+(gen_index-1)*chain_num];
 
       //  Compute the Metropolis ratio for ZP.
-      pd1 = prior_density ( par_num, zp , prior_num, prPtr, prAv, prSd );
+      pd1 = prior_density ( par_num, zp , prior_num, prPtr, prAv, prSd );      
 
       pd2 = prior_density ( par_num, 
         z+0+chain_index*par_num+(gen_index-1)*par_num*chain_num ,
@@ -703,9 +703,9 @@ void acActionDREAMseq::restart_read ( int chain_num, double fit[], int gen_num, 
 
   if ( ! restart )
   {
-    cerr << "\n";
-    cerr << "RESTART_READ - Fatal error!\n";
-    cerr << "  Could not open the file \"" 
+    cout << "\n";
+    cout << "RESTART_READ - Fatal error!\n";
+    cout << "  Could not open the file \"" 
          << restart_read_filename << "\".\n";
     exit ( 1 );
   }
@@ -766,9 +766,9 @@ void acActionDREAMseq::restart_write ( int chain_num, double fit[], int gen_num,
   restart.open ( restart_write_filename.c_str ( ) );   
 
   if(!restart ){
-    cerr << "\n";
-    cerr << "RESTART_WRITE - Fatal error!\n";
-    cerr << "  Could not open \"" << restart_write_filename << "\".\n";
+    cout << "\n";
+    cout << "RESTART_WRITE - Fatal error!\n";
+    cout << "  Could not open \"" << restart_write_filename << "\".\n";
     exit ( 1 );
   }
 
@@ -843,34 +843,34 @@ int acActionDREAMseq::go()
   problem_size ( chain_num, cr_num, gen_num, pair_num, par_num );
 
   // Decide if the problem sizes are acceptable.
-  if(chain_num < 1){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  CHAIN_NUM < 1.\n";
+  if(chain_num < 3){
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  CHAIN_NUM < 3.\n";
     exit(1);
   }
   if(cr_num < 1){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  CR_NUM < 1.\n";
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  CR_NUM < 1.\n";
     exit(1);
   }
   if(gen_num < 2){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  GEN_NUM < 2.\n";
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  GEN_NUM < 2.\n";
     exit(1);
   }
   if(pair_num < 0){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  PAIR_NUM < 0.\n";
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  PAIR_NUM < 0.\n";
     exit (1);
   }
   if(par_num < 1){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  PAR_NUM < 1.\n";
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  PAR_NUM < 1.\n";
     exit ( 1 );
   }
 
@@ -943,13 +943,10 @@ int acActionDREAMseq::go()
   if(restart_read_filename.empty()){
     chain_init ( chain_num, fit, gen_num, par_num, z,
                  prior_num, prPtr, prAv, prSd);
+  }else{
+    restart_read ( chain_num, fit, gen_num, par_num, restart_read_filename, z);
   }
-  else
-  {
-    restart_read ( chain_num, fit, gen_num, par_num, restart_read_filename, z );
-  }
-  chain_init_print ( chain_num, fit, gen_num, par_num, restart_read_filename,
-    z );
+  chain_init_print ( chain_num, fit, gen_num, par_num, restart_read_filename, z);
 //
 //  Carry out the DREAM algorithm.
 //

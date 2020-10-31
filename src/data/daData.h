@@ -22,6 +22,7 @@ class daData{
         with a pair = (key, array of strings).
     */
     dataMap dict;
+    doubleMap userStdDict;
 
   public:
   	//! Empty data constructor
@@ -89,7 +90,7 @@ class daData{
     \param weights inputs weights that multiply the measurement variance for each quantity
     \return value of the log-likelihood at the current parameter realization
     */
-    virtual double evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights) = 0;
+    virtual double evalLogLikelihood(const stdStringVec& keys,const stdVec& avValues,const stdVec& stdFactors,const stdVec& weights) = 0;
 
     /*!
     \verbatim embed:rst 
@@ -110,7 +111,7 @@ class daData{
     \param weights inputs weights that multiply the measurement variance for each quantity
     \return value of the log-likelihood at the current parameter realization
     */
-    virtual void printAndCompare(stdStringVec keys,stdVec values,stdVec weigths) = 0;
+    virtual void printAndCompare(const stdStringVec& keys,const stdVec& values,const stdVec& weigths) = 0;
 
     /*! 
     \verbatim embed:rst 
@@ -130,7 +131,7 @@ class daData{
     \param result outputs values of the model results associated with the vector keys
     \return error outputs error code 0-OK, 1-Error
     */
-    virtual int getPatientValue(string key,double &result) = 0;
+    virtual int getPatientValue(string key,double& result) = 0;
 
     // ===========================
     // PRINTING DICTIONARY CONTENT
@@ -170,7 +171,7 @@ class daData{
     \endverbatim
     \param[out] table the dictionary values without the keys
     */
-    virtual void   getTable(stdMat& table) = 0;
+    virtual void getTable(stdMat& table) = 0;
 
 
     // ========================
@@ -272,7 +273,9 @@ class daData{
     \param[in] weights
     \return value of likelihood
     */    
-    double evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
+    double evalLikelihood(const stdStringVec& keys,const stdVec& avValues,const stdVec& stdFactors,const stdVec& weights);
+
+    void printUserSTDs();
 
 };
 
