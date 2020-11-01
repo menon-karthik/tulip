@@ -390,6 +390,21 @@ void ntNet::printAllMessages(){
   }
 }
 
+void ntNet::writeAllMessages(){
+  for(int loopA=0;loopA<nodeList.size();loopA++){
+    for(int loopB=0;loopB<nodeList[loopA]->inMsgs.size();loopB++){
+      nodeList[loopA]->inMsgs[loopB]->writeToFile(string("msg_node_" + to_string(nodeList[loopA]->nodeID) + "_from_factor_" + to_string(nodeList[loopA]->inMsgs[loopB]->sourceID) + ".txt"));
+    }
+  }
+  for(int loopA=0;loopA<factorList.size();loopA++){
+    for(int loopB=0;loopB<factorList[loopA]->inMsgs.size();loopB++){
+      factorList[loopA]->inMsgs[loopB]->writeToFile(string("msg_factor_" + to_string(factorList[loopA]->factorID) + "_from_node_" + to_string(factorList[loopA]->inMsgs[loopB]->sourceID) + ".txt"));
+    }
+  }
+}
+
+
+
 // Perform Belief Propagation
 int ntNet::runBP(){
 
@@ -476,6 +491,9 @@ int ntNet::runBP(){
     nodeMarginal->writeToFile(string("node_" + to_string(nodeList[loopA]->nodeID) + "_marginal.txt"));
   }
   printf("DONE.\n");
+
+  // Print all messages in the converged BP to file
+  writeAllMessages();
 
   // !!! COMPLETE !!!
   printf("BP COMPLETED!\n");

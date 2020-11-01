@@ -5,22 +5,22 @@ import matplotlib.pyplot as plt
 # Import tulip NET library
 import tulipNT as nt
 
-def prepareRootNodeFiles():
+numSamples = 200
 
-  numSamples = 100
+def prepareRootNodeFiles():
 
   ### Theta 1- Vehicle Velocity - avg = 6 km/s, std = 0.5 km/s
   file = open("theta1.txt","w") 
   # File is comma separated
   # Number of Variables, Number of Samples
-  file.write('1,'+str(numSamples) + '\n') 
+  file.write('1,'+str(numSamples)+'\n') 
   # Name of variables 
   file.write('velocity\n') 
   # Standard Deviation of all variables
-  file.write('500.0\n') 
+  file.write('1000.0\n') 
   # Limits of all variables: first row min and second row max
-  file.write('800.0\n') 
   file.write('4000.0\n') 
+  file.write('8000.0\n') 
   # Matrix of variable realizations
   theta1Samples = np.random.normal(loc=6000.0,scale=500.0,size=(numSamples,1))
   for loopA in range(numSamples):
@@ -31,14 +31,14 @@ def prepareRootNodeFiles():
   file = open("theta2.txt","w") 
   # File is comma separated
   # Number of Variables, Number of Samples
-  file.write('1,'+str(numSamples) + '\n') 
+  file.write('1,'+str(numSamples)+'\n') 
   # Name of variables 
   file.write('el_modulus\n') 
   # Standard Deviation of all variables
-  file.write('10.0e6\n') 
+  file.write('2.0e7\n') 
   # Limits of all variables: first row min and second row max
-  file.write('20.0e6\n') 
-  file.write('80.0e6\n') 
+  file.write('2.0e7\n') 
+  file.write('8.0e7\n') 
   # Matrix of variable realizations
   theta2Samples = np.random.normal(loc=50.0e6,scale=10.0e6,size=(numSamples,1))
   for loopA in range(numSamples):
@@ -53,7 +53,7 @@ def prepareRootNodeFiles():
   # Name of variables 
   file.write('temperature_limit\n') 
   # Standard Deviation of all variables
-  file.write('100.0\n') 
+  file.write('200.0\n') 
   # Limits of all variables: first row min and second row max
   file.write('1200.0\n') 
   file.write('1900.0\n') 
@@ -80,13 +80,13 @@ def prepareDeterministicNodeFiles():
   file = open("node_L.txt","w") 
   # File is comma separated
   # Number of Variables, Number of Samples
-  file.write('2,100\n') 
+  file.write('2,'+str(numSamples)+'\n') 
   # Name of variables 
   file.write('pressure,heatflux\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
-  file.write('1000.0,0.10e6\n') # Pressure [Pa], Heat Flux [W/m2]
+  file.write('5000.0,1.0e6\n') # Pressure [Pa], Heat Flux [W/m2]
   # Limits of all variables: first row min and second row max
-  file.write('1.0e2,1.0e2\n') 
+  file.write('1.0e2,1.0e5\n') 
   file.write('1.0e6,1.0e7\n') 
   # Approximant Type for each variable
   file.write('model\n') # can be MODEL, FILE
@@ -98,13 +98,13 @@ def prepareDeterministicNodeFiles():
   file = open("node_S.txt","w") 
   # File is comma separated
   # Number of Variables, Number of Samples
-  file.write('2,100\n') 
+  file.write('2,'+str(numSamples)+'\n') 
   # Name of variables 
   file.write('sigma_vm,temperature\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
   file.write('0.01e6,50.0\n') # Stress [Pa], Temperature [K]
     # Limits of all variables: first row min and second row max
-  file.write('1.0e2,300.0\n') 
+  file.write('1.0e2,500.0\n') 
   file.write('1.0e6,5000.0\n') 
   # Approximant Type for each variable
   file.write('model\n') # can be MODEL, FILE
@@ -116,14 +116,14 @@ def prepareDeterministicNodeFiles():
   file = open("node_F.txt","w") 
   # File is comma separated
   # Number of Variables, Number of Samples
-  file.write('1,100\n') 
+  file.write('1,'+str(numSamples)+'\n') 
   # Name of variables 
   file.write('failure_ratio\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
-  file.write('0.1\n') # Failure ratio
+  file.write('0.2\n') # Failure ratio
     # Limits of all variables: first row min and second row max
-  file.write('0.0\n') 
-  file.write('10.0\n') 
+  file.write('0.5\n') 
+  file.write('2.0\n') 
   # Approximant Type for each variable
   file.write('model\n') # can be MODEL, FILE
   # Approximant Name or file name for each variable

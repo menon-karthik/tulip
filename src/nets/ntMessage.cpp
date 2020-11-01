@@ -53,9 +53,8 @@ void ntMessage::aggregate(ntMessage* newMsg){
     // Check the number of samples to be the same 
     // otherwise merging is not possible
     if(this->msg.size() != newMsg->msg.size()){
-
+      printf("Msg1 Size: %d, Msg2 Size: %d\n",int(this->msg.size()),int(newMsg->msg.size()));
       throw ntException("ERROR: Incompatible messages in ntMessage::aggregate.");
-
     }else{
 
       // Add variable labels, standard deviations and limits
@@ -162,27 +161,43 @@ void ntMessage::writeToFile(string fileName){
   f = fopen(fileName.c_str(),"w");
   // Message type, sourceID and targetID
   fprintf(f,"%s,%d,%d\n",getMsgTypeString().c_str(),sourceID,targetID);
+  
   // Variable labels
   for(int loopA=0;loopA<varLabels.size();loopA++){
-    fprintf(f,"%s,",varLabels[loopA].c_str());
+    if(loopA<varLabels.size()-1){
+      fprintf(f,"%s,",varLabels[loopA].c_str());  
+    }else{
+      fprintf(f,"%s\n",varLabels[loopA].c_str());  
+    } 
   }
-  fprintf(f,"\n");
+  
   // Variable STDs
   for(int loopA=0;loopA<varSTDs.size();loopA++){
-    fprintf(f,"%.4e,",varSTDs[loopA]);
+    if(loopA<varSTDs.size()-1){
+      fprintf(f,"%.4e,",varSTDs[loopA]);
+    }else{
+      fprintf(f,"%.4e\n",varSTDs[loopA]);
+    } 
   }
-  fprintf(f,"\n");
+
   // Variable Limits
   for(int loopA=0;loopA<varLimits.size();loopA++){
-    fprintf(f,"%.4e,",varLimits[loopA]);
+    if(loopA<varLimits.size()-1){
+      fprintf(f,"%.4e,",varLimits[loopA]);
+    }else{
+      fprintf(f,"%.4e\n",varLimits[loopA]);
+    }
   }
-  fprintf(f,"\n");
+
   // Print Samples
   for(int loopA=0;loopA<msg.size();loopA++){
     for(int loopB=0;loopB<msg[loopA].size();loopB++){
-      fprintf(f,"%.4e,",msg[loopA][loopB]);
+      if(loopB<msg[loopA].size()-1){
+        fprintf(f,"%.4e,",msg[loopA][loopB]);  
+      }else{
+        fprintf(f,"%.4e\n",msg[loopA][loopB]);  
+      }      
     }
-    fprintf(f,"\n");
   }
   // Close State File
   fclose(f);

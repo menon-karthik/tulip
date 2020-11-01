@@ -236,10 +236,63 @@ void ntNode::updateMsg(int factorID,ntMessage* currMsg){
   }
 }
 
+stdIntVec matchInputID_First(cmModel* model,const stdStringVec& upNames){
+  stdIntVec res;
+  string currVarName;
+  for(int loopA=0;loopA<model->getParameterTotal();loopA++){
+    currVarName = model->getParamName(loopA);
+    for(int loopB=0;loopB<upNames.size();loopB++){
+      if(currVarName == upNames[loopB]){
+        res.push_back(loopB);
+      }
+    }
+  }
+  if(res.size() == 0){
+    throw ntException("ERROR: No model input found in getUpInputID.\n");
+  }
+  return res;
+}
+
+stdIntVec matchInputID_Second(cmModel* model,const stdStringVec& upNames){
+  stdIntVec res;
+  string currVarName;
+  for(int loopA=0;loopA<upNames.size();loopA++){
+    for(int loopB=0;loopB<model->getParameterTotal();loopB++){
+      currVarName = model->getParamName(loopB);
+      if(upNames[loopA] == currVarName){
+        res.push_back(loopB);
+      }
+    }
+  }
+  if(res.size() == 0){
+    throw ntException("ERROR: No model input found in getUpInputID.\n");
+  }
+  return res;
+}
+
+
+stdMat extractColumns(const stdIntVec& upID,const stdMat& mat){
+  stdMat res;
+  stdVec tmp;
+  for(int loopA=0;loopA<mat.size();loopA++){
+    tmp.clear();
+    for(int loopB=0;loopB<upID.size();loopB++){
+      tmp.push_back(mat[loopA][upID[loopB]]);
+    }
+    res.push_back(tmp);
+  }
+  return res;
+}
+
 ntMessage* ntNode::forwardUQ(ntMessage* currMsg){
 
+  // Get Column index for the sub-set of the inputs you need to propagate upwards
+  stdIntVec upID = matchInputID_First(nodeModel,currMsg->varLabels);
+  // Extract Columns according to IDs
+  stdMat msgMat = extractColumns(upID,currMsg->msg);
+
   // Create Samples
-  uqSamples* samples = new uqSamples(currMsg->msg);
+  uqSamples* samples = new uqSamples(msgMat);
 
   // Initialize 
   acActionUP_MC* mc = new acActionUP_MC(samples);
@@ -293,36 +346,6 @@ stdVec getInputLimits(cmModel* model,
   return res;
 }
 
-stdIntVec getUpInputID(cmModel* model,const stdStringVec& upNames){
-  stdIntVec res;
-  string currVarName;
-  for(int loopA=0;loopA<model->getParameterTotal();loopA++){
-    currVarName = model->getParamName(loopA);
-    for(int loopB=0;loopB<upNames.size();loopB++){
-      if(currVarName == upNames[loopB]){
-        res.push_back(loopA);
-      }
-    }
-  }
-  if(res.size() == 0){
-    throw ntException("ERROR: No model input found in getUpInputID.\n");
-  }
-  return res;
-}
-
-stdMat extractColumns(const stdIntVec& upID,const stdMat& mat){
-  stdMat res;
-  stdVec tmp;
-  for(int loopA=0;loopA<mat.size();loopA++){
-    tmp.clear();
-    for(int loopB=0;loopB<upID.size();loopB++){
-      tmp.push_back(mat[loopA][upID[loopB]]);
-    }
-    res.push_back(tmp);
-  }
-  return res;
-}
-
 ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
                              const stdVec& upSTD,
                              const stdVec& upLimits,
@@ -331,17 +354,21 @@ ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
   // Create a New Model that returns both the inputs and the outputs
   cmModel* ioModel = new cmCombineInputOutput(nodeModel);
 
-  printf("upNames\n");
-  for(int loopA=0;loopA<upNames.size();loopA++){
-    printf("%s\n",upNames[loopA].c_str());  
-  }
-  printf("\n");
-  printf("msgNames\n");
-  for(int loopA=0;loopA<currMsg->varLabels.size();loopA++){
-    printf("%s\n",currMsg->varLabels[loopA].c_str());  
-  }
+  int showNode = 3;
 
-  
+  // if(nodeID == showNode){
+  //   printf("upNames\n");
+  //   for(int loopA=0;loopA<upNames.size();loopA++){
+  //     printf("%s\n",upNames[loopA].c_str());  
+  //   }
+  //   printf("\n");
+  //   printf("msgNames\n");
+  //   for(int loopA=0;loopA<currMsg->varLabels.size();loopA++){
+  //     printf("%s\n",currMsg->varLabels[loopA].c_str());  
+  //   }
+  //   uqSamples* samples = new uqSamples(currMsg->msg);
+  //   samples->printToFile("debug_samples_out.txt",true);
+  // }
 
   // Create data object
   int columnID = 0;
@@ -354,6 +381,11 @@ ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
   // Assign sample to data object
   ((daData_multiple_Table*)data)->assignFromLabelsAndMat(currMsg->varLabels,currMsg->msg);
   ((daData_multiple_Table*)data)->overwriteStandardDeviations(currMsg->varLabels,currMsg->varSTDs);
+
+  // if(nodeID == showNode){
+  //   data->printToScreen();
+  // }
+
 
   //data->printUserSTDs();
   //printf("This is the model for Node %d\n",nodeID);
@@ -370,8 +402,8 @@ ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
   ioModel->setParameterLimits(inputLimits);
 
   // Set MCMC parameters
-  int totChains           = max(int(currMsg->msg[0].size()), 3); // Min of Number of variables and 3
-  int totGenerations      = 300;
+  int totChains           = max(int(currMsg->msg[0].size()), 5); // Min of Number of variables and 3
+  int totGenerations      = 1000;
   int totalCR             = 3;
   int totCrossoverPairs   = 5;
   double dreamGRThreshold = 1.2;
@@ -407,18 +439,24 @@ ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
   stdMat res;
   stdIntVec resIDX;
   int mcmcSamples = currMsg->msg.size();
-  cmUtils::subSampleTableData("paramTraces.txt",mcmcSamples,2,2 + limits.size()/2,res,resIDX);
+  cmUtils::subSampleTableData("paramTraces.txt",mcmcSamples,2,2 + nodeModel->getParameterTotal()-1,res,resIDX);
   if(mcmcSamples < currMsg->msg.size()){
     throw ntException("ERROR: Not enough samples from MCMC.");
   }
 
   // Get Column index for the sub-set of the inputs you need to propagate upwards
-  stdIntVec upID = getUpInputID(nodeModel,upNames);
+  stdIntVec upID = matchInputID_Second(nodeModel,upNames);
   // Extract Columns according to IDs
   stdMat msgMat = extractColumns(upID,res);
   // Create the message 
   ntMessage* resMsg = new ntMessage(currMsg->messageType,currMsg->sourceID,currMsg->targetID,upNames,upSTD,upLimits,msgMat);
-  
+
+  // if(nodeID == showNode){
+  //   uqSamples* samples = new uqSamples(msgMat);
+  //   samples->printToFile("debug_samples_in.txt",true);
+  //   exit(-1);
+  // }
+
   // Free memory
   delete mcmc;
   delete currMsg;

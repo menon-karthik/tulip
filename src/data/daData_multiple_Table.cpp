@@ -62,8 +62,8 @@ void daData_multiple_Table::assignFromLabelsAndMat(const stdStringVec& labels,co
     stdStringVec tmp;
     for(int loopA=0;loopA<labels.size();loopA++){
       tmp.clear();
-      for(int loopB=0;loopB<values[loopA].size();loopB++){
-        tmp.push_back(to_string(values[loopA][loopB]));
+      for(int loopB=0;loopB<values.size();loopB++){
+        tmp.push_back(to_string(values[loopB][loopA]));
       }
       dict[labels[loopA]] = tmp;
     }
@@ -286,7 +286,13 @@ void daData_multiple_Table::printToScreen(){
   stdIntVec indexSet;
   getIndexSet(indexSet);
 
+  printf("Number of measurements: %d\n",int(dict.begin()->second.size()));
+
   int dataIndex = 0;
+
+  for(int loopIndex=0;loopIndex<indexSet.size();loopIndex++){
+    printf("index set %d: %d\n",loopIndex,indexSet[loopIndex]);
+  }
   
   for(int loopIndex=0;loopIndex<indexSet.size();loopIndex++){
     

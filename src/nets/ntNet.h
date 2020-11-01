@@ -55,6 +55,9 @@ class ntNet{
 
     void printAllMessages();
 
+    // Write all messages and samples to file
+    void writeAllMessages();
+
     // Perform Belief Propagation
     int runBP();
 };
