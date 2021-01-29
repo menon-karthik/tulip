@@ -45,13 +45,13 @@ class ntNetIO{
 
     // Read file for deterministic nodes
     void readDeterministicNodeFile(string fileName,
-                                        int& numVariables,
-                                        int& numSamples,
-                                        stdStringVec& varNames,
-                                        stdVec& varSTD,
-                                        stdVec& limits,
-                                        modelTypes& detVarType,
-                                        string& detModelName);
+                                   int& numVariables,
+                                   int& numSamples,
+                                   stdStringVec& varNames,
+                                   stdVec& varSTD,
+                                   stdVec& limits,
+                                   modelTypes& detVarType,
+                                   string& detModelName);
 
     // Read file for probabilistic nodes
     void readProbabilisticNodeFile(string fileName,

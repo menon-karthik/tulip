@@ -84,7 +84,7 @@ void ntFactor::updateMsg(int nodeID,ntMessage* currMsg){
   }
 }
 
-int ntFactor::getDownstreamDetNodeID(){
+int ntFactor::getDownstreamDetNodeLocalID(){
   bool found = false;
   int count = 0;
   while((!found) && (count<factorNodes.size())){
@@ -108,12 +108,10 @@ void ntFactor::sendMsgToNodes(){
 
   printf("++ Sending message from factor %d\n",this->factorID);
 
-  int downstreamDetNodeID = getDownstreamDetNodeID();
+  int downstreamDetNodeID = getDownstreamDetNodeLocalID();
   if(downstreamDetNodeID == -1){
     throw ntException("ERROR: Cannot find deterministic downstream node in ntFactor::sendMsgToNodes.\n");
   }
-
-  printf("Downstream Deterministic Node ID: %d\n",downstreamDetNodeID);
 
   // Loop on all nodes connected to this factor
   for(int loopA=0;loopA<factorNodes.size();loopA++){
@@ -150,20 +148,22 @@ void ntFactor::sendMsgToNodes(){
       ntMessage* msgToSend;
       if(isDownstreamNode[loopA]){
         // Propagate using the model in the downstream node
-        printf("+ Performing Forward Propagation\n");
+        printf("+++ Performing Forward Propagation\n");
         msgToSend = factorNodes[loopA]->forwardUQ(newMsg);
         factorNodes[loopA]->updateMsg(factorID,msgToSend);
       }else{        
-        printf("+ Performing Inverse Propagation\n");
+        printf("+++ Performing Inverse Propagation\n");
         // Solve an inverse problem using the solver of the node downstream
         msgToSend = factorNodes[downstreamDetNodeID]->inverseUQ(factorNodes[loopA]->varNames,
                                                                 factorNodes[loopA]->varSTD,
                                                                 factorNodes[loopA]->limits,
                                                                 newMsg);
         // Pass message to node upstream
+        // if((this->factorID == 4)&&(factorNodes[loopA]->nodeID == 1)){
+        //   exit(-1);
+        // }
         factorNodes[loopA]->updateMsg(factorID,msgToSend);
       }
-
     }else{
       printf("NO\n");
     }

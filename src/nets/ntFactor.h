@@ -44,7 +44,7 @@ class ntFactor{
 
     void printMessages();
 
-    int getDownstreamDetNodeID();
+    int getDownstreamDetNodeLocalID();
 
 };
 

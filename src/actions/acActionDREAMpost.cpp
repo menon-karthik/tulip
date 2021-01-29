@@ -181,17 +181,21 @@ int acActionDREAM::postProcess(bool debugMode, double burnInPercent){
   //dreamChainFileName;
 
   // Print token
-  printf("TOKEN: %s\n",fileNameToken.c_str());
+  if(printLevel > 0){
+    printf("TOKEN: %s\n",fileNameToken.c_str());  
+  }
 
   // Get List of Files with MCMC Chain
   std::vector<std::string> mcmcFileList;
   getMCMCChainFileList(fileNameToken,mcmcFileList);
 
   // PRINT FILES
-  printf("\n");
-  printf("LIST OF MCMC CHAIN FILES\n");
-  for(int loopA=0;loopA<mcmcFileList.size();loopA++){
-    printf("%s\n",mcmcFileList[loopA].c_str());
+  if(printLevel > 0){
+    printf("\n");
+    printf("LIST OF MCMC CHAIN FILES\n");
+    for(int loopA=0;loopA<mcmcFileList.size();loopA++){
+      printf("%s\n",mcmcFileList[loopA].c_str());
+    }
   }
 
   // Fill Matrix with samples and NO BURN-IN
@@ -206,10 +210,13 @@ int acActionDREAM::postProcess(bool debugMode, double burnInPercent){
   // Set Size
   int sample_num = mcmcSamples.size();
   int par_num = mcmcSamples[0].size();
-  printf("\n");
-  printf("TOTALS\n");
-  printf("Number of Samples: %d\n",sample_num);
-  printf("Number of Parameters: %d\n",par_num);
+
+  if(printLevel > 0){
+    printf("\n");
+    printf("TOTALS\n");
+    printf("Number of Samples: %d\n",sample_num);
+    printf("Number of Parameters: %d\n",par_num);
+  }
 
   // Get Best Result and Write File
   double bestFit = -numeric_limits<double>::max();
@@ -229,11 +236,13 @@ int acActionDREAM::postProcess(bool debugMode, double burnInPercent){
 
   // Write Best Parameters to File
   writeBestParamsToFile("bestParams.txt",bestFit,par_num,currBestParams);
-  printf("\n");
-  printf("BEST PARAMETERS\n");
-  printf("Best Fit: %f\n",bestFit);
-  for(int loopA=0;loopA<(par_num-2);loopA++){
-    printf("Param %d: %f\n",(loopA+1),currBestParams[loopA]);
+  if(printLevel > 0){
+    printf("\n");
+    printf("BEST PARAMETERS\n");
+    printf("Best Fit: %f\n",bestFit);
+    for(int loopA=0;loopA<(par_num-2);loopA++){
+      printf("Param %d: %f\n",(loopA+1),currBestParams[loopA]);
+    }    
   }
   
   // Get First and Second Moments of LPN Parameters
@@ -265,19 +274,22 @@ int acActionDREAM::postProcess(bool debugMode, double burnInPercent){
   // Write Model Stats To File
   writeStatisticsToFile("paramStats.txt",par_num,modelStats);
   //writeStatisticsToLatexTable(par_num,modelStats);
-  printf("\n");
-  printf("PARAMETER STATISTICS\n");
-  for(int loopA=0;loopA<(par_num-2);loopA++){
-    printf("Param %d: %f %f\n",(loopA+1),modelStats[loopA][0],modelStats[loopA][1]);
+  if(printLevel > 0){
+    printf("\n");
+    printf("PARAMETER STATISTICS\n");
+    for(int loopA=0;loopA<(par_num-2);loopA++){
+      printf("Param %d: %f %f\n",(loopA+1),modelStats[loopA][0],modelStats[loopA][1]);
+    }
+  }
+
+  // Completed
+  if(printLevel > 0){
+    printf("\n");
+    printf("Post-Processing Completed.\n");  
   }
 
   // RETURN
   return 0;
-
-  // Completed
-  printf("\n");
-  printf("Completed.\n");
-
 }
 
 

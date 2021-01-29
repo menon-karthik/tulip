@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # Import tulip NET library
 import tulipNT as nt
 
-numSamples = 200
+numSamples = 2000
 
 def prepareRootNodeFiles():
 
@@ -84,10 +84,10 @@ def prepareDeterministicNodeFiles():
   # Name of variables 
   file.write('pressure,heatflux\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
-  file.write('5000.0,1.0e6\n') # Pressure [Pa], Heat Flux [W/m2]
+  file.write('5000.0,1.0e5\n') # Pressure [Pa], Heat Flux [W/m2]
   # Limits of all variables: first row min and second row max
   file.write('1.0e2,1.0e5\n') 
-  file.write('1.0e6,1.0e7\n') 
+  file.write('1.0e6,5.0e6\n') 
   # Approximant Type for each variable
   file.write('model\n') # can be MODEL, FILE
   # Approximant Name or file name for each variable
@@ -102,9 +102,9 @@ def prepareDeterministicNodeFiles():
   # Name of variables 
   file.write('sigma_vm,temperature\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
-  file.write('0.01e6,50.0\n') # Stress [Pa], Temperature [K]
+  file.write('1.0e4,50.0\n') # Stress [Pa], Temperature [K]
     # Limits of all variables: first row min and second row max
-  file.write('1.0e2,500.0\n') 
+  file.write('1.0e2,200.0\n') 
   file.write('1.0e6,5000.0\n') 
   # Approximant Type for each variable
   file.write('model\n') # can be MODEL, FILE
@@ -120,7 +120,7 @@ def prepareDeterministicNodeFiles():
   # Name of variables 
   file.write('failure_ratio\n') # These are mapped to the model results is type is MODEL
   # Standard Deviation of all variables
-  file.write('0.2\n') # Failure ratio
+  file.write('0.1\n') # Failure ratio
     # Limits of all variables: first row min and second row max
   file.write('0.5\n') 
   file.write('2.0\n') 
@@ -165,7 +165,7 @@ def genNetInputFile(fileName,addEvidence=False):
   if(addEvidence):
     file.write('# Define Evidence File\n') 
     file.write('# Evidence File, node ID, VarID1, value1, std1, varID2, value2, std2, ...\n') 
-    file.write('Evidence,File,evidence.txt\n') 
+    file.write('Evidence,4,1,1,1000.0,50.0\n') 
   file.close() 
 
 # MAIN FUNCTION
@@ -176,14 +176,15 @@ if __name__ == "__main__":
 
   # Set Network file, all the file 
   netFile = 'netFile.txt'
-  genNetInputFile(netFile)
+  genNetInputFile(netFile,addEvidence=True)
   
   # Create new Model Network
   net = nt.ntNet(netFile)
 
   # Change the evidence directly in the network
+  # net.removeEvidence()
   # evidenceFile = 'evidence.txt'
-  # net.getEvidence(evidenceFile)
+  # net.assignEvidence(evidenceFile)
 
   # Pass messages and perform inference
   net.runBP()

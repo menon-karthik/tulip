@@ -27,12 +27,19 @@ ntNet::ntNet(string netFile){
 
   // Generate dot file for graphviz graphical representation
   // checkFactorGraphTopology("factorGraphTopology.txt");
+
+  // Set Default Print Level to silent
+  printLevel = 0;
 }
 
 ntNet::~ntNet(){
   delete netIO;
   delete nSampler;
   delete uSampler;
+}
+
+void ntNet::setPrintLevel(int level){
+  this->printLevel = level;
 }
 
 // Assign Single-node Evidence
@@ -46,6 +53,9 @@ void ntNet::assignEvidence(int nodeID,const stdIntVec& varIDs,const stdVec& varA
   int count = 0;
   while((!found)&&(count<nodeList.size())){
     found = (nodeList[count]->nodeID == nodeID);
+    if(!found){
+      count++;
+    }
   }
   if(!found){
     throw ntException("ERROR: Cound not find node ID in ntNet::assignEvidence."); 
@@ -222,11 +232,6 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
   }
 }
 
-// Assign Evidence for multiple nodes by reading it from a file
-void ntNet::assignEvidence(string fileName){
-  throw ntException("ERROR: assignEvidence not yet implemented."); 
-}
-
 // Remove evidence from single nodes
 void ntNet::removeEvidence(int nodeID){
   // Find Node in the network
@@ -255,14 +260,28 @@ void ntNet::removeEvidence(){
 
 // Print Evidence in Networks
 void ntNet::printEvidence(){
-  printf("%10s %10s %15s %15s\n","NodeID","VarID","Average","Std");
+  bool foundEvidence = false;
   for(size_t loopA=0;loopA<nodeList.size();loopA++){
     for(size_t loopB=0;loopB<nodeList[loopA]->evidenceVarID.size();loopB++){
+      if(!foundEvidence){
+        printf("\n");  
+        printf("#####################\n");  
+        printf("### NODE EVIDENCE ###\n");  
+        printf("#####################\n");  
+        printf("%10s %10s %15s %15s\n","NodeID","VarID","Average","Std");  
+        foundEvidence = true;
+      }
       printf("%10d %10d %15.3e %15.3e\n",nodeList[loopA]->nodeID,
                                          nodeList[loopA]->evidenceVarID[loopB],
                                          nodeList[loopA]->evidenceVarAvg[loopB],
                                          nodeList[loopA]->evidenceVarStd[loopB]);
     }
+  }
+  if(!foundEvidence){
+    printf("No Evidence Found!\n");
+  }else{
+    printf("#####################\n");
+    printf("\n");
   }
 }
 
@@ -275,8 +294,6 @@ void ntNet::createNetworkEntities(ntNetIO* netInfo){
   for(size_t loopA=0;loopA<netInfo->nodeID.size();loopA++){
     // Add root node
     node = new ntNode(loopA,netInfo);
-    // printf("Node ID: %d\n",netInfo->nodeID[loopA]);
-    // printf("Node ID: %d\n",node->nodeID);
     // Add to the list of Nodes
     nodeList.push_back(node);
   }
@@ -285,8 +302,34 @@ void ntNet::createNetworkEntities(ntNetIO* netInfo){
   for(size_t loopA=0;loopA<netInfo->edgeNode1.size();loopA++){
     // Add root node
     edge = new ntEdge(netInfo->edgeNode1[loopA],netInfo->edgeNode2[loopA]);
+    // Add to the list of Edges
     edgeList.push_back(edge);
   }
+
+  // Assign Node Evidence
+  stdIntVec evVars;
+  stdVec evAvg;
+  stdVec evStd;
+  int currNode = 0;
+  if(netInfo->evidenceNodeID.size() > 0){
+    for(size_t loopA=0;loopA<netInfo->evidenceNodeID.size();loopA++){
+      currNode = netInfo->evidenceNodeID[loopA];
+      evVars.clear();
+      evAvg.clear();
+      evStd.clear();
+      for(size_t loopB=0;loopB<netInfo->evidenceVarID[loopA].size();loopB++){
+        evVars.push_back(netInfo->evidenceVarID[loopA][loopB]);
+        evAvg.push_back(netInfo->evidenceVarAvg[loopA][loopB]);
+        evStd.push_back(netInfo->evidenceVarStd[loopA][loopB]);
+      }
+      // Add Evidence to node
+      printf("prima...");
+      fflush(stdout);
+      assignEvidence(currNode,evVars,evAvg,evStd);
+    }    
+  }
+  printf("dopo...");
+  fflush(stdout);
 }
 
 int ntNet::getNodeListOrder(int nodeID){
@@ -372,7 +415,8 @@ void ntNet::createFactorGraph(){
 }
 
 void ntNet::printAllMessages(){
-
+  
+  printf("\n");
   printf("#################################\n");
   printf("#### Messages In the Network ####\n");
   printf("#################################\n");
@@ -403,8 +447,6 @@ void ntNet::writeAllMessages(){
   }
 }
 
-
-
 // Perform Belief Propagation
 int ntNet::runBP(){
 
@@ -418,7 +460,8 @@ int ntNet::runBP(){
   printf("- Initializing Root Factors and Leaf Nodes...\n");
   initMsgsOnRootFactorsLeafNodes();
 
-  // Initialize for evidence???
+  // Check Evidence for this run
+  printEvidence();
   
   // Iterative complete message passing for the other nodes
   bool finished = false;
@@ -440,7 +483,10 @@ int ntNet::runBP(){
         printf("\n");
         nodeList[loopA]->sendMsgToFactors();
         // Print Messages in the whole network
-        printAllMessages();
+        if(printLevel > 0){
+          printAllMessages();  
+        }
+        
       }      
     }
 
@@ -454,14 +500,20 @@ int ntNet::runBP(){
         printf("\n");
         factorList[loopA]->sendMsgToNodes();
         // Print Messages in the whole network
-        printAllMessages();
+        if(printLevel > 0){
+          printAllMessages();
+        }
       }
     }
 
     // Update finished: is finished when no more nodes or edges are to be processed
     finished = true;
-    printf("---Node and Factor Status---\n");
-    printf("----------------------------\n");
+
+    printf("\n");
+    printf("################################\n");
+    printf("#### Node and Factor Status ####\n");
+    printf("################################\n");    
+
     for(int loopA=0;loopA<nodeList.size();loopA++){
       finished = finished && nodeList[loopA]->hasProcessedAllMsgs();
       if(nodeList[loopA]->hasProcessedAllMsgs()){
@@ -474,7 +526,7 @@ int ntNet::runBP(){
         printf("Factor %d completed!\n",factorList[loopA]->factorID);
       }      
     }
-    printf("----------------------------\n");
+    printf("################################\n");
 
     // Update Iteration Count
     iterCount++;

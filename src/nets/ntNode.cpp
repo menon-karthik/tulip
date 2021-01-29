@@ -14,9 +14,9 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
   string detModelName;
 
   // Init Gaussian sampler
-  uqPDF* nSampler = new uqGaussianPDF();
+  nSampler = new uqGaussianPDF();
   // Init Uniform sampler
-  uqPDF* uSampler = new uqUniformPDF();
+  uSampler = new uqUniformPDF();
 
   // Assign Node ID
   this->nodeID = netIO->nodeID[nodeIndex];
@@ -304,8 +304,19 @@ ntMessage* ntNode::forwardUQ(ntMessage* currMsg){
 
   // Process Model
   mc->go();
+
   // Return resulting samples
   stdMat res = mc->all_outputs;
+
+  // Need to add noise to the results as every variable is affected by it
+  // Loop throug the samples
+  for(int loopA=0;loopA<res.size();loopA++){
+    // Loop through the dimensions
+    for(int loopB=0;loopB<res[loopA].size();loopB++){
+      res[loopA][loopB] += nSampler->sample(0.0, varSTD[loopB]);
+    }
+  }
+
   // Get the labels, stds and limits from node
   ntMessage* resMsg = new ntMessage(currMsg->messageType,currMsg->sourceID,currMsg->targetID,varNames,varSTD,limits,res);
   // Free memory
@@ -353,25 +364,25 @@ ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
 
   // Create a New Model that returns both the inputs and the outputs
   cmModel* ioModel = new cmCombineInputOutput(nodeModel);
+  bool printDebugMsgs = true;
 
-  int showNode = 3;
-
-  // if(nodeID == showNode){
-  //   printf("upNames\n");
-  //   for(int loopA=0;loopA<upNames.size();loopA++){
-  //     printf("%s\n",upNames[loopA].c_str());  
-  //   }
-  //   printf("\n");
-  //   printf("msgNames\n");
-  //   for(int loopA=0;loopA<currMsg->varLabels.size();loopA++){
-  //     printf("%s\n",currMsg->varLabels[loopA].c_str());  
-  //   }
-  //   uqSamples* samples = new uqSamples(currMsg->msg);
-  //   samples->printToFile("debug_samples_out.txt",true);
-  // }
+  if(printDebugMsgs){
+    printf("upNames\n");
+    for(int loopA=0;loopA<upNames.size();loopA++){
+      printf("%s\n",upNames[loopA].c_str());  
+    }
+    printf("\n");
+    printf("msgNames\n");
+    for(int loopA=0;loopA<currMsg->varLabels.size();loopA++){
+      printf("%s\n",currMsg->varLabels[loopA].c_str());  
+    }
+    uqSamples* samples = new uqSamples(currMsg->msg);
+    samples->printToFile("debug_samples_incomingMsg.txt",true);
+  }
 
   // Create data object
   int columnID = 0;
+
   // Multiple measurements per result quantity
   bool useSingleColumn = false;
   daData* data = new daData_multiple_Table(useSingleColumn,columnID);
@@ -379,36 +390,42 @@ ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
   printf("Number of results: %d, Samples: %d, Dimensions: %d\n",int(currMsg->varLabels.size()),int(currMsg->msg.size()),int(currMsg->msg[0].size()));
 
   // Assign sample to data object
-  ((daData_multiple_Table*)data)->assignFromLabelsAndMat(currMsg->varLabels,currMsg->msg);
-  ((daData_multiple_Table*)data)->overwriteStandardDeviations(currMsg->varLabels,currMsg->varSTDs);
-
-  // if(nodeID == showNode){
-  //   data->printToScreen();
-  // }
-
-
-  //data->printUserSTDs();
-  //printf("This is the model for Node %d\n",nodeID);
+  // Use only a single measurment equal to the mean
+  bool useMean = true;
+  ((daData_multiple_Table*)data)->assignFromLabelsAndMat(currMsg->varLabels,currMsg->msg,useMean);
+  // For inverse analysis you need to compute the standard deviations directly from the message
+  // this will allow you to preserve the incoming messages when computing the outcoming one
+  stdVec msgSampleSTD = currMsg->getSTDFromSamples();
+  ((daData_multiple_Table*)data)->overwriteStandardDeviations(currMsg->varLabels,msgSampleSTD);
 
   // Assign Data to Model
   ioModel->setData(data);
 
   // Assign Model Limits based on upstream variables
   stdVec inputLimits = getInputLimits(nodeModel,upNames,upLimits,currMsg);
-  printf("Limits\n");
-  for(int loopA=0;loopA<inputLimits.size()/2;loopA++){
-    printf("Min: %f, Max: %f\n",inputLimits[loopA*2],inputLimits[loopA*2+1]);
+  ioModel->setParameterLimits(inputLimits);  
+
+  if(printDebugMsgs){
+    data->printToScreen();
+    data->printUserSTDs();
+    printf("This is the model for Node %d\n",nodeID);
+    printf("######\n");
+    printf("Limits\n");
+    for(int loopA=0;loopA<inputLimits.size()/2;loopA++){
+      printf("Min: %f, Max: %f\n",inputLimits[loopA*2],inputLimits[loopA*2+1]);
+    }
   }
-  ioModel->setParameterLimits(inputLimits);
 
   // Set MCMC parameters
   int totChains           = max(int(currMsg->msg[0].size()), 5); // Min of Number of variables and 3
-  int totGenerations      = 1000;
+  int totGenerations      = 5000;
   int totalCR             = 3;
   int totCrossoverPairs   = 5;
   double dreamGRThreshold = 1.2;
   int dreamJumpStep       = 10;
   int dreamGRPrintStep    = 10;
+
+  printf("Total Number of chains used: %d\n",totChains);
 
   string dreamChainFileName("chain_GR_000000.txt");
   string dreamGRFileName("gr_GR.txt");
@@ -437,8 +454,12 @@ ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
   
   // Extract Parameter Samples
   stdMat res;
+  stdMat res_filtered;
   stdIntVec resIDX;
   int mcmcSamples = currMsg->msg.size();
+
+  // Subsample and discard the samples that are outside the variable limits
+  // cmUtils::subSampleTableData("paramTraces.txt",mcmcSamples,2,2 + nodeModel->getParameterTotal()-1,res,resIDX,inputLimits);
   cmUtils::subSampleTableData("paramTraces.txt",mcmcSamples,2,2 + nodeModel->getParameterTotal()-1,res,resIDX);
   if(mcmcSamples < currMsg->msg.size()){
     throw ntException("ERROR: Not enough samples from MCMC.");
@@ -451,16 +472,16 @@ ntMessage* ntNode::inverseUQ(const stdStringVec& upNames,
   // Create the message 
   ntMessage* resMsg = new ntMessage(currMsg->messageType,currMsg->sourceID,currMsg->targetID,upNames,upSTD,upLimits,msgMat);
 
-  // if(nodeID == showNode){
-  //   uqSamples* samples = new uqSamples(msgMat);
-  //   samples->printToFile("debug_samples_in.txt",true);
-  //   exit(-1);
-  // }
+  if(printDebugMsgs){
+    uqSamples* samples = new uqSamples(res);
+    samples->printToFile("debug_samples_outcomingMsg.txt",true);
+  }
 
   // Free memory
   delete mcmc;
   delete currMsg;
   delete ioModel;
+  
   // Return Message
   return resMsg;
 }
@@ -490,6 +511,7 @@ stdMat ntNode::uniformSampleUnobserved(const stdMat& msg){
       }
     }
   }
+  return res;
 }
 
 bool ntNode::findInMsg(int factorID){

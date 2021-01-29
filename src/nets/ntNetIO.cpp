@@ -4,15 +4,10 @@ using namespace std;
 using namespace boost::algorithm;
 
 ntNetIO::ntNetIO(){
-  
-
 }
 
 ntNetIO::~ntNetIO(){
-
 }
-
-
 
 // Read Network Variables and Layout
 void ntNetIO::readFromFile(string fileName){
@@ -59,7 +54,7 @@ void ntNetIO::readFromFile(string fileName){
       // Node,3,deterministic,node_L.txt
         try{
           // Get Node ID
-          this->nodeID.push_back(atoi(tokenizedString[1].c_str()));
+          this->nodeID.push_back(stoi(tokenizedString[1].c_str()));
           // Get Node Type
           if(to_upper_copy(tokenizedString[2]) == string("ROOT")){
             this->nodeType.push_back(ntRoot);
@@ -80,8 +75,8 @@ void ntNetIO::readFromFile(string fileName){
 
         try{
           // Get Node Name
-          this->edgeNode1.push_back(atoi(tokenizedString[1].c_str()));
-          this->edgeNode2.push_back(atoi(tokenizedString[2].c_str()));
+          this->edgeNode1.push_back(stoi(tokenizedString[1].c_str()));
+          this->edgeNode2.push_back(stoi(tokenizedString[2].c_str()));
         }catch(...){
           throw ntException(string("ERROR: Invalid NODE Format. Line " + to_string(lineCount) + "\n").c_str());
         }
@@ -93,13 +88,13 @@ void ntNetIO::readFromFile(string fileName){
 
         try{
           // Get Node ID
-          this->evidenceNodeID.push_back(atoi(tokenizedString[1].c_str()));
-          auxCount = atoi(tokenizedString[2].c_str());
+          this->evidenceNodeID.push_back(stoi(tokenizedString[1].c_str()));
+          auxCount = stoi(tokenizedString[2].c_str());
           tempIntVec.clear();
           tempVec.clear();
           tempVec2.clear();
           for(int loopA=0;loopA<auxCount;loopA++){
-            tempIntVec.push_back(atoi(tokenizedString[loopA*3+3].c_str()));
+            tempIntVec.push_back(stoi(tokenizedString[loopA*3+3].c_str()));
             tempVec.push_back(atof(tokenizedString[loopA*3+4].c_str()));
             tempVec2.push_back(atof(tokenizedString[loopA*3+5].c_str()));
           }
@@ -175,8 +170,8 @@ void ntNetIO::readRootNodeFile(string fileName,
       // # Matrix of variable realizations
       if(lineCount == 1){
         try{
-          numVariables = atoi(tokenizedString[0].c_str());
-          numSamples = atoi(tokenizedString[1].c_str());
+          numVariables = stoi(tokenizedString[0].c_str());
+          numSamples = stoi(tokenizedString[1].c_str());
         }catch(...){
           throw ntException("ERROR: Invalid ROOT NODE file.\n");
         }
@@ -325,8 +320,8 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
       // file.write('darpaSimpleCode1,darpaSimpleCode1\n') # name of the model/file
       if(lineCount == 1){
         try{
-          numVariables = atoi(tokenizedString[0].c_str());
-          numSamples = atoi(tokenizedString[1].c_str());
+          numVariables = stoi(tokenizedString[0].c_str());
+          numSamples = stoi(tokenizedString[1].c_str());
         }catch(...){
           throw ntException("ERROR: Invalid ROOT NODE file.\n");
         }

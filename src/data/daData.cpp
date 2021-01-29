@@ -53,8 +53,10 @@ double daData::evalLikelihood(const stdStringVec& keys,const stdVec& avValues,co
 }
 
 void daData::printUserSTDs(){
+  printf("### User-defined Standard Deviations\n");
   typedef doubleMap::iterator it_type;
   for(it_type iterator = userStdDict.begin(); iterator != userStdDict.end(); iterator++) {
     printf("Key %s, Value %f\n",iterator->first.c_str(),iterator->second);
   }
+  printf("###\n");
 }

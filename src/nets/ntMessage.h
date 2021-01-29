@@ -42,7 +42,12 @@ class ntMessage{
     // Same variables in every message: aggregate on the sampling
     void aggregateMarginals(vector<ntMessage*> msgs);
 
+    // Add Evidence to message
     void addEvidence(int varID,const stdVec& vals);
+
+    // Compute Standard deviations directly from message samples
+    stdVec getSTDFromSamples();
+
 
     string getMsgTypeString();
 

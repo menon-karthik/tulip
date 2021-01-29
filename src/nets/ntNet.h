@@ -23,6 +23,10 @@ class ntNet{
     //! List of edges
     vector<ntEdge*> edgeList;
 
+    //! Print messages during execution
+    //! 0-silent, >0 increasing messages
+    int printLevel;
+
     // Gaussian and uniform samplers
     uqPDF* nSampler;
     uqPDF* uSampler;
@@ -32,13 +36,15 @@ class ntNet{
     //! Virtual Destructor
     virtual ~ntNet();
 
+    // Set Print Level
+    void setPrintLevel(int level);
+
     // Create the network and its topology
     void createNetworkEntities(ntNetIO* netInfo);
     void createFactorGraph();
     void initMsgsOnRootFactorsLeafNodes();
 
     // Assign Evidence
-    void assignEvidence(string fileName);
     void assignEvidence(int nodeID,const stdIntVec& varIDs,const stdVec& varVals,const stdVec& varStd);
     void removeEvidence(int nodeID);
     void removeEvidence();

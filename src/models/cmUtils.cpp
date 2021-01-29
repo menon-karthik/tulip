@@ -1111,15 +1111,55 @@ bool zeroAtValveOpening(int start, int stop, double* curve, double* valveIsOpen)
   return result;
 }
 
-void subSampleTableData(string currTraceFile,int& totSubSamples,int startColumn,int endColumn,stdMat& subSampleTable,stdIntVec& sampleIndexes){
+void subSampleTableData(string currTraceFile,
+                        int& totSubSamples,
+                        int startColumn,
+                        int endColumn,
+                        stdMat& subSampleTable,
+                        stdIntVec& sampleIndexes,
+                        stdVec limits){
   // Read Parameter Table
   subSampleTable.clear();
   stdMat AllSamples;
   stdVec tmpVec;
   int error = readTableFromFile(currTraceFile,AllSamples);
   if(error != 0){
-    throw cmException("Error: Cannot Open table with readTableFromFile.\n");
+    throw cmException("ERROR: Cannot Open table with readTableFromFile.\n");
   }
+
+  // printf("Original Samples: %d\n",int(AllSamples.size()));
+
+  //Filter AllSamples if limits are specified
+  int filtCount = 0;
+  if(limits.size()/2 > 0){
+    stdMat AllSamples_filtered;
+    stdVec tmp;
+    bool isValid = true;    
+    if(limits.size()/2 != endColumn-startColumn+1){
+      throw cmException("ERROR: Invalid number of limits in subSampleTableData.\n");
+    }else{
+      for(int loopA=0;loopA<AllSamples.size();loopA++){
+        isValid = true;
+        tmp.clear();
+        for(int loopB=startColumn;loopB<endColumn+1;loopB++){
+          // printf("Sample: %f, Min: %f, Max: %f\n",AllSamples[loopA][loopB],limits[2*(loopB-startColumn)],limits[2*(loopB-startColumn)+1]);
+          isValid = isValid && (AllSamples[loopA][loopB]>=limits[2*(loopB-startColumn)] && AllSamples[loopA][loopB]<=limits[2*(loopB-startColumn)+1]);
+          tmp.push_back(AllSamples[loopA][loopB]);
+        }
+        if(isValid){
+          // printf("Added\n");
+          filtCount++;
+          AllSamples_filtered.push_back(tmp);  
+        }
+      }
+    }
+    // Copy Samples back
+    AllSamples.clear();
+    AllSamples = AllSamples_filtered;
+    AllSamples_filtered.clear();
+  }
+
+  // printf("Filtered Samples: %d %d\n",filtCount,int(AllSamples.size()));
 
   // Get Total Samples
   int totSamples = AllSamples.size();

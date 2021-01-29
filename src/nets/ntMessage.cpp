@@ -230,3 +230,33 @@ void ntMessage::show(){
   }
 }
 
+stdVec ntMessage::getSTDFromSamples(){
+  stdVec res;
+  double currAVG = 0.0;
+  double currSTD = 0.0;
+  // Cannot do this with only one sample
+  if(msg.size() < 2){
+    throw ntException("ERROR: You need al least two samples to computed the sample statistics for messages.");
+  }
+  for(int loopA=0;loopA<varLabels.size();loopA++){
+    // Compute Mean 
+    currAVG = 0.0;
+    for(int loopB=0;loopB<msg.size();loopB++){
+      currAVG += msg[loopB][loopA];
+    }
+    currAVG /= msg.size();
+    // Compute Standard deviation with unbiased formula
+    currSTD = 0.0;
+    for(int loopB=0;loopB<msg.size();loopB++){
+      currSTD += (msg[loopB][loopA] - currAVG)*(msg[loopB][loopA] - currAVG);
+    } 
+    currSTD = sqrt(currSTD/(msg.size()-1));
+    // Add Standard deviation
+    res.push_back(currSTD);
+  }
+  return res;
+}
+
+
+
+

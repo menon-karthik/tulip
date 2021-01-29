@@ -1,9 +1,11 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
+from scipy.stats import gaussian_kde
 
 numMarginals = 6
-fs=12
+fs=14
 plt.rc('font', family='serif')
 plt.rc('xtick', labelsize='x-small')
 plt.rc('ytick', labelsize='x-small')
@@ -37,66 +39,59 @@ class msg(object):
       self.samples = np.resize(self.samples,(-1,1))
     print(self.samples.shape)
 
-  def plotMsg(self,outFile,plotRed=False):
-    plt.figure(figsize=(4*self.samples.shape[1],3))
+  def plotMsg(self,outFile,plotColor):
+    
     for loopA in range(self.samples.shape[1]):
-      ax = plt.subplot(1,self.samples.shape[1],loopA+1)
-      if(plotRed):
-        ax.hist(self.samples[:,loopA],density=True,color='red')
-      else:
-        ax.hist(self.samples[:,loopA],density=True)
-      ax.set_xlabel(convertToTex(self.names[loopA]),fontsize=fs)
-      ax.set_ylabel('PDF',fontsize=fs)      
-      ax.tick_params(axis='both', labelsize=fs)
-      ax.ticklabel_format(axis='x', style='sci',scilimits=(0,0),useOffset=False,useLocale=False,useMathText=False)
-      ax.set_yticks([])
-      plt.xticks(rotation=80,ha='right')
-      ax.xaxis.set_major_formatter(FormatStrFormatter('%.1e'))
-    plt.tight_layout()
-    plt.savefig(outFile)
+      plt.figure(figsize=(4,3))
+      plt.hist(self.samples[:,loopA],density=True,color=plotColor,bins=30,alpha=0.4)
+      # Plot Kernel Density Estimation
+      density = gaussian_kde(self.samples[:,loopA])
+      xs = np.linspace(self.samples[:,loopA].min(),self.samples[:,loopA].max(),1000)
+      plt.plot(xs,density(xs),color='k',lw=2)
+      # Set title, labels, etc.
+      plt.xlabel(convertToTex(self.names[loopA]),fontsize=fs)
+      plt.ylabel('PDF',fontsize=fs)      
+      plt.tick_params(axis='both', labelsize=fs)
+      plt.ticklabel_format(axis='x', style='sci',scilimits=(0,0),useOffset=False,useLocale=False,useMathText=False)
+      plt.yticks([])
+      # plt.xticks(rotation=80,ha='right')
+      # ax.xaxis.set_major_formatter(FormatStrFormatter('%.1e'))
+      plt.tight_layout()
+      plt.savefig(outFile + '_' + str(loopA) + '.pdf')
+    # plt.show()
+      plt.close()
 
 if __name__ == "__main__": 
 
-  # Check Incoming Node Messages
-  msgNode = msg('msg_node_0_from_factor_0.txt')
-  msgNode.plotMsg('msg_node_0_from_factor_0.pdf')
+  msgList = ['msg_node_0_from_factor_0.txt','msg_node_0_from_factor_3.txt',
+             'msg_node_1_from_factor_1.txt','msg_node_1_from_factor_4.txt',
+             'msg_node_2_from_factor_2.txt','msg_node_2_from_factor_5.txt',
+             'msg_node_3_from_factor_3.txt','msg_node_3_from_factor_4.txt',
+             'msg_node_4_from_factor_4.txt','msg_node_4_from_factor_5.txt',
+             'msg_node_5_from_factor_5.txt',
+             'node_0_marginal.txt','node_1_marginal.txt',
+             'node_2_marginal.txt','node_3_marginal.txt',
+             'node_4_marginal.txt','node_5_marginal.txt']
 
-  msgNode = msg('msg_node_0_from_factor_3.txt')
-  msgNode.plotMsg('msg_node_0_from_factor_3.pdf',plotRed=True)
+  typeList = ['forward','backward',
+             'forward','backward',
+             'forward','backward',
+             'forward','backward',
+             'forward','backward',
+             'forward',
+             'marginal','marginal',
+             'marginal','marginal',
+             'marginal','marginal']
 
-  msgNode = msg('msg_node_1_from_factor_1.txt')
-  msgNode.plotMsg('msg_node_1_from_factor_1.pdf')
-
-  msgNode = msg('msg_node_1_from_factor_4.txt')
-  msgNode.plotMsg('msg_node_1_from_factor_4.pdf',plotRed=True)
-
-  msgNode = msg('msg_node_2_from_factor_2.txt')
-  msgNode.plotMsg('msg_node_2_from_factor_2.pdf')
-
-  msgNode = msg('msg_node_2_from_factor_5.txt')
-  msgNode.plotMsg('msg_node_2_from_factor_5.pdf',plotRed=True)
-
-  msgNode = msg('msg_node_3_from_factor_3.txt')
-  msgNode.plotMsg('msg_node_3_from_factor_3.pdf')
-
-  msgNode = msg('msg_node_3_from_factor_4.txt')
-  msgNode.plotMsg('msg_node_3_from_factor_4.pdf',plotRed=True)
-
-  msgNode = msg('msg_node_4_from_factor_4.txt')
-  msgNode.plotMsg('msg_node_4_from_factor_4.pdf')
-
-  msgNode = msg('msg_node_4_from_factor_5.txt')
-  msgNode.plotMsg('msg_node_4_from_factor_5.pdf',plotRed=True)
-
-  msgNode = msg('msg_node_5_from_factor_5.txt')
-  msgNode.plotMsg('msg_node_5_from_factor_5.pdf')
-
-# node_0_marginal.txt
-# node_1_marginal.txt
-# node_2_marginal.txt
-# node_3_marginal.txt
-# node_4_marginal.txt
-# node_5_marginal.txt
-
-#  marg = msg('node_3_marginal.txt')
-#  marg.plotMsg()
+  for loopA,msgItem in enumerate(msgList):
+    msgNode = msg(msgItem)
+    pre, ext = os.path.splitext(msgItem)
+    if(typeList[loopA] == 'forward'):
+      color = 'b'
+    elif(typeList[loopA] == 'backward'):
+      color = 'r'
+    elif(typeList[loopA] == 'marginal'):
+      color = 'gray'
+    # 
+    msgNode.plotMsg('/home/dschiava/Documents/02_Documents/02_Proposals/01_DARPA_YFA/05_Reports/09_Q2Y3_Report/imgs/noEvidence/' + pre,color)
+  

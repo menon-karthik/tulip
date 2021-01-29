@@ -55,15 +55,28 @@ void daData_multiple_Table::readFromFile(string fileName){
   }
 }
 
-void daData_multiple_Table::assignFromLabelsAndMat(const stdStringVec& labels,const stdMat& values){
+void daData_multiple_Table::assignFromLabelsAndMat(const stdStringVec& labels,const stdMat& values,bool useMean){
   if(labels.size() != values[0].size()){
     throw daException("ERROR: Invalid labels and values in daData_multiple_Table::assignFromLabelsAndMat.\n");
   }else{
     stdStringVec tmp;
     for(int loopA=0;loopA<labels.size();loopA++){
-      tmp.clear();
-      for(int loopB=0;loopB<values.size();loopB++){
-        tmp.push_back(to_string(values[loopB][loopA]));
+      // printf("Printing Label: %s\n",labels[loopA].c_str());
+      if(useMean){
+        // Use only the mean measurement
+        double currMean = 0.0;
+        for(int loopB=0;loopB<values.size();loopB++){
+          currMean += values[loopB][loopA];          
+        }        
+        tmp.clear();
+        tmp.push_back(to_string(currMean/values.size()));
+        // printf("Mean: %s\n",tmp[0].c_str());
+      }else{
+        // Use every observation
+        tmp.clear();
+        for(int loopB=0;loopB<values.size();loopB++){
+          tmp.push_back(to_string(values[loopB][loopA]));
+        }        
       }
       dict[labels[loopA]] = tmp;
     }
