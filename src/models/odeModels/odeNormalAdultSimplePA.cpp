@@ -392,16 +392,16 @@ void odeNormalAdultSimplePA::evalDeriv(double t,const stdVec& Xk,const stdVec& p
   
   // Ventricle activation
   double fAV = 0.0;
-  if(tmv<tsvs){
-    fAV = (1.0-cos(2.0*M_PI*tmv/(double)tsvs))/2.0;
+  if(tmv<tsv){
+    fAV = (1.0-cos(2.0*M_PI*tmv/(double)tsv))/2.0;
   }else{
     fAV = 0.0;
   }
   
   // Atrium activation
   double fAA = 0.0;
-  if(tma<tsas){
-    fAA = (1.0-cos(2.0*M_PI*tma/(double)tsas))/2.0;
+  if(tma<tsa){
+    fAA = (1.0-cos(2.0*M_PI*tma/(double)tsa))/2.0;
   }else{
     fAA = 0.0;
   }
