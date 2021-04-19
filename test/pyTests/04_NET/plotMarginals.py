@@ -53,12 +53,14 @@ class msg(object):
       plt.ylabel('PDF',fontsize=fs)      
       plt.tick_params(axis='both', labelsize=fs)
       plt.ticklabel_format(axis='x', style='sci',scilimits=(0,0),useOffset=False,useLocale=False,useMathText=False)
+      plt.axvline(x=self.limits[loopA*2+0],c='k',ls='--')
+      plt.axvline(x=self.limits[loopA*2+1],c='k',ls='--')
       plt.yticks([])
       # plt.xticks(rotation=80,ha='right')
       # ax.xaxis.set_major_formatter(FormatStrFormatter('%.1e'))
       plt.tight_layout()
       plt.savefig(outFile + '_' + str(loopA) + '.pdf')
-    # plt.show()
+      plt.show()
       plt.close()
 
 if __name__ == "__main__": 
@@ -93,5 +95,11 @@ if __name__ == "__main__":
     elif(typeList[loopA] == 'marginal'):
       color = 'gray'
     # 
-    msgNode.plotMsg('/home/dschiava/Documents/02_Documents/02_Proposals/01_DARPA_YFA/05_Reports/09_Q2Y3_Report/imgs/noEvidence/' + pre,color)
+
+    # folderName = '/home/dschiava/Documents/02_Documents/02_Proposals/01_DARPA_YFA/05_Reports/09_Q2Y3_Report/imgs/noEvidence_it1/'
+    # folderName = '/home/dschiava/Documents/02_Documents/02_Proposals/01_DARPA_YFA/05_Reports/09_Q2Y3_Report/imgs/noEvidence_it2/'
+    # folderName = '/home/dschiava/Documents/02_Documents/02_Proposals/01_DARPA_YFA/05_Reports/09_Q2Y3_Report/imgs/withEvidence_it1/'
+    folderName = '/home/dschiava/Documents/02_Documents/02_Proposals/01_DARPA_YFA/05_Reports/09_Q2Y3_Report/imgs/withEvidence_it2/'
+
+    msgNode.plotMsg(folderName + pre,color)
   

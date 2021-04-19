@@ -204,19 +204,8 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
     if(nodeList[loopA]->nodeFactors.size() == 1){
       if(!nodeList[loopA]->isDownstreamFactor[0]){                
         printf("Initializing Node %d\n",nodeList[loopA]->nodeID);
-        // Loop on number of samples
-        currMessage.clear();
-        for(int loopB=0;loopB<nodeList[loopA]->numSamples;loopB++){
-          tmpSample.clear();
-          for(int loopC=0;loopC<nodeList[loopA]->numVariables;loopC++){
-            // Generate a random sample for this variable in the range
-            currSample = uSampler->sample(nodeList[loopA]->limits[loopC*2],nodeList[loopA]->limits[loopC*2+1]);
-            // Add to temporary sample
-            tmpSample.push_back(currSample);
-          }
-          currMessage.push_back(tmpSample);
-        }
-        // Add to message to single factor
+        // Copy samples to a message
+        currMessage = ntUtils::copySamples(nodeList[loopA]->varSamples);
         // Create New Message
         msg = new ntMessage(mtNodeToFactor,
                             nodeList[loopA]->nodeID,
@@ -230,6 +219,80 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
       }
     }
   }
+}
+
+void ntNet::assignUniformSamplesToLeaves(){
+  // Initialize Leaf Nodes with Uniform Distributions
+  stdVec tmpSample;
+  double currSample = 0.0;
+  for(int loopA=0;loopA<nodeList.size();loopA++){
+    if(nodeList[loopA]->nodeFactors.size() == 1){
+      if(!nodeList[loopA]->isDownstreamFactor[0]){                
+        printf("Assigning Uniform Samples to Node %d\n",nodeList[loopA]->nodeID);
+        nodeList[loopA]->varSamples.clear();
+        // Loop on number of samples
+        for(int loopB=0;loopB<nodeList[loopA]->numSamples;loopB++){
+          tmpSample.clear();
+          for(int loopC=0;loopC<nodeList[loopA]->numVariables;loopC++){
+            // Generate a random sample for this variable in the range
+            currSample = uSampler->sample(nodeList[loopA]->limits[loopC*2],nodeList[loopA]->limits[loopC*2+1]);
+            // Add to temporary sample
+            tmpSample.push_back(currSample);
+          }
+          nodeList[loopA]->varSamples.push_back(tmpSample);
+        }
+      }
+    }
+  }
+}
+
+void ntNet::reassignRootAndLeafSamplesFromPreviousRun(){
+
+  // All Incoming Messages for the root factors become samples for the downstream node  
+  for(int loopA=0;loopA<factorList.size();loopA++){
+    if(factorList[loopA]->factorNodes.size() == 1){
+      if(factorList[loopA]->isDownstreamNode[0]){
+        printf("Initializing Factor %d\n",factorList[loopA]->factorID);
+        // Get Incoming Message from previous run and Assign it as samples for the downstream node
+        factorList[loopA]->factorNodes[0]->varSamples = ntUtils::copySamples(factorList[loopA]->factorNodes[0]->marginal->msg);
+      }
+    }
+  }
+
+  // Initialize Leaf Nodes with Uniform Distributions
+  for(int loopA=0;loopA<nodeList.size();loopA++){
+    if(nodeList[loopA]->nodeFactors.size() == 1){
+      if(!nodeList[loopA]->isDownstreamFactor[0]){                
+        printf("Initializing Node %d\n",nodeList[loopA]->nodeID);
+        // Get Incoming Message from previous run and Assign it as samples for the downstream node
+        nodeList[loopA]->varSamples = ntUtils::copySamples(nodeList[loopA]->marginal->msg);
+      }
+    }
+  }
+
+  // Delete all incoming messages on nodes
+  printf("Deleting all Node Messages and Marginals...\n");
+  for(int loopA=0;loopA<nodeList.size();loopA++){
+    delete nodeList[loopA]->marginal;
+    nodeList[loopA]->marginal = NULL;
+    nodeList[loopA]->hasMarginal = false;
+    for(int loopB=0;loopB<nodeList[loopA]->inMsgs.size();loopB++){
+      delete nodeList[loopA]->inMsgs[loopB];
+      nodeList[loopA]->inMsgs[loopB] = NULL;
+    }
+    nodeList[loopA]->inMsgs.clear();
+  }
+
+  // Delete all incoming messages on factors
+  printf("Deleting all Factor Messages...\n");
+  for(int loopA=0;loopA<factorList.size();loopA++){
+    for(int loopB=0;loopB<factorList[loopA]->inMsgs.size();loopB++){
+      delete factorList[loopA]->inMsgs[loopB];
+      factorList[loopA]->inMsgs[loopB] = NULL;
+    }
+    factorList[loopA]->inMsgs.clear();
+  }
+
 }
 
 // Remove evidence from single nodes
@@ -323,13 +386,9 @@ void ntNet::createNetworkEntities(ntNetIO* netInfo){
         evStd.push_back(netInfo->evidenceVarStd[loopA][loopB]);
       }
       // Add Evidence to node
-      printf("prima...");
-      fflush(stdout);
       assignEvidence(currNode,evVars,evAvg,evStd);
     }    
   }
-  printf("dopo...");
-  fflush(stdout);
 }
 
 int ntNet::getNodeListOrder(int nodeID){
@@ -448,7 +507,7 @@ void ntNet::writeAllMessages(){
 }
 
 // Perform Belief Propagation
-int ntNet::runBP(){
+int ntNet::runBP(bool init){
 
   bool sentOK;
 
@@ -456,9 +515,15 @@ int ntNet::runBP(){
   printf("--- Running BP Iterations\n");
   printf("\n");
 
+  if(init){
+    assignUniformSamplesToLeaves();
+  }else{
+    reassignRootAndLeafSamplesFromPreviousRun();
+  }
+
   // Initialize messages on root and leaf nodes
   printf("- Initializing Root Factors and Leaf Nodes...\n");
-  initMsgsOnRootFactorsLeafNodes();
+  initMsgsOnRootFactorsLeafNodes();    
 
   // Check Evidence for this run
   printEvidence();
@@ -530,17 +595,20 @@ int ntNet::runBP(){
 
     // Update Iteration Count
     iterCount++;
+    // if(iterCount == 3){
+    //   exit(-1);
+    // }
     string pbFile("BP_it_"+to_string(iterCount)+".txt");
     checkFactorGraphMessages(pbFile);
   }
 
   // BP Iterations competed: need to aggregate node incoming messages 
   printf("Computing Node Marginals...");
-  ntMessage* nodeMarginal;
   for(int loopA=0;loopA<nodeList.size();loopA++){
-    nodeMarginal = nodeList[loopA]->computeMarginal();
-    //nodeMarginal->show();
-    nodeMarginal->writeToFile(string("node_" + to_string(nodeList[loopA]->nodeID) + "_marginal.txt"));
+    nodeList[loopA]->computeMarginal();
+    // Compute outside
+    // nodeMarginal->show();
+    nodeList[loopA]->marginal->writeToFile(string("node_" + to_string(nodeList[loopA]->nodeID) + "_marginal.txt"));
   }
   printf("DONE.\n");
 

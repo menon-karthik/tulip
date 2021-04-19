@@ -109,4 +109,4 @@ if __name__ == "__main__":
   plotMarginalTable(nodeMessageList,'nodeMsg.pdf')
 
   # Plot Factor Messages
-  # plotMarginalTable(factorMessageList,'factorMsg.pdf')
+  plotMarginalTable(factorMessageList,'factorMsg.pdf')

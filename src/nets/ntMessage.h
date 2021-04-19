@@ -2,6 +2,7 @@
 #define NTMESSAGE_H
 
 # include "uqTypes.h"
+# include "cmUtils.h"
 # include "ntUtils.h"
 
 enum messageTypes{mtFactorToNode,mtNodeToFactor};
@@ -40,6 +41,7 @@ class ntMessage{
     void aggregateFromList(vector<ntMessage*> msgs);
 
     // Same variables in every message: aggregate on the sampling
+    void aggregateMarginals_fake(vector<ntMessage*> msgs);
     void aggregateMarginals(vector<ntMessage*> msgs);
 
     // Add Evidence to message
@@ -47,7 +49,6 @@ class ntMessage{
 
     // Compute Standard deviations directly from message samples
     stdVec getSTDFromSamples();
-
 
     string getMsgTypeString();
 

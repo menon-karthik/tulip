@@ -128,9 +128,26 @@ bool areCompatibleMsgs(vector<ntMessage*> msgs){
   return check;
 }
 
+void ntMessage::aggregateMarginals_fake(vector<ntMessage*> msgs){
+  // Only one message
+  this->messageType = msgs[0]->messageType;
+  this->sourceID    = msgs[0]->sourceID;
+  this->targetID    = msgs[0]->targetID;
+  this->varLabels   = msgs[0]->varLabels;
+  this->varSTDs     = msgs[0]->varSTDs;
+  this->varLimits   = msgs[0]->varLimits;
+  this->msg = ntUtils::copySamples(msgs[0]->msg);
+}
+
 void ntMessage::aggregateMarginals(vector<ntMessage*> msgs){
 
+  int totBins = 30;
+  int numSamples = 0;
+  uqPDF* uSampler = new uqUniformPDF();
+
   if(msgs.size() == 1){
+
+    // Only one message
     this->messageType = msgs[0]->messageType;
     this->sourceID    = msgs[0]->sourceID;
     this->targetID    = msgs[0]->targetID;
@@ -138,22 +155,202 @@ void ntMessage::aggregateMarginals(vector<ntMessage*> msgs){
     this->varSTDs     = msgs[0]->varSTDs;
     this->varLimits   = msgs[0]->varLimits;
     this->msg = ntUtils::copySamples(msgs[0]->msg);
+
   }else{
+    
     // Multiple Messages
     if(areCompatibleMsgs(msgs)){
+
+      // Assign common properties
       this->messageType = msgs[0]->messageType;
       this->sourceID    = msgs[0]->sourceID;
       this->targetID    = msgs[0]->targetID;
       this->varLabels   = msgs[0]->varLabels;
       this->varSTDs     = msgs[0]->varSTDs;
       this->varLimits   = msgs[0]->varLimits;
+
+      // Get total number of samples
+      numSamples = msgs[0]->msg.size();
+
+      // Allocate message sample storage      
+      stdVec temp;
+      for(int loopA=0;loopA<numSamples;loopA++){
+        temp.clear();
+        for(int loopB=0;loopB<varLabels.size();loopB++){
+          temp.push_back(0.0);
+        }
+        this->msg.push_back(temp);
+      }
+    
+      // Determine maximum and minimum for each variable
+      stdVec sampleLimits(2*varLabels.size(),0.0);
+      double currMax = 0.0;
+      double currMin = 0.0;
+      double groupMax = 0.0;
+      double groupMin = 0.0;
+      for(int loopA=0;loopA<varLabels.size();loopA++){                
+        // printf("Variable %s\n",varLabels[loopA].c_str());
+        groupMax = numeric_limits<double>::max();
+        groupMin = -numeric_limits<double>::max();        
+        for(int loopB=0;loopB<msgs.size();loopB++){
+          // Set the min and max for the current message
+          currMax = -numeric_limits<double>::max();
+          currMin = numeric_limits<double>::max();
+          for(int loopC=0;loopC<numSamples;loopC++){
+            
+            if(msgs[loopB]->msg[loopC][loopA] > currMax){
+              currMax = msgs[loopB]->msg[loopC][loopA];
+            }
+
+            if(msgs[loopB]->msg[loopC][loopA] < currMin){
+              currMin = msgs[loopB]->msg[loopC][loopA];
+            }
+          }
+
+          // printf("Message %d\n",loopB);
+          // printf("min: %f, max: %f\n",currMin,currMax);
+
+          if(currMin > groupMin){
+            groupMin = currMin;
+          }
+
+          if(currMax < groupMax){
+            groupMax = currMax;
+          }
+        }
+        // printf("group min: %f, group max: %f\n",groupMin,groupMax);        
+        sampleLimits[2*loopA+0] = groupMin;
+        sampleLimits[2*loopA+1] = groupMax;
+      }
+
+      for(int loopA=0;loopA<varLabels.size();loopA++){
+        printf("%s min: %f max: %f\n",varLabels[loopA].c_str(),sampleLimits[2*loopA+0],sampleLimits[2*loopA+1]);
+      }
+
+      // Determine common discretization using limits      
+      stdMat discrX;
+      double deltaX = 0.0;
+      double currBinCenter = 0.0;
+      stdVec tmp;
+      stdVec deltas;
+      stdVec prod(totBins,0.0);
+      for(int loopA=0;loopA<varLabels.size();loopA++){        
+        deltaX = (sampleLimits[2*loopA+1]-sampleLimits[2*loopA+0])/double(totBins);
+        deltas.push_back(deltaX);
+        currBinCenter = sampleLimits[2*loopA+0] + 0.5*deltaX;
+        tmp.clear();
+        tmp.push_back(currBinCenter);
+        for(int loopB=0;loopB<totBins-1;loopB++){
+          currBinCenter += deltaX;
+          tmp.push_back(currBinCenter);
+        }
+        discrX.push_back(tmp);
+      }
+
+      for(int loopA=0;loopA<varLabels.size();loopA++){
+        printf("%s\n",varLabels[loopA].c_str());
+        for(int loopB=0;loopB<totBins;loopB++){
+          printf("%f ",discrX[loopA][loopB]);
+        }
+        printf("\n");
+
+      }
+
+      // Allocate PMF
+      stdMat pmfs;
+      stdVec pmfTemp;
       for(int loopA=0;loopA<msgs.size();loopA++){
-        ntUtils::appendSamples(msgs[loopA]->msg,this->msg);
-      }      
+        pmfTemp.clear();
+        for(int loopB=0;loopB<totBins;loopB++){
+          pmfTemp.push_back(0.0);
+        }
+        pmfs.push_back(pmfTemp);
+      }
+
+      // Construct PMF
+      double currSample = 0.0;
+      int currBinID = 0;
+      double normConst = 0.0;
+      stdVec newSamples;
+
+      // Loop on the variables
+      for(int loopA=0;loopA<varLabels.size();loopA++){        
+
+        // Loop on messages to be aggregated
+        for(int loopB=0;loopB<msgs.size();loopB++){
+
+          // Loop on the samples
+          for(int loopC=0;loopC<numSamples;loopC++){
+            // Get Sample
+            currSample = msgs[loopB]->msg[loopC][loopA];
+            // Get corresponding bin
+            currBinID = int((currSample-sampleLimits[2*loopA+0])/deltas[loopA]);
+            // Some of the samples might be outside the limits so be careful!!!
+            if((currBinID >= 0)&&(currBinID < numSamples)){
+              pmfs[loopB][currBinID] += 1.0;
+            }
+          }
+
+          // Make it a valid PMF
+          normConst = 0.0;
+          for(int loopC=0;loopC<totBins;loopC++){
+            normConst += pmfs[loopB][loopC];
+          }
+          for(int loopC=0;loopC<totBins;loopC++){
+            pmfs[loopB][loopC] /= normConst;
+          }
+          // for(int loopC=0;loopC<pmfs[loopB].size();loopC++){
+          //   printf("%f ",pmfs[loopB][loopC]);
+          // }
+          // printf("\n");
+
+
+        }
+
+        // Perform product
+        for(int loopB=0;loopB<totBins;loopB++){
+          prod[loopB] = 1.0;
+          for(int loopD=0;loopD<msgs.size();loopD++){
+            prod[loopB] *= pmfs[loopD][loopB];
+          }
+        }
+
+        // Normalize resulting PMFs
+        normConst = 0.0;
+        for(int loopB=0;loopB<totBins;loopB++){
+          normConst += prod[loopB];
+        }
+        for(int loopB=0;loopB<totBins;loopB++){
+          prod[loopB] /= normConst;
+        }
+
+        // cmUtils::writeVectorToFile(varLabels[loopA],prod);
+        
+        newSamples = ntUtils::genSampleFromPMF(discrX[loopA],prod,numSamples,uSampler);
+
+        // for(int loopC=0;loopC<newSamples.size();loopC++){
+        //   printf("%f ",newSamples[loopC]);
+        // }
+        // printf("\n");
+
+
+        printf("Eccolo 7\n");
+        fflush(stdout);        
+
+
+        // Add samples to message
+        for(int loopB=0;loopB<numSamples;loopB++){
+          this->msg[loopB][loopA] = newSamples[loopB];
+        }
+
+      }
     }else{
       throw ntException("ERROR: Incoming messages are not compatible in ntMessage::aggregateMarginals."); 
     }
   }
+  delete uSampler;
+  uSampler = NULL;
+
 }
 
 void ntMessage::writeToFile(string fileName){

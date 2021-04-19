@@ -42,7 +42,11 @@ class ntNet{
     // Create the network and its topology
     void createNetworkEntities(ntNetIO* netInfo);
     void createFactorGraph();
+    
+    // Initialization functions
     void initMsgsOnRootFactorsLeafNodes();
+    void assignUniformSamplesToLeaves();
+    void reassignRootAndLeafSamplesFromPreviousRun();
 
     // Assign Evidence
     void assignEvidence(int nodeID,const stdIntVec& varIDs,const stdVec& varVals,const stdVec& varStd);
@@ -65,7 +69,7 @@ class ntNet{
     void writeAllMessages();
 
     // Perform Belief Propagation
-    int runBP();
+    int runBP(bool init=true);
 };
 
 #endif // NTNET_H

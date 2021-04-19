@@ -72,6 +72,10 @@ class ntNode{
     // Approximant 
     cmModel* nodeModel;
 
+    // Approximant 
+    bool hasMarginal;
+    ntMessage* marginal;
+
   	//! Default Constructor
   	ntNode(int nodeID,ntNetIO* netIO);
     //! Virtual Destructor
@@ -114,7 +118,7 @@ class ntNode{
 
     void printMessages();
 
-    ntMessage* computeMarginal();
+    void computeMarginal();
 
 };
 

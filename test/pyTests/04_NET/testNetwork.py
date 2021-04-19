@@ -181,10 +181,7 @@ if __name__ == "__main__":
   # Create new Model Network
   net = nt.ntNet(netFile)
 
-  # Change the evidence directly in the network
-  # net.removeEvidence()
-  # evidenceFile = 'evidence.txt'
-  # net.assignEvidence(evidenceFile)
-
-  # Pass messages and perform inference
+  # Pass messages and perform inference - First Step
   net.runBP()
+  # Second update step
+  net.runBP(False)

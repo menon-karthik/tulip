@@ -100,6 +100,7 @@ namespace uqUtils{
 
   // Solve LS Problem
   void solveLSProblem(int totRows,int totCols,const stdVec& rhs,const stdMat& mat,stdVec &coeffs,double &resNorm);
+
 }
 
 #endif // UQUTILS_H

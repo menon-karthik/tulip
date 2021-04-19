@@ -23,6 +23,9 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
   // Look at the node Type 
   this->nodeType = netIO->nodeType[nodeIndex];
 
+  // Set the marginal properties
+  hasMarginal = false;
+
   // Read Node Information based on type
   if(this->nodeType == ntRoot){
 
@@ -536,7 +539,11 @@ bool ntNode::hasProcessedAllMsgs(){
 }
 
 bool ntNode::messagesAreReadyFor(int factorID){
-  bool msgReady = true;
+  // If it's a leaf node you can resend the message you received from the unique factor
+  if((nodeFactors.size() == 1)&&(nodeFactors[0]->factorID == factorID)){
+    return findInMsg(nodeFactors[0]->factorID);
+  }
+  bool msgReady = true;  
   for(int loopA=0;loopA<nodeFactors.size();loopA++){
     if(nodeFactors[loopA]->factorID != factorID){
       msgReady = msgReady && findInMsg(nodeFactors[loopA]->factorID);  
@@ -561,13 +568,13 @@ void ntNode::printMessages(){
   }
 }
 
-ntMessage* ntNode::computeMarginal(){
+void ntNode::computeMarginal(){
   vector<ntMessage*> msgList;
   for(int loopA=0;loopA<inMsgs.size();loopA++){
     msgList.push_back(inMsgs[loopA]);
   }
-  ntMessage* marginal = new ntMessage();
+  marginal = new ntMessage();
   marginal->aggregateMarginals(msgList);
-  return marginal;
+  // marginal->aggregateMarginals_fake(msgList);
 }
 
