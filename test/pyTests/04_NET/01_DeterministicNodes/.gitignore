@@ -1,0 +1,12 @@
+*.txt
+*.png
+*.svg
+*.out
+*.pdf
+el_modulus
+heatflux
+pressure
+sigma_vm
+temperature
+temperature_limit
+velocity

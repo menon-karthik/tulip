@@ -1,6 +1,6 @@
 # Imports
 import sys
-sys.path.insert(0, '../../../py')
+sys.path.insert(0, '../../../../bin/py')
 import tulipUQ as uq
 import numpy as np
 

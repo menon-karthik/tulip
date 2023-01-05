@@ -20,6 +20,7 @@ class uqMultiIndex{
     
     // CONSTRUCTOR
     uqMultiIndex(int dim, int order, int miType);
+    virtual ~uqMultiIndex();
 
     // GET NUMBER OF BASIS
     int getTotalBasis();

@@ -55,6 +55,40 @@ void daData_multiple_Table::readFromFile(string fileName){
   }
 }
 
+void daData_multiple_Table::assignFromLabelsAndMat(const stdStringVec& labels,const stdMat& values,bool useMean){
+  if(labels.size() != values[0].size()){
+    throw daException("ERROR: Invalid labels and values in daData_multiple_Table::assignFromLabelsAndMat.\n");
+  }else{
+    stdStringVec tmp;
+    for(int loopA=0;loopA<labels.size();loopA++){
+      // printf("Printing Label: %s\n",labels[loopA].c_str());
+      if(useMean){
+        // Use only the mean measurement
+        double currMean = 0.0;
+        for(int loopB=0;loopB<values.size();loopB++){
+          currMean += values[loopB][loopA];          
+        }        
+        tmp.clear();
+        tmp.push_back(to_string(currMean/values.size()));
+        // printf("Mean: %s\n",tmp[0].c_str());
+      }else{
+        // Use every observation
+        tmp.clear();
+        for(int loopB=0;loopB<values.size();loopB++){
+          tmp.push_back(to_string(values[loopB][loopA]));
+        }        
+      }
+      dict[labels[loopA]] = tmp;
+    }
+  }
+}
+  
+void daData_multiple_Table::overwriteStandardDeviations(const stdStringVec& labels,const stdVec& stds){
+  for(int loopA=0;loopA<labels.size();loopA++){
+    userStdDict[labels[loopA]] = stds[loopA];
+  }
+}
+
 double daData_multiple_Table::evalOBJ(const stdStringVec& keys,const stdVec& values,const stdVec& weights){
   
   // Check The Size of keys and values
@@ -103,11 +137,19 @@ double daData_multiple_Table::evalOBJ(const stdStringVec& keys,const stdVec& val
   return result;
 }
 
-double daData_multiple_Table::evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+double daData_multiple_Table::evalLogLikelihood(const stdStringVec& keys,const stdVec& avValues,const stdVec& stdFactors,const stdVec& weights){
+
+  bool useUserSTDs = (!userStdDict.empty());
+
+  if(!useUserSTDs){
+    if(keys.size() != stdFactors.size()){
+      throw daException("ERROR: Invalid stds in daData_multiple_Table::evalLogLikelihood.\n");
+    }
+  }
   
   // Check The Size of keys and values
-  if((keys.size() != avValues.size())||(keys.size() != stdFactors.size())||(keys.size() != weights.size())){
-    throw daException("Error in evalPosterior size of keys and values are not consistent.\n");
+  if((keys.size() != avValues.size())||(keys.size() != weights.size())){
+    throw daException("ERROR: Invalid values or weights in daData_multiple_Table::evalLogLikelihood.\n");
   }
   //if(useSingleColumn){
   //  if(dict.begin()->second.size() < columnID){
@@ -142,7 +184,11 @@ double daData_multiple_Table::evalLogLikelihood(stdStringVec keys,stdVec avValue
       if(dict.find(keys[loopA]) != dict.end()){
         // Found Key
         computed = avValues[loopA];  
-        stdFactor = stdFactors[loopA];
+        if(useUserSTDs){
+          stdFactor = userStdDict[keys[loopA]];
+        }else{
+          stdFactor = stdFactors[loopA];  
+        }        
         weightVal = weights[loopA];
         measuredString = dict[keys[loopA]][dataIndex];
         if(measuredString.compare("none") != 0){
@@ -166,7 +212,7 @@ double daData_multiple_Table::evalLogLikelihood(stdStringVec keys,stdVec avValue
   return result;
 }
 
-void daData_multiple_Table::printAndCompare(stdStringVec keys,stdVec values,stdVec weigths){
+void daData_multiple_Table::printAndCompare(const stdStringVec& keys,const stdVec& values,const stdVec& weigths){
   
   // Check The Size of keys and values
   if((keys.size() != values.size())||(keys.size() != weigths.size())){
@@ -223,7 +269,7 @@ void daData_multiple_Table::printAndCompare(stdStringVec keys,stdVec values,stdV
   fclose(fp);
 }
 
-int daData_multiple_Table::getPatientValue(string key,double &result){
+int daData_multiple_Table::getPatientValue(string key,double& result){
   if(useSingleColumn){
     int retVal = 0;
     if(dict.find(key) != dict.end()){
@@ -253,7 +299,13 @@ void daData_multiple_Table::printToScreen(){
   stdIntVec indexSet;
   getIndexSet(indexSet);
 
+  printf("Number of measurements: %d\n",int(dict.begin()->second.size()));
+
   int dataIndex = 0;
+
+  for(int loopIndex=0;loopIndex<indexSet.size();loopIndex++){
+    printf("index set %d: %d\n",loopIndex,indexSet[loopIndex]);
+  }
   
   for(int loopIndex=0;loopIndex<indexSet.size();loopIndex++){
     

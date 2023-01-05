@@ -1,36 +1,4 @@
-
 # include "cmTableInterpolator.h"
-
-void solveLSProblem(int totRows,int totCols, 
-                    stdVec rhs,stdMat mat,
-                    stdVec &coeffs,double &resNorm){
-
-  // Copy MAT and RHS
-  arma::mat armaMAT(totRows,totCols);
-  arma::vec armaRHS(totRows);
-  for(int loopA=0;loopA<totRows;loopA++){
-    armaRHS(loopA) = rhs[loopA];
-    for(int loopB=0;loopB<totCols;loopB++){
-      armaMAT(loopA,loopB) = mat[loopA][loopB];
-    }
-  }
-  
-  // Solve Least Squares
-  arma::vec lsSol = arma::solve(armaMAT,armaRHS);
-
-  // Copy Coefficients
-  for(int loopA=0;loopA<totCols;loopA++){
-    coeffs.push_back(lsSol(loopA));
-  }
-  
-  // Compute Residual Norm
-  arma::vec resVec = armaRHS - armaMAT*lsSol;
-  resNorm = 0.0;
-  for(int loopA=0;loopA<totRows;loopA++){
-    resNorm += (resVec(loopA))*(resVec(loopA));
-  }
-  resNorm = sqrt(resNorm/(double)totRows);
-}
 
 // ===========
 // CONSTRUCTOR
@@ -84,7 +52,7 @@ cmTableInterpolator::cmTableInterpolator(string tableFile, string weightFile,
   //  printf("Min: %f, Max: %f\n",limits[2*loopA + 0],limits[2*loopA + 1]);
   //}
   double currValue = 0.0;
-  uqSamples xValues(totInputs);
+  uqSamples* xValues = new uqSamples(totInputs);
   stdVec sample;
   for(int loopA=0;loopA<tableValues.size();loopA++){
     sample.clear();
@@ -95,11 +63,11 @@ cmTableInterpolator::cmTableInterpolator(string tableFile, string weightFile,
       currValue = 2.0*(currValue - limits[loopB*2 + 0])/(limits[loopB*2 + 1] - limits[loopB*2 + 0]) - 1.0;
       sample.push_back(currValue);
     }
-    xValues.addOneSample(sample);
+    xValues->addOneSample(sample);
   }
 
   // Print Samples For Debug Purposes
-  xValues.printToFile("Samples.txt",true);
+  xValues->printToFile("Samples.txt",true);
   
   // Form Polynomial Matrix
   uqPolyMatrix polyMat(xValues,order,kPolyLegendre,kMIPartialOrder);
@@ -133,7 +101,8 @@ cmTableInterpolator::cmTableInterpolator(string tableFile, string weightFile,
       //  printf("rhs n. %d: %e\n",loopC,rhs[loopC]);
       //}
 
-      solveLSProblem(polyMat.getRowCount(),polyMat.getColCount(),rhs,polyMat.getMatrix(),coeffs,resNorm);      
+      // Least Squares Solve
+      uqUtils::solveLSProblem(polyMat.getRowCount(),polyMat.getColCount(),rhs,polyMat.getMatrix(),coeffs,resNorm);      
 
       printf("Output: %d, Res Norm: %e\n",loopA,resNorm);
       //for(int loopC=0;loopC<polyMat.getColCount();loopC++){
@@ -178,6 +147,7 @@ cmTableInterpolator::cmTableInterpolator(string tableFile, string weightFile,
       throw new cmException("ERROR: Invalid Interpolation Type.\n");
     }
   }
+  delete xValues;
 }
 
 // GET NUMBER OF PARAMETERS
@@ -285,7 +255,7 @@ double cmTableInterpolator::evalModelError(const stdVec& inputs,stdVec& outputs,
 
   if(interpMethod != kNearestNighbor){
     // Convert Input to Samples
-    uqSamples sample(totInputs);
+    uqSamples* sample = new uqSamples(totInputs);
 
     // Form Samples
     stdVec limits;
@@ -299,7 +269,7 @@ double cmTableInterpolator::evalModelError(const stdVec& inputs,stdVec& outputs,
       currValue = 2.0*(currValue - limits[loopB*2 + 0])/(limits[loopB*2 + 1] - limits[loopB*2 + 0]) - 1.0;
       currSample.push_back(currValue);
     }
-    sample.addOneSample(currSample);
+    sample->addOneSample(currSample);
   
     // Form Polynomial Matrix
     uqPolyMatrix polyMat(sample,polyOrder,kPolyLegendre,kMIPartialOrder);

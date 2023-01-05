@@ -47,8 +47,16 @@ void daData::removeKeyValue(string key){
   }
 }
 
-double daData::evalLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights){
+double daData::evalLikelihood(const stdStringVec& keys,const stdVec& avValues,const stdVec& stdFactors,const stdVec& weights){
   double ll = evalLogLikelihood(keys,avValues,stdFactors,weights);
   return exp(-ll);  
 }
 
+void daData::printUserSTDs(){
+  printf("### User-defined Standard Deviations\n");
+  typedef doubleMap::iterator it_type;
+  for(it_type iterator = userStdDict.begin(); iterator != userStdDict.end(); iterator++) {
+    printf("Key %s, Value %f\n",iterator->first.c_str(),iterator->second);
+  }
+  printf("###\n");
+}

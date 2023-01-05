@@ -31,7 +31,7 @@ class uqMatrix{
     double operator()(const int nRow, const int nCol);
     
     // PERFORM MATRIX VECTOR PRODUCT
-    stdVec applyTo(stdVec coeff);
+    stdVec applyTo(const stdVec& coeff);
     
     // SET FIRST COLUMN TO ZERO
     void setColumnToZero(int colId);

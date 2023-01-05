@@ -5,6 +5,8 @@
 # include "uqMWBasis.h"
 # include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 // APPROXIMANT ON A SINGLE ELEMENT
 class uq1DApproximant_SE: public uq1DApproximant{
   public:
@@ -36,7 +38,7 @@ class uq1DApproximant_SE: public uq1DApproximant{
     virtual void exportToTextFile(string fileName, bool append = false);
     virtual int  importFromTextFile(string fileName, bool startFromTop = true,int startLine = 0);
     virtual void normalizeByConstant(double normValue);
-    virtual void getExtremes(stdVec& result);
+    virtual void getLimits(stdVec& res);
 };
 
 #endif // UQ1DPPROXIMANT_SE_H

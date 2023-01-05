@@ -11,6 +11,9 @@ acActionUP_MC::acActionUP_MC(uqSamples* locInputs): acActionUP(locInputs){
   opts.useExistingSamples = true;
 }
 
+acActionUP_MC::~acActionUP_MC(){
+}
+
 // PERFORM MCMC
 int acActionUP_MC::go(){
 
@@ -182,5 +185,13 @@ void acActionUP_MC::printStatsToFile(string fileName){
     fclose(avgF);
     fclose(stdF);
   }
+}
+
+uqApproximant* acActionUP_MC::getApproximant(){
+  throw acException("ERROR: Approximant Not Defined for UP MC.");
+}
+
+stdMat acActionUP_MC::getStatistics(){
+  throw acException("NOT IMPLEMENTED."); 
 }
 

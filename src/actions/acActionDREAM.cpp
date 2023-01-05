@@ -45,6 +45,13 @@ acActionDREAM::acActionDREAM(int locTotChains,
   this->priorFileName = priorFileName;
   this->priorModelType = priorModelType;
 
+  // Init Print Level to Silent
+  this->printLevel = 0;
+
+}
+
+void acActionDREAM::setPrintLevel(int level){
+  this->printLevel = level;
 }
 
 void acActionDREAM::std_compute_ini (int chain_num, int gen_index, int gen_num, int par_num, 
@@ -466,19 +473,16 @@ double* acActionDREAM::sample_candidate (int chain_index, int chain_num, double 
 //
   r = new int[2*pair_num];
 
-  for ( i = 0; i < pair_num; i++ )
-  {
-    while ( 1 )
-    {
+  for ( i = 0; i < pair_num; i++ ){
+    
+    while ( 1 ){
+    
       r2 = uSampler->sample(0.0,1.0);
       pair[0] = ( int ) ( r2 * ( double ) chain_num );
       r2 = uSampler->sample(0.0,1.0);
       pair[1] = ( int ) ( r2 * ( double ) chain_num );
 
-      if ( pair[0] != pair[1] &&
-           pair[0] != chain_index && 
-           pair[1] != chain_index )
-      {
+      if ( pair[0] != pair[1] && pair[0] != chain_index && pair[1] != chain_index ){
         break;
       }
     }
@@ -697,9 +701,9 @@ void acActionDREAM::restart_read(int chain_num, double fit[], int gen_num, int p
   restart.open ( restart_read_filename.c_str ( ) );
 
   if(!restart){
-    cerr << "\n";
-    cerr << "RESTART_READ - Fatal error!\n";
-    cerr << "  Could not open the file \"" 
+    cout << "\n";
+    cout << "RESTART_READ - Fatal error!\n";
+    cout << "  Could not open the file \"" 
          << restart_read_filename << "\".\n";
     exit ( 1 );
   }
@@ -1089,7 +1093,7 @@ void acActionDREAM::chain_outliers (int chain_num, int gen_index, int gen_num,
   }
   
   //  List the outlier chains.
-  if(0 < outlier_num){
+  if((outlier_num > 0)&&(printLevel > 0)){
     cout << "\n";
     cout << "CHAIN_OUTLIERS:\n";
     cout << "  At iteration " << gen_index 
@@ -1165,16 +1169,18 @@ void acActionDREAM::chain_write (string chain_filename, int chain_num, double fi
   chain_filename2 = chain_filename;
 
   //  Write parameter samples of all chains.
-  cout << "\n";
-  cout << "CHAIN_WRITE:\n";
+  if(printLevel > 0){
+    cout << "\n";
+    cout << "CHAIN_WRITE:\n";
+  }
 
   for(j = 0; j < chain_num; j++){
     chain.open ( chain_filename2.c_str ( ) );
 
     if(!chain){
-      cerr << "\n";
-      cerr << "CHAIN_WRITE - Fatal error!\n";
-      cerr << "  Could not open file \"" << chain_filename2 << "\".\n";
+      cout << "\n";
+      cout << "CHAIN_WRITE - Fatal error!\n";
+      cout << "  Could not open file \"" << chain_filename2 << "\".\n";
       exit ( 1 );
     }
 
@@ -1192,7 +1198,9 @@ void acActionDREAM::chain_write (string chain_filename, int chain_num, double fi
 
     chain.close ( );
 
-    cout << "  Created file \"" << chain_filename2 << "\".\n";
+    if(printLevel > 0){
+      cout << "  Created file \"" << chain_filename2 << "\".\n";
+    }
 
     filename_inc ( &chain_filename2 );
   }
@@ -1390,9 +1398,9 @@ void acActionDREAM::filename_inc ( string *filename )
 
   if ( lens <= 0 )
   {
-    cerr << "\n";
-    cerr << "FILENAME_INC - Fatal error!\n";
-    cerr << "  The input string is empty.\n";
+    cout << "\n";
+    cout << "FILENAME_INC - Fatal error!\n";
+    cout << "  The input string is empty.\n";
     exit ( 1 );
   }
 
@@ -1572,8 +1580,7 @@ void acActionDREAM::gr_compute (int chain_num, int gen_index, int gen_num, doubl
     }
   }
 
-  if ( gr_conv ) 
-  {
+  if((gr_conv)&&(printLevel > 0)){
     cout << "\n";
     cout << "GR_COMPUTE:\n";
     cout << "  GR convergence at iteration: " << gen_index << "\n";
@@ -1627,12 +1634,11 @@ void acActionDREAM::gr_write(double gr[], string gr_filename, int gr_num, int pa
 
   gr_unit.open ( gr_filename.c_str ( ) );
 
-  if ( ! gr_unit )
-  {
-    cerr << "\n";
-    cerr << "GR_WRITE - Fatal error!\n";
-    cerr << "  Could not open the file \"" << gr_filename << "\"\n";
-    exit ( 1 );
+  if (! gr_unit){
+    cout << "\n";
+    cout << "GR_WRITE - Fatal error!\n";
+    cout << "  Could not open the file \"" << gr_filename << "\"\n";
+    exit(1);
   }
 
   gr_unit <<
@@ -1650,9 +1656,11 @@ void acActionDREAM::gr_write(double gr[], string gr_filename, int gr_num, int pa
 
   gr_unit.close ( );
 
-  cout << "\n";
-  cout << "GR_WRITE:\n";
-  cout << "  Created the file \"" << gr_filename << "\".\n";
+  if(printLevel > 0){
+    cout << "\n";
+    cout << "GR_WRITE:\n";
+    cout << "  Created the file \"" << gr_filename << "\".\n";    
+  }
 
   return;
 }
@@ -1794,9 +1802,9 @@ void acActionDREAM::sample_limits(double limits[], int par_num, double zp[])
       // Fix Parameter
       zp[i] = limits[i*2 + 0];
     }else if ( w < 0.0 ){
-      cerr << "\n";
-      cerr << "SAMPLE_LIMITS - Fatal error!\n";
-      cerr << "  Upper limit less than lower limit.\n";
+      cout << "\n";
+      cout << "SAMPLE_LIMITS - Fatal error!\n";
+      cout << "  Upper limit less than lower limit.\n";
       exit ( 1 );
     }else{
       while ( zp[i] < limits[0+i*2] ){
@@ -1974,6 +1982,7 @@ double* acActionDREAM::prior_sample ( int par_num, int prior_num, int* prPtr, co
   for(int loopA=0;loopA<currLimits.size();loopA++){
     limits[loopA] = currLimits[loopA];
   }
+
   // GET PARAMETER ESTIMATE
   stdVec stdStartingParams;
   model->getDefaultParams(stdStartingParams);
@@ -2059,8 +2068,10 @@ double acActionDREAM::sample_likelihood (int par_num, double zp[])
   }  
 
   // Print Log Likelihood
-  printf("LL: %.5f\n",value);
-  fflush(stdout);
+  if(printLevel > 0){
+    printf("LL: %.5f\n",value);
+    fflush(stdout);
+  }
   
   // Return
   return value;

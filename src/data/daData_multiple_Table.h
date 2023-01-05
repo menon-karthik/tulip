@@ -34,13 +34,16 @@ class daData_multiple_Table: public daData{
   	
     virtual void   readFromFile(string fileName);
     virtual double evalOBJ(const stdStringVec& keys,const stdVec& values,const stdVec& weights);
-    virtual double evalLogLikelihood(stdStringVec keys,stdVec avValues,stdVec stdFactors,stdVec weights);
-    virtual void   printAndCompare(stdStringVec keys,stdVec values,stdVec weigths);
-    virtual int    getPatientValue(string key,double &result);
+    virtual double evalLogLikelihood(const stdStringVec& keys,const stdVec& avValues,const stdVec& stdFactors,const stdVec& weights);
+    virtual void   printAndCompare(const stdStringVec& keys,const stdVec& values,const stdVec& weigths);
+    virtual int    getPatientValue(string key,double& result);
     virtual void   printToScreen();
     virtual void   getTable(stdMat& table);
 
     void getIndexSet(stdIntVec& indexSet);
+
+    void assignFromLabelsAndMat(const stdStringVec& labels,const stdMat& values, bool useMean);
+    void overwriteStandardDeviations(const stdStringVec& labels,const stdVec& stds);
     
 };
 

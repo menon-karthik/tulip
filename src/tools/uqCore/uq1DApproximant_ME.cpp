@@ -1,5 +1,7 @@
 #include "uq1DApproximant_ME.h"
 
+using namespace std;
+
 // Default Constructor
 uq1DApproximant_ME::uq1DApproximant_ME(){
 }
@@ -34,15 +36,15 @@ double uq1DApproximant_ME::evaluate(double XValue){
 
 // Get Element ID from Value
 int uq1DApproximant_ME::getElementID(double value){
-  stdVec extremes;
-  getExtremes(extremes);
+  stdVec limits;
+  getLimits(limits);
   bool found = false;
   int count = 0;
   while((!found)&&(count<approx.size())){
     // Check If Found
     found = ((value >= approx[count]->limits[0])&&(value < approx[count]->limits[1]));
     // Check the special case in the upper limit
-    if((fabs(approx[count]->limits[1] - extremes[1])<1.0e-3)&&(fabs(value - approx[count]->limits[1])<1.0e-3)){
+    if((fabs(approx[count]->limits[1] - limits[1])<1.0e-3)&&(fabs(value - approx[count]->limits[1])<1.0e-3)){
       found = true;
     }
     // Update Count
@@ -52,7 +54,7 @@ int uq1DApproximant_ME::getElementID(double value){
   }
   // Check if found
   if(!found){
-    printf("Value: %f, Extremes: %f %f\n",value,extremes[0],extremes[1]);
+    printf("Value: %f, limits: %f %f\n",value,limits[0],limits[1]);
     printf("Warning: Element not found for MEApproximant. Returning 0 at value %f...\n",value);
     return -1;
   }
@@ -60,17 +62,17 @@ int uq1DApproximant_ME::getElementID(double value){
   return count;
 }
 
-// Get the extremes 
-void uq1DApproximant_ME::getExtremes(stdVec& result){
-  result.resize(2);
-  result[0] = std::numeric_limits<double>::max();
-  result[1] = -std::numeric_limits<double>::max();
+// Get the limits 
+void uq1DApproximant_ME::getLimits(stdVec& res){
+  res.resize(2);
+  res[0] = std::numeric_limits<double>::max();
+  res[1] = -std::numeric_limits<double>::max();
   for(int loopA=0;loopA<approx.size();loopA++){
-    if(approx[loopA]->limits[0] < result[0]){
-      result[0] = approx[loopA]->limits[0];
+    if(approx[loopA]->limits[0] < res[0]){
+      res[0] = approx[loopA]->limits[0];
     }
-    if(approx[loopA]->limits[1] > result[1]){
-      result[1] = approx[loopA]->limits[1];
+    if(approx[loopA]->limits[1] > res[1]){
+      res[1] = approx[loopA]->limits[1];
     }
   }
 }

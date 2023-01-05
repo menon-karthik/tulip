@@ -39,15 +39,17 @@ class acActionUP_MC: public acActionUP{
 
   	// Constructor
   	acActionUP_MC(uqSamples* locInputs);
-
-  	// Get Statistics
-  	double getStats(int index){return stats[index];}
-
-  	// Perform Action
-  	virtual int go();
+    virtual ~acActionUP_MC();
 
     // Print Stored Statistics to File
     void printStatsToFile(string fileName);
+
+    // Construct stochastic approximation or evaluate samples
+    virtual int go();
+    // Get Approximant
+    virtual uqApproximant* getApproximant();
+    // Get Statistics
+    virtual stdMat getStatistics();
 };
 
 # endif //ACACTIONUP_H

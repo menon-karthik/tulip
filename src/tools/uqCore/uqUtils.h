@@ -3,7 +3,6 @@
 
 # define ARMA_DONT_USE_CXX11
 # include <armadillo>
-# include <chrono> 
 
 # include "uqException.h"
 # include "uqTypes.h"
@@ -98,6 +97,9 @@ namespace uqUtils{
   // Basic utilities
   double sumvec(int num,double vec[]);
   void printTimestamp();
+
+  // Solve LS Problem
+  void solveLSProblem(int totRows,int totCols,const stdVec& rhs,const stdMat& mat,stdVec &coeffs,double &resNorm);
 
 }
 

@@ -171,4 +171,35 @@ void printTimestamp(){
   cout << time_buffer << "\n";
 }
 
+void solveLSProblem(int totRows,int totCols, 
+                    const stdVec& rhs,const stdMat& mat,
+                    stdVec &coeffs,double &resNorm){
+
+  // Copy MAT and RHS
+  arma::mat armaMAT(totRows,totCols);
+  arma::vec armaRHS(totRows);
+  for(int loopA=0;loopA<totRows;loopA++){
+    armaRHS(loopA) = rhs[loopA];
+    for(int loopB=0;loopB<totCols;loopB++){
+      armaMAT(loopA,loopB) = mat[loopA][loopB];
+    }
+  }
+  
+  // Solve Least Squares
+  arma::vec lsSol = arma::solve(armaMAT,armaRHS);
+
+  // Copy Coefficients
+  for(int loopA=0;loopA<totCols;loopA++){
+    coeffs.push_back(lsSol(loopA));
+  }
+  
+  // Compute Residual Norm
+  arma::vec resVec = armaRHS - armaMAT*lsSol;
+  resNorm = 0.0;
+  for(int loopA=0;loopA<totRows;loopA++){
+    resNorm += (resVec(loopA))*(resVec(loopA));
+  }
+  resNorm = sqrt(resNorm/(double)totRows);
+}
+
 }

@@ -7,6 +7,8 @@ uqSamples::uqSamples(){
   totSamples = 0;
   totDims = 0;
   areIndependent = true;
+  uSampler = NULL;
+  nSampler = NULL;
 }
 
 // CONSTRUCTOR
@@ -14,9 +16,16 @@ uqSamples::uqSamples(int dimNum):uqSamples(){
   totDims = dimNum;
 }
 
-uqSamples::uqSamples(stdVec onePoint):uqSamples(){
+uqSamples::uqSamples(const stdVec& onePoint):uqSamples(){
   totDims = onePoint.size();
   addOneSample(onePoint);
+}
+
+uqSamples::uqSamples(const stdMat& samples):uqSamples(){
+  totDims = samples[0].size();
+  for(size_t loopA=0;loopA<samples.size();loopA++){
+    addOneSample(samples[loopA]);
+  }
 }
 
 // COPY CONSTRUCTOR
@@ -102,6 +111,14 @@ void uqSamples::getValues(stdMat& copyVals){
   }
 }
 
+stdVec uqSamples::getColumn(int dim){
+  stdVec res;
+  for(int loopA=0;loopA<values.size();loopA++){
+    res.push_back(values[loopA][dim]);
+  }
+  return res;
+}
+
 // SET DEPENDENCE
 void uqSamples::setSampleIndependence(bool flag){
   areIndependent = flag;
@@ -119,7 +136,7 @@ double uqSamples::operator()(const int nRow, const int nCol){
 }
 
 // ADD SINGLE SAMPLE
-void uqSamples::addOneSample(stdVec sample){
+void uqSamples::addOneSample(const stdVec& sample){
   totSamples++;
   values.push_back(sample);
 }
@@ -1091,7 +1108,7 @@ void uqSamples::generateCartesianGrid(int gridOrder, int gridType, int rangeType
 // ==============================
 // EXTRACT SAMPLES ON A PARTITION
 // ==============================
-void uqSamples::extractPartitionSamples(uqSamples* samples,stdVec limits,stdIntVec& ind){
+void uqSamples::extractPartitionSamples(uqSamples* samples,const stdVec& limits,stdIntVec& ind){
   
   // Check dimension match
   totDims = samples->totDims;
@@ -1303,7 +1320,7 @@ void uqSamples::addVariableFromFile(string fileName,int numColumn){
 // =========================================================
 // RESCALE SAMPLE FROM CARTESIAN PARTITION TO FULL HYPERCUBE
 // =========================================================
-void uqSamples::rescaleOnHypercube(stdVec currLimits){
+void uqSamples::rescaleOnHypercube(const stdVec& currLimits){
   // Sanity Check
   double currValue1 = 0.0;
   double currValue2 = 0.0;

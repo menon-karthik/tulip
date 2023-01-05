@@ -3,8 +3,9 @@
 
 # include <string>
 
-# include "uqTypes.h"
+# include "cmException.h"
 # include "daData.h"
+# include "uqTypes.h"
 
 using namespace std;
 
@@ -19,6 +20,8 @@ class cmModel{
     stdVec    frozenParamVAL;
     //! Level of printing for model debug information
     int printLevel;
+    //! Limits set by users
+    stdVec userLimits;
 
   	//! Default constructor
   	cmModel();
@@ -205,6 +208,9 @@ class cmModel{
 
     // GET PARAMETER LIMITS
     void getParameterLimits(stdVec& limits);
+
+    // GET PARAMETER LIMITS
+    void setParameterLimits(const stdVec& limits);
 };
 
 #endif //CMMODEL_H

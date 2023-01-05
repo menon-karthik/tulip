@@ -33,12 +33,12 @@ class uqAlgorithmBCS: public uqAlgorithm{
     uqAlgorithmBCS();
 
     // RUN
-    double run(int sample_num, int par_num, 
+    double run(int totSamples, int totBasis, 
                stdVec yValues,stdMat basisMat,
-               stdVec &coeffs,stdMat &coeffsCov,
+               stdVec &coeffs,stdMat &coeffsCov, 
                double &noiseEstimate);
 };
-
+ 
 
 #endif // UQALGORITHMBCS_H
 

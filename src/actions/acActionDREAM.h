@@ -67,6 +67,9 @@ class acActionDREAM: public acAction{
     uqUniformPDF*  uSampler;
     uqGaussianPDF* nSampler;
     uqCategoricalPMF* catSampler;
+
+    // Print Level 
+    int printLevel;
     
     // Protected Functions
     void std_compute_ini (int chain_num, int gen_index, int gen_num, int par_num, 
@@ -185,6 +188,8 @@ class acActionDREAM: public acAction{
     \param[in] burnInPercent percent of initial samples in each chain output to be rejected.
     */
   	int postProcess(bool debugMode, double burnInPercent);
+
+    void setPrintLevel(int level);
 
   	// Virtual Function from acAction
   	virtual int go() = 0;

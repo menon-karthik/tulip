@@ -93,26 +93,29 @@ void acActionDREAMseq::chain_init_print (int chain_num, double fit[], int gen_nu
   int i;
   int j;
 
-  cout << "\n";
-  cout << "CHAIN_INIT_PRINT\n";
-  cout << "  Display initial values of Markov chains.\n";
+  if(printLevel > 0){
 
-  if(!restart_read_filename.empty()){
-    cout << "  Initialization from restart file \"" 
-         << restart_read_filename << "\"\n";
-  }else{
-    cout << "  Initialization by sampling prior density.\n";
-  }
-  for(j = 0; j < chain_num; j++){
     cout << "\n";
-    cout << "  Chain " << j << "\n";
-    cout << "  Fitness " << fit[j+0*chain_num] << "\n";
-    for(i = 0; i < par_num; i++){
-      cout << "  " << setw(14) << z[i+j*par_num+0*par_num*chain_num];
-      if ( ( i + 1 ) % 5 == 0 || i == par_num - 1 ){
-        cout << "\n";
-      }
+    cout << "CHAIN_INIT_PRINT\n";
+    cout << "  Display initial values of Markov chains.\n";
+
+    if(!restart_read_filename.empty()){
+      cout << "  Initialization from restart file \"" 
+           << restart_read_filename << "\"\n";
+    }else{
+      cout << "  Initialization by sampling prior density.\n";
     }
+    for(j = 0; j < chain_num; j++){
+      cout << "\n";
+      cout << "  Chain " << j << "\n";
+      cout << "  Fitness " << fit[j+0*chain_num] << "\n";
+      for(i = 0; i < par_num; i++){
+        cout << "  " << setw(14) << z[i+j*par_num+0*par_num*chain_num];
+        if ( ( i + 1 ) % 5 == 0 || i == par_num - 1 ){
+          cout << "\n";
+        }
+      }
+    }  
   }
   return;
 }
@@ -247,6 +250,10 @@ void acActionDREAMseq::cr_dis_update (int chain_index, int chain_num, double cr_
       cr_dis[cr_index] = cr_dis[cr_index] + pow ( ( z[i1] - z[i2] ) / std[i], 2 );  
     }
   }
+
+  // free
+  delete [] std;
+
   return;
 }
 
@@ -395,16 +402,39 @@ void acActionDREAMseq::dream_algm_seq(int chain_num, int cr_num, double fit[], i
 //
 //  Initialize the CR values.
 //
-  cr = new double[cr_num];
-  cr_dis = new double[cr_num];
+  cr      = new double[cr_num];
+  cr_dis  = new double[cr_num];
   cr_prob = new double[cr_num];
-  cr_ups = new int[cr_num];
+  cr_ups  = new int[cr_num];
 
-  cr_init ( cr, cr_dis, cr_num, cr_prob, cr_ups );
+  cr_init ( cr, cr_dis, cr_num, cr_prob, cr_ups );  
 
-  for(gen_index = 1; gen_index < gen_num; gen_index++){
+  bool doneProgress[10];
+  for(int loopA=0;loopA<10;loopA++){
+    doneProgress[loopA] = false;
+  }
+
+  for(gen_index=1;gen_index<gen_num;gen_index++){
+
+    // Print Progress 
+    int currProgress = 0;
+    if(printLevel == 0){
+      if(gen_index == 1){
+        printf("Sampling...");
+      }else{
+        currProgress = int(((gen_index-1)/double(gen_num-1))*100);
+        if((currProgress % 10 == 0)&&(!doneProgress[currProgress/10])){
+          doneProgress[currProgress/10] = true;
+          printf("%d.",currProgress);
+        }
+      }
+      if(gen_index == gen_num-1){
+      printf("100.OK.\n");
+      }
+    }
+
     for(chain_index = 0; chain_index < chain_num; chain_index++){
-
+      
       //  Choose CR_INDEX, the index of a CR.
       cr_index = cr_index_choose(cr_num, cr_prob);
 
@@ -424,7 +454,7 @@ void acActionDREAMseq::dream_algm_seq(int chain_num, int cr_num, double fit[], i
       zp_old_fit = fit[chain_index+(gen_index-1)*chain_num];
 
       //  Compute the Metropolis ratio for ZP.
-      pd1 = prior_density ( par_num, zp , prior_num, prPtr, prAv, prSd );
+      pd1 = prior_density ( par_num, zp , prior_num, prPtr, prAv, prSd );      
 
       pd2 = prior_density ( par_num, 
         z+0+chain_index*par_num+(gen_index-1)*par_num*chain_num ,
@@ -499,8 +529,7 @@ void acActionDREAMseq::dream_algm_seq(int chain_num, int cr_num, double fit[], i
 //
   zp_accept_rate = ( double ) ( zp_accept ) / ( double ) ( zp_count );
 
-  cout << "\n";
-  cout << "  The acceptance rate is " << zp_accept_rate << "\n";
+  cout << "MCMC acceptance rate: " << zp_accept_rate << "\n";
 
   delete [] cr;
   delete [] cr_dis;
@@ -699,9 +728,9 @@ void acActionDREAMseq::restart_read ( int chain_num, double fit[], int gen_num, 
 
   if ( ! restart )
   {
-    cerr << "\n";
-    cerr << "RESTART_READ - Fatal error!\n";
-    cerr << "  Could not open the file \"" 
+    cout << "\n";
+    cout << "RESTART_READ - Fatal error!\n";
+    cout << "  Could not open the file \"" 
          << restart_read_filename << "\".\n";
     exit ( 1 );
   }
@@ -762,9 +791,9 @@ void acActionDREAMseq::restart_write ( int chain_num, double fit[], int gen_num,
   restart.open ( restart_write_filename.c_str ( ) );   
 
   if(!restart ){
-    cerr << "\n";
-    cerr << "RESTART_WRITE - Fatal error!\n";
-    cerr << "  Could not open \"" << restart_write_filename << "\".\n";
+    cout << "\n";
+    cout << "RESTART_WRITE - Fatal error!\n";
+    cout << "  Could not open \"" << restart_write_filename << "\".\n";
     exit ( 1 );
   }
 
@@ -781,16 +810,18 @@ void acActionDREAMseq::restart_write ( int chain_num, double fit[], int gen_num,
 
   restart.close ( );
 
-  cout << "\n";
-  cout << "RESTART_WRITE:\n";
-  cout << "  Created restart file \"" << restart_write_filename << "\".\n";
+  if(printLevel > 0){
+    cout << "\n";
+    cout << "RESTART_WRITE:\n";
+    cout << "  Created restart file \"" << restart_write_filename << "\".\n";  
+  }
 
   return;
 }
 
 
-int acActionDREAMseq::go()
-{
+int acActionDREAMseq::go(){
+
   string chain_filename = "";
   int chain_num;
   int cr_num;
@@ -817,62 +848,68 @@ int acActionDREAMseq::go()
   stdVec prAv;
   stdVec prSd;
 
-  uqUtils::printTimestamp();
+  if(printLevel > 0){
+    uqUtils::printTimestamp();  
+  }
 
   // Allocate Samplers
   uSampler = new uqUniformPDF();
   nSampler = new uqGaussianPDF();
   catSampler = new uqCategoricalPMF();
 
-  cout << "\n";
-  cout << "DREAM\n";
-  cout << "  C++ version\n";
-  cout << "  MCMC acceleration by Differential Evolution.\n";
-  cout << "  Sequential Algorithm.\n";
-  cout << "\n";
-  // Print sampler seeds
-  cout << "Uniform Sampler Seed: " << uSampler->getSeed() << endl;
-  cout << "Normal Sampler Seed: " << nSampler->getSeed() << endl;
-  cout << "Categorical Sampler Seed: " << catSampler->getSeed() << endl;
+  if(printLevel > 0){
+    cout << "\n";
+    cout << "DREAM\n";
+    cout << "  C++ version\n";
+    cout << "  MCMC acceleration by Differential Evolution.\n";
+    cout << "  Sequential Algorithm.\n";
+    cout << "\n";
+    // Print sampler seeds
+    cout << "Uniform Sampler Seed: " << uSampler->getSeed() << endl;
+    cout << "Normal Sampler Seed: " << nSampler->getSeed() << endl;
+    cout << "Categorical Sampler Seed: " << catSampler->getSeed() << endl;    
+  }
 
   // Get the problem sizes.
   problem_size ( chain_num, cr_num, gen_num, pair_num, par_num );
 
   // Decide if the problem sizes are acceptable.
-  if(chain_num < 1){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  CHAIN_NUM < 1.\n";
+  if(chain_num < 3){
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  CHAIN_NUM < 3.\n";
     exit(1);
   }
   if(cr_num < 1){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  CR_NUM < 1.\n";
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  CR_NUM < 1.\n";
     exit(1);
   }
   if(gen_num < 2){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  GEN_NUM < 2.\n";
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  GEN_NUM < 2.\n";
     exit(1);
   }
   if(pair_num < 0){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  PAIR_NUM < 0.\n";
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  PAIR_NUM < 0.\n";
     exit (1);
   }
   if(par_num < 1){
-    cerr << "\n";
-    cerr << "DREAM - Fatal error!\n";
-    cerr << "  PAR_NUM < 1.\n";
+    cout << "\n";
+    cout << "DREAM - Fatal error!\n";
+    cout << "  PAR_NUM < 1.\n";
     exit ( 1 );
   }
 
   //  Read Prior Information From File if Available
   if(usePriorFromFile){    
-    printf("READING PRIOR INFORMATION FROM FILE.\n");
+    if(printLevel > 0){
+      printf("READING PRIOR INFORMATION FROM FILE.\n");
+    }
     // Read Statistics from file
     int error = cmUtils::readPriorFromFile(priorFileName,prior_num,prAv,prSd);    
     if(error != 0){  
@@ -885,15 +922,19 @@ int acActionDREAMseq::go()
     model->getPriorMapping(priorModelType,prPtr);
       
     // PRINT PRIOR INFORMATION READ
-    printf("\n");
-    printf("PRIOR INFORMATION.\n");
-    printf("%10s %10s %10s %10s\n","NUM","PTR","AV VALUE","SD VALUE");
-    for(int loopA=0;loopA<prior_num;loopA++){
-      printf("%10d %10d %10f %10f\n",loopA,prPtr[loopA],prAv[loopA],prSd[loopA]);
+    if(printLevel > 0){
+      printf("\n");
+      printf("PRIOR INFORMATION.\n");
+      printf("%10s %10s %10s %10s\n","NUM","PTR","AV VALUE","SD VALUE");
+      for(int loopA=0;loopA<prior_num;loopA++){
+        printf("%10d %10d %10f %10f\n",loopA,prPtr[loopA],prAv[loopA],prSd[loopA]);
+      }
+      printf("\n");
     }
-    printf("\n");
   }else{
-    printf("NO PRIOR FILE PROVIDED.\n");
+    if(printLevel > 0){
+      printf("NO PRIOR FILE PROVIDED.\n");
+    }
   }
 
   //  Get the problem data values;
@@ -905,9 +946,11 @@ int acActionDREAMseq::go()
 //
 //  Print the data as a job record.
 //
-  input_print ( chain_filename, chain_num, cr_num, gr_filename, gr_threshold, 
-    jumpstep, limits, gen_num, pair_num, par_num, 
-    printstep, restart_read_filename, restart_write_filename );
+  if(printLevel > 0){
+    input_print(chain_filename, chain_num, cr_num, gr_filename, gr_threshold, 
+                jumpstep, limits, gen_num, pair_num, par_num, 
+                printstep, restart_read_filename, restart_write_filename);
+  }
 //
 //  Allocate and zero out memory.
 //
@@ -920,18 +963,23 @@ int acActionDREAMseq::go()
 //  Set the jump rate table.
 //
   jumprate_table = jumprate_table_init ( pair_num, par_num );
-
-  jumprate_table_print ( jumprate_table, pair_num, par_num );
+  
+  if(printLevel > 0){
+    jumprate_table_print(jumprate_table, pair_num, par_num);
+  }
+  
 //
 //  Initialize the Gelman-Rubin data.
 //
-  gr_init ( gr, gr_conv, gr_count, gr_num, par_num );
+  gr_init(gr,gr_conv,gr_count,gr_num,par_num);
 
-  cout << "\n";
-  cout << "GR_PRINT:\n";
-  cout << "  GR_CONV  = " << gr_conv << "\n";
-  cout << "  GR_COUNT = " << gr_count << "\n";
-  cout << "  GR_NUM   = " << gr_num << "\n";  
+  if(printLevel > 0){
+    cout << "\n";
+    cout << "GR_PRINT:\n";
+    cout << "  GR_CONV  = " << gr_conv << "\n";
+    cout << "  GR_COUNT = " << gr_count << "\n";
+    cout << "  GR_NUM   = " << gr_num << "\n";  
+  }
 
 //
 //  Set the first generation of the chains from restart data, or by sampling.
@@ -939,13 +987,10 @@ int acActionDREAMseq::go()
   if(restart_read_filename.empty()){
     chain_init ( chain_num, fit, gen_num, par_num, z,
                  prior_num, prPtr, prAv, prSd);
+  }else{
+    restart_read ( chain_num, fit, gen_num, par_num, restart_read_filename, z);
   }
-  else
-  {
-    restart_read ( chain_num, fit, gen_num, par_num, restart_read_filename, z );
-  }
-  chain_init_print ( chain_num, fit, gen_num, par_num, restart_read_filename,
-    z );
+  chain_init_print ( chain_num, fit, gen_num, par_num, restart_read_filename, z);
 //
 //  Carry out the DREAM algorithm.
 //
@@ -991,11 +1036,13 @@ int acActionDREAMseq::go()
 //
 //  Terminate.
 //
-  cout << "\n";
-  cout << "DREAM\n";
-  cout << "  Normal end of execution.\n";
-  cout << "\n";
-  uqUtils::printTimestamp();
+  if(printLevel > 0){
+    cout << "\n";
+    cout << "DREAM\n";
+    cout << "  Normal end of execution.\n";
+    cout << "\n";
+    uqUtils::printTimestamp();  
+  }
 
   return 0;
 }

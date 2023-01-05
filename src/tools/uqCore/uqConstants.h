@@ -27,4 +27,8 @@ const int kMIFullOrder = 0;
 //! Total order multi-index for multi-d polynomials
 const int kMIPartialOrder = 1;
 
+// TYPE OF APPROXIMANT
+enum approxTypes{atPoly,atOrthoPoly,atMW};
+
+
 #endif // UQCONSTANTS

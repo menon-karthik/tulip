@@ -1,6 +1,9 @@
 #ifndef CMUTILS_H
 #define CMUTILS_H
 
+# define ARMA_DONT_USE_CXX11
+# include <armadillo>
+
 # include <string.h>
 # include <vector>
 # include <boost/algorithm/string.hpp>
@@ -835,8 +838,15 @@ No Reference
 \param[in] endColumn end of columns in file.
 \param[out] subSampleTable Table with parameters sub-samples.
 \param[out] sampleIndexes Vector with the indexes of the sub-samples.
+\param[out] (optional) limits Vector with limits for each of the columns
 */
-void subSampleTableData(string currTraceFile,int& totSubSamples,int startColumn,int endColumn,stdMat& subSampleTable,stdIntVec& sampleIndexes);
+void subSampleTableData(string currTraceFile,
+                        int& totSubSamples,
+                        int startColumn,
+                        int endColumn,
+                        stdMat& subSampleTable,
+                        stdIntVec& sampleIndexes,
+                        stdVec limits = stdVec());
 
 /*! 
 \verbatim embed:rst

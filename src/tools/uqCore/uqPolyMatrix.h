@@ -8,8 +8,9 @@
 
 class uqPolyMatrix: public uqMatrix{
   public:
-    // CONSTUCTOR
-    uqPolyMatrix(uqSamples xValues, int maxOrder, int polyType, int completeOrderType);
+    
+    uqPolyMatrix(uqSamples* xValues, int maxOrder, int polyType, int completeOrderType);
+    virtual ~uqPolyMatrix();
 };
 
 #endif // UQPOLYMATRIX_H
