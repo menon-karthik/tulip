@@ -756,6 +756,7 @@ int ntNet::runBP(bool init){
 
   // !!! COMPLETE !!!
   printf("BP COMPLETED!\n");
+  return 0;
 
 }
 

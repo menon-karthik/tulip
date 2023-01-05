@@ -74,6 +74,7 @@ stdVec uqApproximant_ME::getLimits(){
       }
     }
   }
+  return currLimits;
 }
 
 // Export Multi-element Approximant to File

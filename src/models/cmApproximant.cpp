@@ -67,4 +67,6 @@ double cmApproximant::evalModelError(const stdVec& inputs,stdVec& outputs,stdInt
   // Error Code
   errorCode.clear();
   errorCode.push_back(0);
+  // Return 0.0
+  return 0.0;
 }

@@ -81,6 +81,7 @@ int acActionUP_PC::go(){
     delete mat;
     delete bcs;
   }
+  return 0;
 }
 
 // Get Approximant

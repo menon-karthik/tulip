@@ -167,6 +167,7 @@ int uqApproximant_SE::importFromFile(string fileName, bool startFromTop, int sta
     return 1;
   }
   myReadFile.close();
+  return 0;
 }
 
 void uqApproximant_SE::exportToFile(string fileName, bool append){
