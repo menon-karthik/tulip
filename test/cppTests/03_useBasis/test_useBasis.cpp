@@ -82,7 +82,7 @@ int main(int argc, char* argv[]){
     }
 
     // PRINT RESULT MATRIX
-    writeTableToFile(string("tutorial_06.out"),results);
+    cmUtils::writeTableToFile(string("tutorial_06.out"),results);
   
   }catch(exception &e){
     // ERROR: TERMINATED!

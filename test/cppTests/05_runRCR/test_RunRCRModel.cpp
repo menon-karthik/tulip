@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
 
     stdMat matForcing;
     string fileName = string("inflow.flow");
-    readTableFromFile(fileName, matForcing);
+    cmUtils::readTableFromFile(fileName, matForcing);
     
     // Create a ODE Model
     odeModel* ode = new odeRCR();

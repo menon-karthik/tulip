@@ -1,7 +1,7 @@
 # =======================
 # SELECT TESTS TO INCLUDE
 # =======================
-OPTION(test_runModels "Run LPN Models with defualt parameter set" ON)
+OPTION(test_runModels "Run LPN Models with default parameter set" ON)
 
 # ==========================
 # SET TARGET LOCATION TO BIN
@@ -17,5 +17,7 @@ IF(test_runModels)
   ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/test/cppTests/03_useBasis)
   ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/test/cppTests/04_optRCR)
   ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/test/cppTests/05_runRCR)
-  ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/test/cppTests/06_nonLinear)
+  IF(addModelBertini)
+    ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/test/cppTests/06_nonLinear)
+  ENDIF()
 ENDIF()
