@@ -91,5 +91,45 @@ stdVec genSampleFromPMF(const stdVec& bins,const stdVec& pmf,int n,uqPDF* uSampl
   return res;
 }
 
+bool isInStringVec(string name,const stdStringVec& vec){
+  int count = 0;
+  bool found = false;
+  while((!found)&&(count<vec.size())){
+    found = (name == vec[count]);
+    if(!found){
+      count++;
+    }
+  }
+  return found;
+}
+
+double discretizeSample(double sample, int numSubdiv, double lb, double ub){
+  // CHECK!!!
+  double res = lb + round((sample-lb)/((ub-lb)/(numSubdiv-1)))*((ub-lb)/(numSubdiv-1));
+  // printf("sample: %f, discrete: %f\n",sample,res);
+  return res;
+}
+
+// Returns the integer index for the discrete sample in the bin vector
+int getSampleState(double sample, int numSubdiv, double lb, double ub){
+  return round((sample-lb)/((ub-lb)/(numSubdiv-1)));
+}
+
+stdVec getBins(int numSubdiv, double lb, double ub){
+  stdVec res;
+  for(int loopA=0;loopA<numSubdiv;loopA++){
+    res.push_back(lb + loopA*(ub-lb)/(numSubdiv-1));
+  }
+  return res;
+}
+
+bool sameArray(const stdVec& v1,const stdVec& v2){
+  double diff = 0.0;
+  for(int loopA=0;loopA<v1.size();loopA++){
+    diff += (v1[loopA]-v2[loopA])*(v1[loopA]-v2[loopA]);
+  }
+  return sqrt(diff) < 1.0e-5;
+}
+
 }
 

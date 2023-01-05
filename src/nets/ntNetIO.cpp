@@ -418,12 +418,159 @@ void ntNetIO::readDeterministicNodeFile(string fileName,
 
 void ntNetIO::readProbabilisticNodeFile(string fileName,
                                         int& numVariables,
-                                        int& NumSamples,
-                                        stdStringVec& varNames,
+                                        int& numSamples,
+                                        stdStringVec& varNames,                                        
                                         stdVec& varSTD,
-                                        modelTypes& detVarType,
-                                        string& detModelName){
-  throw ntException("ERROR: readProbabilisticNodeFile not implemented.\n");
+                                        stdVec& limits,
+                                        stdIntVec& subdiv,
+                                        stdMat& cpt){
+
+  // Message
+  printf("Reading probabilistic node file: %s ... \n",fileName.c_str());
+
+  // Declare
+  stdStringVec tokenizedString;
+  stdVec       tmpVec;
+  stdVec       minLimits;
+  stdVec       maxLimits;
+  bool doInclude = false;
+  int auxCount = 0;
+
+  // Declare input File
+  ifstream infile;
+  infile.open(fileName);
+  if(infile.fail()){
+    throw ntException("ERROR: Input file does not exist.\n");
+  }
+  int lineCount = 1;
+
+  // Read Data From File
+  string buffer;
+  while (getline(infile,buffer)){
+    // Trim String
+    trim(buffer);
+    // Tokenize String
+    split(tokenizedString, buffer, boost::is_any_of(" ,"), boost::token_compress_on);
+    // Check for Empty buffer
+    if(!buffer.empty()){
+
+      if(lineCount == 1){
+        // 1,100 # Number of variables, number of samples
+        try{
+          numVariables = stoi(tokenizedString[0].c_str());
+          numSamples = stoi(tokenizedString[1].c_str());
+        }catch(...){
+          throw ntException("ERROR: Invalid numVariables,numSamples in PROBABILISTIC NODE file.\n");
+        }
+        // Increment Line Count
+        lineCount++;
+
+      }else if(lineCount == 2){
+
+        // velocity # Variable names
+        try{
+          varNames.clear();
+          for(int loopA=0;loopA<tokenizedString.size();loopA++){
+            varNames.push_back(tokenizedString[loopA]);
+          }
+        }catch(...){
+          throw ntException("ERROR: Invalid variable names in PROBABILISTIC NODE file.\n");
+        }
+        lineCount++;
+
+      }else if(lineCount == 3){
+
+        // velocity # Variable names
+        try{
+          varSTD.clear();
+          for(int loopA=0;loopA<tokenizedString.size();loopA++){
+            varSTD.push_back(atof(tokenizedString[loopA].c_str()));
+          }
+        }catch(...){
+          throw ntException("ERROR: Invalid standard deviation in PROBABILISTIC NODE file.\n");
+        }
+        lineCount++;
+
+      }else if(lineCount == 4){
+        // 800.0 # Minimum range for each variable
+        try{
+          minLimits.clear();
+          for(int loopA=0;loopA<tokenizedString.size();loopA++){
+            minLimits.push_back(atof(tokenizedString[loopA].c_str()));
+          }
+        }catch(...){
+          throw ntException("ERROR: Invalid min limit in PROBABILISTIC NODE file.\n");
+        }
+        lineCount++;
+
+      }else if(lineCount == 5){
+        // 4000.0 # Maximum range for each variable
+        try{
+          maxLimits.clear();
+          for(int loopA=0;loopA<tokenizedString.size();loopA++){
+            maxLimits.push_back(atof(tokenizedString[loopA].c_str()));
+          }
+        }catch(...){
+          throw ntException("ERROR: Invalid max limit in PROBABILISTIC NODE file.\n");
+        }
+        lineCount++;
+
+      }else if(lineCount == 6){
+
+        // 10 # Subdivisions for each variable in the node
+        try{
+          subdiv.clear();
+          for(int loopA=0;loopA<tokenizedString.size();loopA++){
+            subdiv.push_back(atof(tokenizedString[loopA].c_str()));
+          }
+        }catch(...){
+          throw ntException("ERROR: Invalid number of subdivisions in PROBABILISTIC NODE file.\n");
+        }
+        lineCount++;
+        break;
+
+      }else if((tokenizedString.size() == 0)||(tokenizedString[0].at(0) == '#')||(tokenizedString[0].find_first_not_of(' ') == std::string::npos)){
+        // COMMENT OR BLANK LINE: DO NOTHING
+      }
+    }
+  }
+
+  // Read the Sample Matrix
+  int cptRowNum = 0;
+  while(getline(infile,buffer)){
+    trim(buffer);
+    // Tokenize String
+    split(tokenizedString, buffer, boost::is_any_of(" ,"), boost::token_compress_on);
+    // Check for Empty buffer
+    if(!buffer.empty()){
+      if((tokenizedString.size() == 0)||(tokenizedString[0].at(0) == '#')||(tokenizedString[0].find_first_not_of(' ') == std::string::npos)){
+        // DO NOTHING
+      }else{
+        tmpVec.clear();
+        for(int loopA=0;loopA<tokenizedString.size();loopA++){
+          tmpVec.push_back(atof(tokenizedString[loopA].c_str()));
+          // printf("%f ",tmpVec[loopA]);
+        }
+        // printf("\n");
+        cpt.push_back(tmpVec);
+        cptRowNum++;
+      }
+    }
+  }
+
+  // Assemble Limits in unique std vector
+  if(minLimits.size() != maxLimits.size()){
+    throw ntException("ERROR: Limits array not compatible in readDeterministicNodeFile.\n");
+  }
+
+  limits.clear();
+  for(int loopA=0;loopA<minLimits.size();loopA++){
+    limits.push_back(minLimits[loopA]);
+    limits.push_back(maxLimits[loopA]);
+  }
+
+  // Close File
+  infile.close();
 }
 
 

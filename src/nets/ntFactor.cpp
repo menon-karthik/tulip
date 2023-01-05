@@ -84,11 +84,11 @@ void ntFactor::updateMsg(int nodeID,ntMessage* currMsg){
   }
 }
 
-int ntFactor::getDownstreamDetNodeLocalID(){
+int ntFactor::getDownstreamDetProbNodeLocalID(){
   bool found = false;
   int count = 0;
   while((!found) && (count<factorNodes.size())){
-    found = (isDownstreamNode[count]) && (factorNodes[count]->nodeType == ntDeterministic);
+    found = (isDownstreamNode[count]) && ((factorNodes[count]->nodeType == ntDeterministic) || (factorNodes[count]->nodeType == ntProbabilistic));
     if(!found){
       count++;
     }
@@ -108,9 +108,9 @@ void ntFactor::sendMsgToNodes(){
 
   printf("++ Sending message from factor %d\n",this->factorID);
 
-  int downstreamDetNodeID = getDownstreamDetNodeLocalID();
-  if(downstreamDetNodeID == -1){
-    throw ntException("ERROR: Cannot find deterministic downstream node in ntFactor::sendMsgToNodes.\n");
+  int downstreamDetProbNodeID = getDownstreamDetProbNodeLocalID();
+  if(downstreamDetProbNodeID == -1){
+    throw ntException("ERROR: Cannot find neither a deterministic nor a probabilistic downstream node in ntFactor::sendMsgToNodes.\n");
   }
 
   // Loop on all nodes connected to this factor
@@ -137,31 +137,74 @@ void ntFactor::sendMsgToNodes(){
           currMgs->targetID = factorNodes[loopA]->nodeID;
           currMgs->messageType = mtFactorToNode;
           msgs.push_back(currMgs);
+
+          // printf("Samples in original message\n");
+          // for(int loopB=0;loopB<currMgs->msg.size();loopB++){
+          //   for(int loopC=0;loopC<currMgs->msg[loopB].size();loopC++){
+          //     printf("%f ",currMgs->msg[loopB][loopC]);
+          //   }
+          //   printf("\n");
+          // }
         }
       }
 
-      // Create a New Message by aggregating the other
+      // Print limits for msgs
+      // printf("Limits before aggregation\n");
+      // for(int loopB=0;loopB<msgs.size();loopB++){
+      //   for(int loopC=0;loopC<msgs[loopB]->varLimits.size();loopC++){
+      //     printf("%f ",msgs[loopB]->varLimits[loopC]);
+      //   }
+      //   printf("\n");
+      // }
+
+      // Create a New Message by aggregating the others
       ntMessage* newMsg = new ntMessage();
       newMsg->aggregateFromList(msgs);
+
+      // Print limits for msgs
+      // printf("Limits after aggregation\n");
+      // for(int loopB=0;loopB<newMsg->varLimits.size();loopB++){
+      //   printf("%f ",newMsg->varLimits[loopB]);
+      // }
+      // printf("\n");
+
+      // printf("Number of Aggregated Messages: %d\n",int(msgs.size()));
+
+      // printf("Samples in Aggregated Message\n");
+      // for(int loopB=0;loopB<newMsg->msg.size();loopB++){
+      //   for(int loopC=0;loopC<newMsg->msg[loopB].size();loopC++){
+      //     printf("%f ",newMsg->msg[loopB][loopC]);
+      //   }
+      //   printf("\n");
+      // }
 
       // Pass message to factor loopA
       ntMessage* msgToSend;
       if(isDownstreamNode[loopA]){
         // Propagate using the model in the downstream node
-        printf("+++ Performing Forward Propagation\n");
-        msgToSend = factorNodes[loopA]->forwardUQ(newMsg);
+        if(factorNodes[loopA]->nodeType == ntDeterministic){
+          printf("+++ Performing Forward Propagation\n");
+          msgToSend = factorNodes[loopA]->forwardUQ(newMsg);
+        }else if (factorNodes[loopA]->nodeType == ntProbabilistic){
+          printf("+++ Generate Forward Samples Through CPT\n");
+          msgToSend = factorNodes[loopA]->forwardCPT(newMsg);
+        }
         factorNodes[loopA]->updateMsg(factorID,msgToSend);
-      }else{        
-        printf("+++ Performing Inverse Propagation\n");
-        // Solve an inverse problem using the solver of the node downstream
-        msgToSend = factorNodes[downstreamDetNodeID]->inverseUQ(factorNodes[loopA]->varNames,
-                                                                factorNodes[loopA]->varSTD,
-                                                                factorNodes[loopA]->limits,
-                                                                newMsg);
-        // Pass message to node upstream
-        // if((this->factorID == 4)&&(factorNodes[loopA]->nodeID == 1)){
-        //   exit(-1);
-        // }
+      }else{                
+        if(factorNodes[downstreamDetProbNodeID]->nodeType == ntDeterministic){
+          // Solve an inverse problem using the solver of the node downstream
+          printf("+++ Performing Inverse Propagation\n");
+          msgToSend = factorNodes[downstreamDetProbNodeID]->inverseUQ(factorNodes[loopA]->varNames,
+                                                                      factorNodes[loopA]->varSTD,
+                                                                      factorNodes[loopA]->limits,
+                                                                      newMsg);        
+        }else if (factorNodes[downstreamDetProbNodeID]->nodeType == ntProbabilistic){
+          printf("+++ Generate Inverse Samples Through CPT\n");
+          msgToSend = factorNodes[downstreamDetProbNodeID]->InverseCPT(factorNodes[loopA]->varNames,
+                                                                       factorNodes[loopA]->varSTD,
+                                                                       factorNodes[loopA]->limits,
+                                                                       newMsg);
+        }
         factorNodes[loopA]->updateMsg(factorID,msgToSend);
       }
     }else{

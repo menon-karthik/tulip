@@ -223,9 +223,9 @@ void ntMessage::aggregateMarginals(vector<ntMessage*> msgs){
         sampleLimits[2*loopA+1] = groupMax;
       }
 
-      for(int loopA=0;loopA<varLabels.size();loopA++){
-        printf("%s min: %f max: %f\n",varLabels[loopA].c_str(),sampleLimits[2*loopA+0],sampleLimits[2*loopA+1]);
-      }
+      // for(int loopA=0;loopA<varLabels.size();loopA++){
+      //   printf("%s min: %f max: %f\n",varLabels[loopA].c_str(),sampleLimits[2*loopA+0],sampleLimits[2*loopA+1]);
+      // }
 
       // Determine common discretization using limits      
       stdMat discrX;
@@ -247,14 +247,13 @@ void ntMessage::aggregateMarginals(vector<ntMessage*> msgs){
         discrX.push_back(tmp);
       }
 
-      for(int loopA=0;loopA<varLabels.size();loopA++){
-        printf("%s\n",varLabels[loopA].c_str());
-        for(int loopB=0;loopB<totBins;loopB++){
-          printf("%f ",discrX[loopA][loopB]);
-        }
-        printf("\n");
-
-      }
+      // for(int loopA=0;loopA<varLabels.size();loopA++){
+      //   printf("%s\n",varLabels[loopA].c_str());
+      //   for(int loopB=0;loopB<totBins;loopB++){
+      //     printf("%f ",discrX[loopA][loopB]);
+      //   }
+      //   printf("\n");
+      // }
 
       // Allocate PMF
       stdMat pmfs;
@@ -334,8 +333,8 @@ void ntMessage::aggregateMarginals(vector<ntMessage*> msgs){
         // printf("\n");
 
 
-        printf("Eccolo 7\n");
-        fflush(stdout);        
+        // printf("Eccolo 7\n");
+        // fflush(stdout);        
 
 
         // Add samples to message

@@ -26,7 +26,7 @@ ntNet::ntNet(string netFile){
   printf("Done.\n");
 
   // Generate dot file for graphviz graphical representation
-  // checkFactorGraphTopology("factorGraphTopology.txt");
+  checkFactorGraphTopology("factorGraphTopology.txt");
 
   // Set Default Print Level to silent
   printLevel = 0;
@@ -178,14 +178,23 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
   stdVec tmpSample;
   ntMessage* msg;
   double currSample;
+  double lb = 0.0;
+  double ub = 0.0;
+  int subDivs = 0;
+  stdVec tmp;
+  int varID = 0;
+  double avg = 0.0;
+  double std = 0.0;
 
   // Initialize Root Factor Messages with Priors
   for(int loopA=0;loopA<factorList.size();loopA++){
     if(factorList[loopA]->factorNodes.size() == 1){
       if(factorList[loopA]->isDownstreamNode[0]){
         printf("Initializing Factor %d\n",factorList[loopA]->factorID);
+        
         // Copy samples from downstream node
         currMessage = ntUtils::copySamples(factorList[loopA]->factorNodes[0]->varSamples);
+
         // Create New Message
         msg = new ntMessage(mtFactorToNode,
                             factorList[loopA]->factorID,
@@ -194,6 +203,23 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
                             factorList[loopA]->factorNodes[0]->varSTD,
                             factorList[loopA]->factorNodes[0]->limits,                            
                             currMessage);
+
+        // Add evidence to the message if needed
+        if(factorList[loopA]->factorNodes[0]->evidenceVarID.size() > 0){        
+          // If there is evidence for certain variables, replace these variables with the evidence
+          for(int loopB=0;loopB<factorList[loopA]->factorNodes[0]->evidenceVarID.size();loopB++){
+            tmp.clear();
+            varID = factorList[loopA]->factorNodes[0]->evidenceVarID[loopB];
+            avg = factorList[loopA]->factorNodes[0]->evidenceVarAvg[loopB];
+            std = factorList[loopA]->factorNodes[0]->evidenceVarStd[loopB];
+            for(int loopC=0;loopC<msg->msg.size();loopC++){
+              tmp.push_back(avg + nSampler->sample(0.0,std));
+            }
+            msg->addEvidence(varID,tmp);
+          }
+        }  
+
+        // Add Message
         factorList[loopA]->factorNodes[0]->inMsgs.push_back(msg);
       }
     }
@@ -214,6 +240,22 @@ void ntNet::initMsgsOnRootFactorsLeafNodes(){
                             nodeList[loopA]->varSTD,
                             nodeList[loopA]->limits,
                             currMessage);
+
+        // Add evidence to the message if needed
+        if(nodeList[loopA]->evidenceVarID.size() > 0){ 
+          // If there is evidence for certain variables, replace these variables with the evidence
+          for(int loopB=0;loopB<nodeList[loopA]->evidenceVarID.size();loopB++){
+            tmp.clear();
+            varID = nodeList[loopA]->evidenceVarID[loopB];
+            avg = nodeList[loopA]->evidenceVarAvg[loopB];
+            std = nodeList[loopA]->evidenceVarStd[loopB];
+            for(int loopC=0;loopC<msg->msg.size();loopC++){
+              tmp.push_back(avg + nSampler->sample(0.0,std));
+            }
+            msg->addEvidence(varID,tmp);
+          }
+        }  
+
         // Provide the message as an incoming message to the factor
         nodeList[loopA]->nodeFactors[0]->inMsgs.push_back(msg);
       }
@@ -228,6 +270,7 @@ void ntNet::assignUniformSamplesToLeaves(){
   for(int loopA=0;loopA<nodeList.size();loopA++){
     if(nodeList[loopA]->nodeFactors.size() == 1){
       if(!nodeList[loopA]->isDownstreamFactor[0]){                
+        // This is a leaf node
         printf("Assigning Uniform Samples to Node %d\n",nodeList[loopA]->nodeID);
         nodeList[loopA]->varSamples.clear();
         // Loop on number of samples
@@ -348,6 +391,57 @@ void ntNet::printEvidence(){
   }
 }
 
+void ntNet::assignProbabilisticNodesInputs(){
+
+  // Assign Additional Information to Probabilistic Nodes
+  // int totalInputs;
+  // stdIntVec inputSubdiv;
+  // stdStringVec inputNames;
+
+  stdIntVec inputIdx;
+
+  int totInputs = 0;
+  for(size_t loopA=0;loopA<nodeList.size();loopA++){
+    totInputs = 0;
+    if(nodeList[loopA]->nodeType == ntProbabilistic){
+      inputIdx.clear();
+
+      // int totalInputs;
+      for(size_t loopB=0;loopB<edgeList.size();loopB++){
+        if(edgeList[loopB]->nodes[1] == loopA){
+          totInputs += nodeList[loopA]->numVariables;
+          inputIdx.push_back(edgeList[loopB]->nodes[0]);
+        }
+      }
+      nodeList[loopA]->totalInputs = totInputs;
+
+      // stdIntVec inputSubdiv;
+      for(int loopB=0;loopB<inputIdx.size();loopB++){
+        if(nodeList[inputIdx[loopB]]->varSubdiv.size() > 0){
+          // Assign subdivisions if they have been defined
+          for(int loopC=0;loopC<nodeList[inputIdx[loopB]]->varSubdiv.size();loopC++){
+            nodeList[loopA]->inputSubdiv.push_back(nodeList[inputIdx[loopB]]->varSubdiv[loopC]);
+          }
+          
+        }else{
+          // Binary variables if not otherwise specified
+          for(int loopC=0;loopC<nodeList[inputIdx[loopB]]->numVariables;loopC++){
+            // Binary variables if not otherwise stated
+            nodeList[loopA]->inputSubdiv.push_back(2);
+          }
+        }
+      }
+
+      // stdStringVec inputNames;
+      for(int loopB=0;loopB<inputIdx.size();loopB++){
+        for(int loopC=0;loopC<nodeList[inputIdx[loopB]]->varNames.size();loopC++){
+          nodeList[loopA]->inputNames.push_back(nodeList[inputIdx[loopB]]->varNames[loopC]);
+        }
+      }
+    }
+  }  
+}
+
 // Create Nodes and Edges
 void ntNet::createNetworkEntities(ntNetIO* netInfo){
   // Create Nodes
@@ -368,6 +462,38 @@ void ntNet::createNetworkEntities(ntNetIO* netInfo){
     // Add to the list of Edges
     edgeList.push_back(edge);
   }
+
+  // Gather Additional Information For Probabilistic Nodes
+  assignProbabilisticNodesInputs();
+
+  // printf("PROBABILISTIC NODE INFOS\n");  
+  // for(int loopA=0;loopA<nodeList.size();loopA++){
+  //   if(nodeList[loopA]->nodeType == ntProbabilistic){
+  //     // Print the variables names
+  //     printf("VAR NAMES\n");
+  //     for(int loopB=0;loopB<nodeList[loopA]->varNames.size();loopB++){
+  //       printf("%s ",nodeList[loopA]->varNames[loopB].c_str());  
+  //     }
+  //     printf("\n");
+  //     printf("VAR SUBDIVS\n");
+  //     for(int loopB=0;loopB<nodeList[loopA]->varSubdiv.size();loopB++){
+  //       printf("%d ",nodeList[loopA]->varSubdiv[loopB]);  
+  //     }
+  //     printf("\n");
+  //     printf("Total Inputs: %d\n",nodeList[loopA]->totalInputs);
+  //     printf("INPUT NAMES\n");
+  //     for(int loopB=0;loopB<nodeList[loopA]->inputNames.size();loopB++){
+  //       printf("%s ",nodeList[loopA]->inputNames[loopB].c_str());  
+  //     }
+  //     printf("\n");
+  //     printf("INPUT SUBDIVS\n");
+  //     for(int loopB=0;loopB<nodeList[loopA]->inputSubdiv.size();loopB++){
+  //       printf("%d ",nodeList[loopA]->inputSubdiv[loopB]);  
+  //     }
+  //     printf("\n");
+  //     printf("\n");
+  //   }
+  // }
 
   // Assign Node Evidence
   stdIntVec evVars;
@@ -527,7 +653,7 @@ int ntNet::runBP(bool init){
 
   // Check Evidence for this run
   printEvidence();
-  
+
   // Iterative complete message passing for the other nodes
   bool finished = false;
   int iterCount = 0;  
@@ -577,7 +703,7 @@ int ntNet::runBP(bool init){
     printf("\n");
     printf("################################\n");
     printf("#### Node and Factor Status ####\n");
-    printf("################################\n");    
+    printf("################################\n");
 
     for(int loopA=0;loopA<nodeList.size();loopA++){
       finished = finished && nodeList[loopA]->hasProcessedAllMsgs();
@@ -595,11 +721,22 @@ int ntNet::runBP(bool init){
 
     // Update Iteration Count
     iterCount++;
-    // if(iterCount == 3){
-    //   exit(-1);
-    // }
+    if(iterCount > 10){
+      printf("\n");
+      printf("WARNING: Maximum number of BP iterations reached. Exiting BP Loop.\n");
+      printf("\n");
+      break;
+    }
     string pbFile("BP_it_"+to_string(iterCount)+".txt");
     checkFactorGraphMessages(pbFile);
+
+    // TEST: Print Message 
+    //nodeList[0]->inMsgs[0]->show();
+    //if(iterCount == 2){
+    //  exit(-1);
+    //}
+
+
   }
 
   // BP Iterations competed: need to aggregate node incoming messages 
@@ -613,7 +750,9 @@ int ntNet::runBP(bool init){
   printf("DONE.\n");
 
   // Print all messages in the converged BP to file
+  printf("Export All Messages...");
   writeAllMessages();
+  printf("DONE.\n");
 
   // !!! COMPLETE !!!
   printf("BP COMPLETED!\n");

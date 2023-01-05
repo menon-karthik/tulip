@@ -42,6 +42,7 @@ class ntNet{
     // Create the network and its topology
     void createNetworkEntities(ntNetIO* netInfo);
     void createFactorGraph();
+    void assignProbabilisticNodesInputs();
     
     // Initialization functions
     void initMsgsOnRootFactorsLeafNodes();

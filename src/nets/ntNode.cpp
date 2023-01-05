@@ -6,12 +6,18 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
 
   int numVariables;
   int numSamples;
+  int totalInputs;
   stdStringVec varNames;
   stdVec varSTD;
   stdVec limits;
   stdMat varSamples;
   modelTypes detVarType;
   string detModelName;
+  stdIntVec subdiv;
+  stdIntVec inputSubdiv;
+  stdMat cpt;
+
+  stdVec tmp;
 
   // Init Gaussian sampler
   nSampler = new uqGaussianPDF();
@@ -102,9 +108,32 @@ ntNode::ntNode(int nodeIndex,ntNetIO* netIO){
                                      numSamples,
                                      varNames,
                                      varSTD,
-                                     detVarType,
-                                     detModelName);
+                                     limits,
+                                     subdiv,
+                                     cpt);
 
+    // Assign to Node Variable
+    this->numVariables = numVariables;
+    this->numSamples = numSamples;
+    this->varNames = varNames;
+    this->varSTD = varSTD;
+    this->limits = limits;
+    // printf("Limits\n");
+    // for(int loopA=0;loopA<numVariables;loopA++){
+    //   printf("lb %f, ub %f\n",limits[2*loopA],limits[2*loopA+1]);
+    // }
+    this->detVarType = detVarType;
+    this->detModelName = detModelName;
+    this->varSubdiv = subdiv;
+    // Store Conditional Probability Matrix
+    for(int loopA=0;loopA<cpt.size();loopA++){
+      tmp.clear();
+      for(int loopB=0;loopB<cpt[loopA].size();loopB++){
+        tmp.push_back(cpt[loopA][loopB]);
+      }
+      this->CPT.push_back(tmp);
+    }
+    
   }else{
     throw ntException("ERROR: Invalid node type in ntNode Constructor.");
   }
@@ -170,7 +199,7 @@ void ntNode::sendMsgToFactors(){
     printf("Sending to factor %d...",nodeFactors[loopA]->factorID);
 
     // Check all other factors are ready
-    okToSend = messagesAreReadyFor(nodeFactors[loopA]->factorID);
+    okToSend = messagesAreReadyFor_2(nodeFactors[loopA]->factorID);
 
     // Continue to process the message only if all factors are ready
     if(okToSend){
@@ -180,7 +209,7 @@ void ntNode::sendMsgToFactors(){
       // Get Messages from all factors but loopA and aggegate
       vector<ntMessage*> msgs;
       for(int loopB=0;loopB<nodeFactors.size();loopB++){
-        if(loopB != loopA){
+        if((loopB != loopA)&&(findInMsg(nodeFactors[loopB]->factorID))){
           // Get message from node
           //printf("Gather message from neighbor factor %d\n",nodeFactors[loopB]->factorID);
           currMgs = copyInMsg(nodeFactors[loopB]->factorID);
@@ -189,12 +218,27 @@ void ntNode::sendMsgToFactors(){
           currMgs->targetID = nodeFactors[loopA]->factorID;
           currMgs->messageType = mtNodeToFactor;
           msgs.push_back(currMgs);
+
+          // printf("Samples in original message\n");
+          // for(int loopB=0;loopB<currMgs->msg.size();loopB++){
+          //   for(int loopC=0;loopC<currMgs->msg[loopB].size();loopC++){
+          //     printf("%f ",currMgs->msg[loopB][loopC]);
+          //   }
+          //   printf("\n");
+          // }
+
         }
       }
 
-      // Create a New Message by aggregating the other
+      // If messages are more than 1 then exit
+      if(msgs.size() > 1){
+        printf("AGGREGATING MULTIPLE MESSAGES AT NODES\n");
+      }
+
+      // These are incoming messages for a node, therefore contain the same variable
+      // Need to aggregate as you do with marginals
       ntMessage* newMsg = new ntMessage();
-      newMsg->aggregateFromList(msgs);
+      newMsg->aggregateMarginals(msgs);
 
       // Add evidence to the message if specified
       stdVec tmp;
@@ -554,6 +598,25 @@ bool ntNode::messagesAreReadyFor(int factorID){
   return msgReady;
 }
 
+// DEBUG VERSION
+bool ntNode::messagesAreReadyFor_2(int factorID){
+  // If you find at least one incoming message excluding this factor then send
+  int count = 0;
+  for(int loopA=0;loopA<nodeFactors.size();loopA++){
+    if(nodeFactors[loopA]->factorID != factorID){
+      if(findInMsg(nodeFactors[loopA]->factorID)){
+        count++;
+      }
+    }else{
+      // Check if the factor already got a message from this node
+      if(nodeFactors[loopA]->findInMsg(nodeID)){
+        return false;
+      }
+    }
+  }
+  return count > 0;
+}
+
 void ntNode::printMessages(){
   if(inMsgs.size()>0){
     printf("%-7s %-18s %-10s %-10s %-10s %-10s\n","Node","Type","SourceID","TargetID","n. Samples","n. Dims");  
@@ -577,4 +640,399 @@ void ntNode::computeMarginal(){
   marginal->aggregateMarginals(msgList);
   // marginal->aggregateMarginals_fake(msgList);
 }
+
+// Find CPT row which corresponds to the given sample
+void ntNode::getPMFSfromCPT(const stdVec& sample,stdMat& pmfs){
+
+  // Print Node CPT
+  // printf("Node CPT\n");
+  // for(int loopA=0;loopA<CPT.size();loopA++){
+  //   for(int loopB=0;loopB<CPT[loopA].size();loopB++){
+  //     printf("%f ",CPT[loopA][loopB]);
+  //   }
+  //   printf("\n");
+  // }
+
+  // printf("Sample in getPMFSfromCPT ");
+  // for(int loopA=0;loopA<sample.size();loopA++){
+  //   printf("%f ",sample[loopA]);
+  // }
+  // printf("\n");
+
+  stdVec tmpPMF;
+  stdVec currState;
+  bool found = false;
+  int count = 0;
+  while((!found)&&(count<CPT.size())){
+    // Extract state from CPT row
+    currState.clear();
+    for(int loopA=0;loopA<totalInputs;loopA++){
+      currState.push_back(CPT[count][loopA]);
+    }
+    // Compare sample and currState componentwise
+    found = ntUtils::sameArray(sample,currState);
+    if(!found){
+      count++;
+    }
+  }
+  if(!found){
+    throw ntException("ERROR: Cannot find row in probabilistic node CPT.");
+  }else{
+
+    pmfs.clear();
+    for(int loopA=0;loopA<numVariables;loopA++){
+      tmpPMF.clear();
+      for(int loopB=0;loopB<varSubdiv[loopA];loopB++){
+        // printf("Count: %d\n",count);
+        // printf("Index: %d\n",totalInputs + loopA*varSubdiv[loopA] + loopB);
+        // printf("CPT component: %f\n",CPT[count][totalInputs + loopA*varSubdiv[loopA] + loopB]);
+        tmpPMF.push_back(CPT[count][totalInputs + loopA*varSubdiv[loopA] + loopB]);
+
+      }
+      pmfs.push_back(tmpPMF);
+    }
+  }
+}
+
+ntMessage* ntNode::forwardCPT(ntMessage* currMsg){
+
+  stdMat pmfs;
+  stdVec tmp;
+  stdVec discrSample;
+  double lb = 0.0;
+  double ub = 0.0;
+  stdMat res;
+  stdVec bins;
+  int varID = 0;
+  double avg = 0.0;
+
+  // Loop through the samples 
+  for(int loopA=0;loopA<currMsg->msg.size();loopA++){
+    
+    // Collect Sample
+    tmp.clear();
+    // printf("Sample: ");
+    for(int loopB=0;loopB<currMsg->msg[loopA].size();loopB++){
+      tmp.push_back(currMsg->msg[loopA][loopB]);
+      // printf("%f ",currMsg->msg[loopA][loopB]);
+    }
+    // printf("\n");
+    
+    // Make sample discrete using input subdivisions
+    discrSample.clear();
+    for(int loopB=0;loopB<tmp.size();loopB++){
+      lb = currMsg->varLimits[2*loopB];
+      ub = currMsg->varLimits[2*loopB+1];
+      // printf("Bounds: %f %f\n",lb,ub);
+      // printf("Subdivs: %d\n",inputSubdiv[loopB]);
+      discrSample.push_back(ntUtils::discretizeSample(tmp[loopB],inputSubdiv[loopB],lb,ub));
+    }
+
+    // printf("Discrete sample: ");
+    // for(int loopB=0;loopB<tmp.size();loopB++){
+    //   printf("%f ",discrSample[loopB]);
+    // }
+    // printf("\n");
+
+    // Find CPT row
+    getPMFSfromCPT(discrSample,pmfs);
+
+    // printf("PMF from CPT: ");
+    // for(int loopB=0;loopB<pmfs[0].size();loopB++){
+    //  printf("%f ",pmfs[0][loopB]);
+    // }
+    // printf("\n");
+
+    // Generate sample from PMF for each outputs variable
+    tmp.clear();
+    // printf("BINS\n");
+    for(int loopB=0;loopB<pmfs.size();loopB++){
+      // Determine the bins for this variable
+      lb = currMsg->varLimits[2*loopB];
+      ub = currMsg->varLimits[2*loopB+1];
+      bins = ntUtils::getBins(inputSubdiv[loopB],lb,ub);
+      
+      // printf("BINS: ");
+      // for(int loopC=0;loopC<bins.size();loopC++){
+      //   printf("%f ",bins[loopC]);
+      // }
+      // printf("\n");
+
+      // Generate Sample From PMF
+      tmp.push_back(ntUtils::genSampleFromPMF(bins,pmfs[loopB],1,uSampler)[0]);
+
+      // printf("PMF from CPT: ");
+      // for(int loopC=0;loopC<pmfs[loopB].size();loopC++){
+      //  printf("%f ",pmfs[loopB][loopC]);
+      // }
+      // printf("\n");
+    }
+
+    // Add sample to outgoing message sample matrix
+    res.push_back(tmp);    
+
+  }
+
+  // Create a new message
+  ntMessage* resMsg = new ntMessage(currMsg->messageType,currMsg->sourceID,currMsg->targetID,varNames,varSTD,limits,res);
+
+  
+  // I DON'T THINK I CAN SIMPLY ADD THE EVIDENCE HERE!!!!
+  // // Add evidence to the message if needed
+  // if(evidenceVarID.size() > 0){        
+  //   // If there is evidence for certain variables, replace these variables with the evidence
+  //   for(int loopA=0;loopA<evidenceVarID.size();loopA++){
+  //     tmp.clear();
+  //     varID = evidenceVarID[loopA];
+  //     avg = evidenceVarAvg[loopA];
+  //     for(int loopB=0;loopB<resMsg->msg.size();loopB++){
+  //       tmp.push_back(avg);
+  //     }
+  //     resMsg->addEvidence(varID,tmp);
+  //   }
+  // }  
+
+  // Return message
+  return resMsg;
+}
+
+int ntNode::findOutputIDX(string output){
+  int count = 0;
+  bool found = false;
+  while((!found)&&(count<varNames.size())){
+    found = (output == varNames[count]);
+    if(!found){
+      count++;
+    }
+  }
+  if(found){
+    return count;
+  }else{
+    throw ntException("ERROR: Cannot find output variable name in ntNode::findOutputIDX.");
+  }
+}
+
+int ntNode::getoutputColumn(string output, double sample){
+  // Find the output number 
+  int outIDX = findOutputIDX(output);
+  // Sum all discrete states up to outIDX-1
+  int colStartIDX = totalInputs;
+  for(int loopA=0;loopA<outIDX;loopA++){
+    colStartIDX += varSubdiv[loopA];
+  }
+  // Get limits for the current output
+  double lb = limits[2*outIDX];
+  double ub = limits[2*outIDX+1];
+  // Get the discrete state which corresponds to sample
+  colStartIDX += ntUtils::getSampleState(sample, varSubdiv[outIDX],lb,ub);
+  // Return index
+  return colStartIDX;
+}
+
+void ntNode::extractCPTColumnPMFFromSample(const stdVec& sample, const stdStringVec& msgVarNames, const stdBoolVec& isOutCol, const stdIntVec& inColIdx, stdVec& rowIDX, stdVec& pmf){
+
+  stdIntVec inIdx;
+  stdVec inVal;
+
+  // Get input index and value
+  for(int loopA=0;loopA<sample.size();loopA++){
+    if(!isOutCol[loopA]){
+      inIdx.push_back(inColIdx[loopA]);
+      inVal.push_back(sample[loopA]);
+      // printf("Input idx: %d, Sample value: %f\n",inColIdx[loopA],sample[loopA]);
+    }
+  }
+
+  // Find all row indices in CPT which correspond to inIdx and inVal
+  int count = 0;
+  bool found = false;
+  rowIDX.clear();
+  while(count<CPT.size()){
+    found = true;
+    for(int loopA=0;loopA<inIdx.size();loopA++){
+      found = ((found) && (fabs(CPT[count][inIdx[loopA]]-inVal[loopA]) < 1.0e-5));
+    }
+    if(found){
+      rowIDX.push_back(count);
+    }
+    // Advance search    
+    count++;
+  }
+
+  // printf("Rows found in the CPT matrix\n");
+  // for(int loopA=0;loopA<rowIDX.size();loopA++){
+  //   printf("%d\n",int(rowIDX[loopA]));
+  // }
+
+  // For every row make a list by multipying the column value for each output
+  double prod = 1.0;
+  int discrIdx = 0;
+  pmf.clear();
+  for(int loopA=0;loopA<rowIDX.size();loopA++){
+    prod = 1.0;
+    for(int loopB=0;loopB<sample.size();loopB++){
+      if(isOutCol[loopB]){
+        // Determine the columns of this output
+        discrIdx = getoutputColumn(msgVarNames[loopB],sample[loopB]);        
+        // Multiply its value
+        prod *= CPT[rowIDX[loopA]][discrIdx];  
+      }      
+    }
+    // printf("Prod: %f\n",prod);
+    pmf.push_back(prod);
+  }
+
+  // Normalize PMF
+  double sum = 0.0;
+  for(int loopA=0;loopA<pmf.size();loopA++){
+    sum += pmf[loopA];
+  }
+  for(int loopA=0;loopA<pmf.size();loopA++){
+    pmf[loopA] = pmf[loopA]/sum;
+  }
+
+  // printf("Resulting PMF\n");
+  // for(int loopA=0;loopA<pmf.size();loopA++){
+  //   printf("%f\n",pmf[loopA]);
+  // }
+}
+
+bool ntNode::isNodeVariableName(string name){
+  int count = 0;
+  bool found = false;
+  while((!found)&&(count<varNames.size())){
+    found = (name == varNames[count]);
+    if(!found){
+      count++;
+    }
+  }
+  return found;
+}
+
+int ntNode::getNodeInputVariableNameIdx(string name){
+  int count = 0;
+  bool found = false;
+  while((!found)&&(count<inputNames.size())){
+    found = (name == inputNames[count]);
+    if(!found){
+      count++;
+    }
+  }
+  return count;
+}
+
+void ntNode::prepareIO(ntMessage* currMsg, stdBoolVec& isOutCol, stdIntVec& inColIdx){
+  string currVarName;
+  // Get a boolean vector if a variable is an output
+  isOutCol.clear();
+  for(int loopA=0;loopA<currMsg->varLabels.size();loopA++){
+    currVarName = currMsg->varLabels[loopA];
+    isOutCol.push_back(isNodeVariableName(currVarName));
+  }
+  // Find the indices of the input variables
+  inColIdx.clear();
+  for(int loopA=0;loopA<currMsg->varLabels.size();loopA++){
+    currVarName = currMsg->varLabels[loopA];
+    inColIdx.push_back(getNodeInputVariableNameIdx(currVarName));
+  }
+}
+
+void getMsgTargetVarIDX(const stdStringVec& upNames, const stdStringVec& inputNames, stdIntVec& msgTargetVarIDX){
+  msgTargetVarIDX.clear();
+  for(int loopA=0;loopA<inputNames.size();loopA++){
+    // See if you can find it in upNames
+    if(ntUtils::isInStringVec(inputNames[loopA],upNames)){
+      msgTargetVarIDX.push_back(loopA);
+    }
+  }
+}
+
+ntMessage* ntNode::InverseCPT(const stdStringVec& upNames,
+                              const stdVec& upSTD,
+                              const stdVec& upLimits,
+                              ntMessage* currMsg){
+
+  int dim1 = 0;
+  int dim2 = 0;
+  int cptRow = 0;
+  double prod = 1.0;
+  double sumPMF = 0.0;
+  double lb = 0.0;
+  double ub = 0.0;
+  stdVec sample;
+  stdVec discrSample;
+  stdVec tmpCol;
+  stdVec pmf;
+  stdVec bins;
+  stdVec tmp;
+  stdMat cptCols;
+  stdMat res;
+
+  stdBoolVec isOutCol;
+  stdIntVec inColIdx;
+  stdVec rowIDX;
+
+  int varID = 0;
+  double avg = 0.0;
+
+  //currMsg->show();  
+
+  printf("\n");
+
+  // Analyze the incoming message and odentify inputs/outputs
+  prepareIO(currMsg, isOutCol, inColIdx);
+
+  // Loop through the samples 
+  for(int loopA=0;loopA<currMsg->msg.size();loopA++){
+
+    // Collect Sample
+    sample.clear();
+    for(int loopB=0;loopB<currMsg->msg[loopA].size();loopB++){
+      sample.push_back(currMsg->msg[loopA][loopB]);
+    }
+    
+    // Make sample discrete using input subdivisions
+    discrSample.clear();
+    //printf("Sample Inverse discr.\n");
+    for(int loopB=0;loopB<sample.size();loopB++){
+      lb = currMsg->varLimits[2*loopB];
+      ub = currMsg->varLimits[2*loopB+1];
+      //printf("Bounds: %f %f\n",lb,ub);
+      //printf("Subdivs: %d\n",inputSubdiv[loopB]);
+      discrSample.push_back(ntUtils::discretizeSample(sample[loopB],inputSubdiv[loopB],lb,ub));
+      //printf("Sample: %f, Discrete sample: %f\n",sample[loopB],discrSample[loopB]);
+    }
+    //printf("\n");
+
+    // Extract CPT columns corresponding to each sample
+    extractCPTColumnPMFFromSample(discrSample, currMsg->varLabels, isOutCol, inColIdx, rowIDX, pmf);
+  
+    // Sample from PMF and return corresponding input state
+    cptRow = int(ntUtils::genSampleFromPMF(rowIDX,pmf,1,uSampler)[0]);
+    // Find index of target ID variable on node inputs
+    stdIntVec msgTargetVarIDX;
+    getMsgTargetVarIDX(upNames,inputNames,msgTargetVarIDX);
+    // Add samples from message target variable
+    tmp.clear();
+    for(int loopB=0;loopB<msgTargetVarIDX.size();loopB++){
+      // printf("Selected Up Value: %f\n",CPT[cptRow][msgTargetVarIDX[loopB]]);
+      tmp.push_back(CPT[cptRow][msgTargetVarIDX[loopB]]);
+    }
+    res.push_back(tmp);
+  }
+
+  // Create outgoing message
+  ntMessage* resMsg = new ntMessage(currMsg->messageType,currMsg->sourceID,currMsg->targetID,upNames,upSTD,upLimits,res);
+
+
+  // if(upNames[0] == string("rainy")){
+  //   printf("ECCOLO!!!!\n");
+  //   exit(-1);  
+  // }
+
+
+  // Return message
+  return resMsg;  
+}
+
 

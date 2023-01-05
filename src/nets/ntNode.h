@@ -55,6 +55,21 @@ class ntNode{
     // Models for deterministic nodes
     modelTypes detVarType;
     string detModelName;
+
+    // Variables for probabilistic nodes
+    // Subdivisions of the variables stored in the node
+    stdIntVec varSubdiv;
+    // Total inputs to the node, the size of the CPT clearly depends on the number of inputs
+    int totalInputs;
+    // Total subdivisions for each input variable
+    stdIntVec inputSubdiv;
+    // Name of the input variables
+    stdStringVec inputNames;
+    // Conditional probability table (CPT)
+    // The CPT stores a single line for each possible input variable combination with the value of the input variables
+    // plus as many PMF as variables stored in the probabilistic node
+    stdMat CPT;
+
     // Evidence: variable ID and evidence value
     stdIntVec evidenceVarID;
     stdVec evidenceVarAvg;
@@ -85,11 +100,16 @@ class ntNode{
     bool findInMsg(int factorID);
     // Check that all messages are present to send a message to factor factorID
     bool messagesAreReadyFor(int factorID);
+    bool messagesAreReadyFor_2(int factorID); // DEBUG
     // Check that all incoming messages are present
     bool hasProcessedAllMsgs();
 
     // Get message from node
     ntMessage* copyInMsg(int targetFactorID);
+
+    // Check if variable name belongs to node and get its idx
+    bool isNodeVariableName(string name);
+    int getNodeInputVariableNameIdx(string name);
 
     // Check if the node has evidence
     bool hasEvidence();
@@ -100,6 +120,14 @@ class ntNode{
                          const stdVec& upSTD,
                          const stdVec& upLimits,
                          ntMessage* currMsg);
+
+    // Forward and inverse propagation through CPT
+    ntMessage* forwardCPT(ntMessage* currMsg);
+    ntMessage* InverseCPT(const stdStringVec& upNames,
+                          const stdVec& upSTD,
+                          const stdVec& upLimits,
+                          ntMessage* currMsg);
+
     // Update message 
     void updateMsg(int nodeID,ntMessage* currMsg);
 
@@ -120,6 +148,18 @@ class ntNode{
 
     void computeMarginal();
 
+    void getPMFSfromCPT(const stdVec& sample,stdMat& pmfs);
+
+    void prepareIO(ntMessage* currMsg, stdBoolVec& isOutCol, stdIntVec& inColIdx);
+    int findOutputIDX(string output);
+    int getoutputColumn(string output, double sample);
+
+    void extractCPTColumnPMFFromSample(const stdVec& sample, 
+                                       const stdStringVec& msgVarNames, 
+                                       const stdBoolVec& isOutCol, 
+                                       const stdIntVec& inColIdx, 
+                                       stdVec& rowIDX, 
+                                       stdVec& pmf);
 };
 
 #endif // NTNODE_H

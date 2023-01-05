@@ -56,11 +56,12 @@ class ntNetIO{
     // Read file for probabilistic nodes
     void readProbabilisticNodeFile(string fileName,
                                    int& numVariables,
-                                   int& NumSamples,
-                                   stdStringVec& varNames,
+                                   int& numSamples,
+                                   stdStringVec& varNames,                                        
                                    stdVec& varSTD,
-                                   modelTypes& detVarType,
-                                   string& detModelName);
+                                   stdVec& limits,
+                                   stdIntVec& subdiv,
+                                   stdMat& cpt);
 };
 
 #endif // NTNETIO_H
