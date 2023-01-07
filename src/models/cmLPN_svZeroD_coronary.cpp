@@ -7,11 +7,11 @@
 #include <limits>
 #include <string.h>
 #include <ctime>
-#include "cmLPN_svZeroD.h"
+#include "cmLPN_svZeroD_coronary.h"
 
 using namespace std;
 
-cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path){
+cmLPN_svZeroD_coronary::cmLPN_svZeroD_coronary(std::string model_path){
   
   // Load shared library and get interface functions.
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
@@ -161,7 +161,7 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path){
       this->P_RA_id = i;
     }
   }
-  //std::cout << "[cmLPN_svZeroD] Q_lca_ids.size() this->nCOR_l: " << Q_lca_ids.size() << ", "<< this->nCOR_l << std::endl;
+  //std::cout << "[cmLPN_svZeroD_coronary] Q_lca_ids.size() this->nCOR_l: " << Q_lca_ids.size() << ", "<< this->nCOR_l << std::endl;
   
   // Check to make sure all variables ids have been assigned
   for (int i = 0; i < this->nCOR_l; i++) {
@@ -181,7 +181,7 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path){
     }
   }
   if ((Q_aorta_id < 0) || (P_aorta_id < 0) || (Q_LV_id < 0) || (V_LV_id < 0) || (Q_LA_id < 0) || (Q_RV_id < 0) || (P_pul_id < 0) || (P_RV_id < 0) || (P_RA_id < 0)) {
-    std::cout << "[cmLPN_svZeroD] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
+    std::cout << "[cmLPN_svZeroD_coronary] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
     throw std::runtime_error("Error: Did not find all solution IDs for variables.");
   }
 
@@ -190,7 +190,7 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path){
 // ==========================
 // READ TARGET DATA FROM FILE
 // ==========================
-void cmLPN_svZeroD::readTargetsFromFile(string targetFileName)
+void cmLPN_svZeroD_coronary::readTargetsFromFile(string targetFileName)
 {
   std::ifstream read_file;
   read_file.open(targetFileName.c_str());
@@ -327,32 +327,32 @@ void cmLPN_svZeroD::readTargetsFromFile(string targetFileName)
 // ========================
 // GET NUMBER OF PARAMETERS
 // ========================
-int cmLPN_svZeroD::getParameterTotal(){
+int cmLPN_svZeroD_coronary::getParameterTotal(){
   return 38;
 }
 
 // ===================================
 // GET NUMBER OF PARAMETERS (UNKNOWNS)
 // ===================================
-int cmLPN_svZeroD::getStateTotal(){
+int cmLPN_svZeroD_coronary::getStateTotal(){
   return nUnknowns; 
 }
 
-int cmLPN_svZeroD::getAuxStateTotal(){
+int cmLPN_svZeroD_coronary::getAuxStateTotal(){
   return 50;
 }
 
 // ===========================
 // GET TOTAL NUMBER OF RESULTS
 // ===========================
-int cmLPN_svZeroD::getResultTotal(){
+int cmLPN_svZeroD_coronary::getResultTotal(){
   return 29;  
 }
 
 // ==================
 // GET PARAMETER NAME
 // ==================
-string cmLPN_svZeroD::getParamName(int index){
+string cmLPN_svZeroD_coronary::getParamName(int index){
   string result;
   switch(index){
     case 0: {          
@@ -476,7 +476,7 @@ string cmLPN_svZeroD::getParamName(int index){
 // ===============
 // GET RESULT NAME
 // ===============
-string cmLPN_svZeroD::getResultName(int index){
+string cmLPN_svZeroD_coronary::getResultName(int index){
   string result;
   switch(index){
     case 0: {      
@@ -571,7 +571,7 @@ string cmLPN_svZeroD::getResultName(int index){
 }
 
 // READ CORONARY PARAMETERS FROM FILE
-void cmLPN_svZeroD::readParamsFromFile(stdVec& inputs, std::string param_path) {
+void cmLPN_svZeroD_coronary::readParamsFromFile(stdVec& inputs, std::string param_path) {
    std::ifstream param_reader(param_path.c_str());
    std::string buffer;
    std::vector<std::string> tokens;
@@ -598,7 +598,7 @@ void cmLPN_svZeroD::readParamsFromFile(stdVec& inputs, std::string param_path) {
 // ====================
 // GET MODEL PARAMETERS
 // ====================
-void cmLPN_svZeroD::getDefaultParams(stdVec& zp){
+void cmLPN_svZeroD_coronary::getDefaultParams(stdVec& zp){
       
       zp.resize(getParameterTotal());
 
@@ -655,7 +655,7 @@ void cmLPN_svZeroD::getDefaultParams(stdVec& zp){
 // ====================
 // GET PARAMETER RANGES
 // ====================
-void cmLPN_svZeroD::getParameterLimits(stdVec& limits){
+void cmLPN_svZeroD_coronary::getParameterLimits(stdVec& limits){
 
   limits.resize(2*getParameterTotal());
 
@@ -708,7 +708,7 @@ void cmLPN_svZeroD::getParameterLimits(stdVec& limits){
   }
 }
 
-void cmLPN_svZeroD::printResults(int totalResults, double* Xn) {
+void cmLPN_svZeroD_coronary::printResults(int totalResults, double* Xn) {
   printf("RESULT PRINTOUT\n");
   for(int loopA = 0; loopA < totalResults; loopA++) {
     string s = getResultName(loopA);
@@ -740,7 +740,7 @@ void writeAllDataFile(int totalSteps,int totalStates,int totAuxStates,double** o
 // ==========================================
 // MAIN FUNCTION FOR STAGE1-2BLOCKS LPN MODEL
 // ==========================================
-int cmLPN_svZeroD::solveCoronaryLPN(double* params, double* results){
+int cmLPN_svZeroD_coronary::solveCoronaryLPN(double* params, double* results){
 
   // Time parameters
   //double totalTime = numCycles * cycleTime;
@@ -1158,7 +1158,7 @@ int cmLPN_svZeroD::solveCoronaryLPN(double* params, double* results){
 // =========================
 // EVAL MODEL ERROR FUNCTION
 // =========================
-double cmLPN_svZeroD::evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode) {
+double cmLPN_svZeroD_coronary::evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode) {
 
   int model = 0;
 
