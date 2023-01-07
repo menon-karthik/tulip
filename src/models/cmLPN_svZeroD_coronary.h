@@ -110,7 +110,7 @@ class cmLPN_svZeroD_coronary: public cmModel {
         double targetPaoMax;
 
         // Assign parameter values from input
-        void assignParameters(double* params);
+        //void assignParameters(double* params);
 
 	// GET RESULT NAME
 	string getResultName(int index);
