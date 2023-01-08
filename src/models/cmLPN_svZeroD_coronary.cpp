@@ -1158,7 +1158,7 @@ int cmLPN_svZeroD_coronary::solveCoronaryLPN(double* params, double* results){
 // =========================
 // EVAL MODEL ERROR FUNCTION
 // =========================
-double cmLPN_svZeroD_coronary::evalModelError(stdVec& inputs, stdVec& outputs, stdIntVec& errorCode) {
+double cmLPN_svZeroD_coronary::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode) {
 
   int model = 0;
 
