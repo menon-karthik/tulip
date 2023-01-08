@@ -42,7 +42,7 @@ class cmLPN_svZeroD_coronary: public cmModel {
 	virtual void getDefaultParams(stdVec& zp);
 
 	// SOLVE MODEL AND GET LOG LIKELIHOOD TO INTERFACE WITH DREAM
-	virtual double evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode);
+	virtual double evalModelError(stdVec& inputs, stdVec& outputs, stdIntVec& errorCode);
 
 	// SET 3D MODEL SURROGATE FILE
 	//void set3DSurrogateFile(string surrModelFileName);
