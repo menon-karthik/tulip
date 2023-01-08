@@ -63,9 +63,9 @@ int main(int argc, char* argv[]){
 
     // Create new LPN model
     std::string model_path = "svzerod_tuning.json";
-    cmLPN_svZeroD_coronary* lpnModel(model_path);
-    //cmLPN_svZeroD_coronary* lpnModel;
-    //lpnModel = new cmLPN_svZeroD_coronary(model_path);
+    //cmLPN_svZeroD_coronary* lpnModel(model_path);
+    cmLPN_svZeroD_coronary* lpnModel;
+    lpnModel = new cmLPN_svZeroD_coronary(model_path);
 
     // Assign Dataset to model
     int currPatient = 0;
