@@ -47,17 +47,21 @@ class cmLPN_svZeroD_coronary: public cmModel {
 	// SET 3D MODEL SURROGATE FILE
 	//void set3DSurrogateFile(string surrModelFileName);
   
-        // RETURN THE NUMBER OF EXTRA OUTPUTS
-        int  getAuxStateTotal();
+    // RETURN THE NUMBER OF EXTRA OUTPUTS
+    int  getAuxStateTotal();
 
-        // READ CORONARY PARAMETERS FROM FILE
-        void readParamsFromFile(stdVec& inputs, std::string param_path);
+    // READ CORONARY PARAMETERS FROM FILE
+    void readParamsFromFile(stdVec& inputs, std::string param_path);
 
-        // PRINT OUT RESULTS
-        void printResults(int totalResults, double *Xn);
-        
-        // Read target data from file
-        void readTargetsFromFile(string targetFileName);
+    // PRINT OUT RESULTS
+    void printResults(int totalResults, double *Xn);
+    
+    // Read target data from file
+    void readTargetsFromFile(string targetFileName);
+
+    virtual void getPriorMapping(int priorModelType,int* prPtr);
+
+    virtual void getDefaultParameterLimits(stdVec& limits);
 
   protected:
 

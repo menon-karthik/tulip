@@ -1313,3 +1313,11 @@ double cmLPN_svZeroD_coronary::evalModelError(const stdVec& inputs, stdVec& outp
   //std::cout << "[evalModelError] END " << std::endl;
   return result;
 }
+
+void cmLPN_svZeroD_coronary::getPriorMapping(int priorModelType,int* prPtr) {
+  std::runtime_error("ERROR: cmLPN_svZeroD_coronary::getPriorMapping not implemented.")
+}
+
+void cmLPN_svZeroD_coronary::getDefaultParameterLimits(stdVec& limits) {
+  std::runtime_error("ERROR: cmLPN_svZeroD_coronary::getDefaultParameterLimits not implemented.")
+}
