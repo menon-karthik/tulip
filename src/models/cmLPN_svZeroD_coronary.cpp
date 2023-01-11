@@ -657,7 +657,10 @@ void cmLPN_svZeroD_coronary::getDefaultParams(stdVec& zp){
 // ====================
 void cmLPN_svZeroD_coronary::getParameterLimits(stdVec& limits){
 
+  //std::cout<<"KMENON coronary limits0"<<std::endl;
   limits.resize(2*getParameterTotal());
+  //std::cout<<"KMENON limits1"<<std::endl;
+  //std::cout<<limits.size()<<std::endl;
 
   // Constrained ranges
   limits[0]=0.4000;   limits[1]=0.4500; // Tsa
@@ -698,6 +701,8 @@ void cmLPN_svZeroD_coronary::getParameterLimits(stdVec& limits){
   limits[70]=0.1;     limits[71]=0.2;   // Rprox_factor
   limits[72]=0.2000;  limits[73]=1.000; // imr
   limits[74]=0.3;     limits[75]=1.5;   // init_volume_scaling
+  //std::cout<<"KMENON limits2"<<std::endl;
+  //std::cout<<limits.size()<<std::endl;
 
   int currParam = 0;
   for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
@@ -706,6 +711,8 @@ void cmLPN_svZeroD_coronary::getParameterLimits(stdVec& limits){
     limits[currParam*2]     = frozenParamVAL[loopA];
     limits[currParam*2 + 1] = frozenParamVAL[loopA];
   }
+  //std::cout<<"KMENON limits3"<<std::endl;
+  //std::cout<<limits.size()<<std::endl;
 }
 
 void cmLPN_svZeroD_coronary::printResults(int totalResults, double* Xn) {
@@ -1315,9 +1322,13 @@ double cmLPN_svZeroD_coronary::evalModelError(const stdVec& inputs, stdVec& outp
 }
 
 void cmLPN_svZeroD_coronary::getPriorMapping(int priorModelType,int* prPtr) {
+  std::cout<<"ERROR: cmLPN_svZeroD_coronary::getPriorMapping not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
   std::runtime_error("ERROR: cmLPN_svZeroD_coronary::getPriorMapping not implemented.");
 }
 
 void cmLPN_svZeroD_coronary::getDefaultParameterLimits(stdVec& limits) {
+  std::cout<<"ERROR: cmLPN_svZeroD_coronary::getDefaultParameterLimits not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
   std::runtime_error("ERROR: cmLPN_svZeroD_coronary::getDefaultParameterLimits not implemented.");
 }

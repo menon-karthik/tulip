@@ -187,7 +187,7 @@ double daData_multiple_Table::evalLogLikelihood(const stdStringVec& keys,const s
         if(useUserSTDs){
           stdFactor = userStdDict[keys[loopA]];
         }else{
-          stdFactor = stdFactors[loopA];  
+          stdFactor = stdFactors[loopA]; 
         }        
         weightVal = weights[loopA];
         measuredString = dict[keys[loopA]][dataIndex];

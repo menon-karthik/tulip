@@ -2,6 +2,8 @@
 #define CMMODEL_H
 
 # include <string>
+# include <iostream>
+# include <stdio.h>
 
 # include "cmException.h"
 # include "daData.h"
@@ -207,7 +209,7 @@ class cmModel{
     void freezeModelParameters(const stdIntVec& localParamIDX,const stdVec& localParamVal);
 
     // GET PARAMETER LIMITS
-    void getParameterLimits(stdVec& limits);
+    virtual void getParameterLimits(stdVec& limits);
 
     // GET PARAMETER LIMITS
     void setParameterLimits(const stdVec& limits);

@@ -45,7 +45,7 @@ int main(int argc, char* argv[]){
     int timeStampColumn = 0;
     int columnID = 1; //TODO: Not sure
     bool useSingleColumn = true;
-    string currPatientFile(""); //TODO
+    string currPatientFile("coronary.csv"); //TODO
     daData* data = new daData_multiple_Table(useSingleColumn,columnID);
     data->readFromFile(currPatientFile);
 
@@ -73,19 +73,19 @@ int main(int argc, char* argv[]){
 
     // Set Optimizer Parameters
     // Total Number of iterations
-    int totIterations = 5;
+    int totIterations = 50;
     // Convergence Tolerance
-    double convTol = 1.0e-6;
+    double convTol = 1.0e-1;
     // Check Convergence every convUpdateIt iterations
-    int convUpdateIt = 1;
+    int convUpdateIt = 10;
     // Maximum Iterations
-    int maxOptIt = 100;
+    int maxOptIt = 200;
     // Coefficient for Step increments
-    double stepCoefficient = 0.01;
+    double stepCoefficient = 0.1;
     // File with initial starting point
-    bool useStartingParameterFromFile = false;
+    bool useStartingParameterFromFile = true;
     bool startFromCentre = false;
-    string startParameterFile("");
+    string startParameterFile("coronaryParams.txt");
 
     // Construct Action
     acAction* nm = new acActionOPT_NM(convTol, 
