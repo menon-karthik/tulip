@@ -80,6 +80,7 @@ class cmLPN_svZeroD: public cmModel {
   protected:
 
         LPNSolverInterface interface;
+        svZeroDModel* zeroDmodel;
         int num_blocks;
         std::vector<double> init_state_y, init_state_ydot;
         std::vector<double> coronary_params;
@@ -129,7 +130,7 @@ class cmLPN_svZeroD: public cmModel {
 
         // Assign parameter values from input
         //void assignParameters(double* params);
-        int  solveCoronaryLPN(double* params, double* results);
+        int  solveLPN(double* params, double* results);
 };
 
 #endif // CMLPNSVZEROD_H

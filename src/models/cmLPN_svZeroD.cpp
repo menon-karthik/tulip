@@ -4,6 +4,8 @@ using namespace std;
 
 cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model){
   
+  //TODO: Maybe interface should be created in svZeroD model? Or it at least needs to be accessible by the model
+  //TODO: Try to handle all interface bookkeeping here and pass interface to model for specific things
   // Load shared library and get interface functions.
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
   this->interface.load_library(interface_lib);
@@ -11,8 +13,8 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model){
   this->nUnknowns = this->interface.system_size_;
 
   // Set svZeroD model
-  this->model = model;
-  this->model->setup_model();
+  this->zeroDmodel = model;
+  this->zeroDmodel->setup_model(interface);
   
   // Save initial state
   this->init_state_y.resize(this->nUnknowns);
@@ -20,166 +22,166 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model){
   this->interface.return_y(init_state_y);
   this->interface.return_ydot(init_state_ydot);
 
-  //TODO: The rest of this should go to model->setup_model
-  // Number of blocks and number of each type
-  this->num_blocks = this->interface.block_names_.size();
-  this->nCOR_l = 0;
-  this->nCOR_r = 0;
-  this->nCOR = 0;
-  this->nRCR = 0;
-  std::string block_name;
-  for (int i = 0; i < this->num_blocks; i++) {
-    block_name = this->interface.block_names_[i];
-    if (block_name.substr(0,6) == "BC_lca") {
-      this->nCOR_l++;
-    } else if (block_name.substr(0,6) == "BC_rca") {
-      this->nCOR_r++;
-    //} else if ((block_name.substr(0,6) == "BC_RCR") || (block_name.substr(0,8) == "BC_aorta")) {
-    } else if (block_name.substr(0,6) == "BC_RCR") {
-      this->nRCR++;
-    } 
-  }
-  this->nCOR = this->nCOR_l + this->nCOR_r; 
-        
-  this->coronary_params.resize(6);
-  this->rcr_params.resize(3);
-  this->heart_params.resize(27);
-  this->vessel_params.resize(4);
- 
-  // Initialize parameter vectors and read baseline block params
-  // Baseline parameters (named *_base) are set in the svZeroD config file
-  //
-  // Read left coronary parameters
-  this->Ra_l_base.reserve(this->nCOR_l);
-  this->Ram_l_base.reserve(this->nCOR_l);
-  this->Rv_l_base.reserve(this->nCOR_l);
-  this->Ca_l_base.reserve(this->nCOR_l);
-  this->Cim_l_base.reserve(this->nCOR_l);
-  for (int i = 0; i < this->nCOR_l; i++) {
-    block_name = "BC_lca" + to_string(i+1);
-    this->interface.read_block_params(block_name, this->coronary_params);
-    this->Ra_l_base[i] = this->coronary_params[0];
-    this->Ram_l_base[i] = this->coronary_params[1];
-    this->Rv_l_base[i] = this->coronary_params[2];
-    this->Ca_l_base[i] = this->coronary_params[3];
-    this->Cim_l_base[i] = this->coronary_params[4];
-  }
-  
-  // Read right coronary parameters
-  this->Ra_r_base.reserve(this->nCOR_r);
-  this->Ram_r_base.reserve(this->nCOR_r);
-  this->Rv_r_base.reserve(this->nCOR_r);
-  this->Ca_r_base.reserve(this->nCOR_r);
-  this->Cim_r_base.reserve(this->nCOR_r);
-  for (int i = 0; i < this->nCOR_r; i++) {
-    block_name = "BC_rca" + to_string(i+1);
-    this->interface.read_block_params(block_name, this->coronary_params);
-    this->Ra_r_base[i] = this->coronary_params[0];
-    this->Ram_r_base[i] = this->coronary_params[1];
-    this->Rv_r_base[i] = this->coronary_params[2];
-    this->Ca_r_base[i] = this->coronary_params[3];
-    this->Cim_r_base[i] = this->coronary_params[4];
-  }
-  
-  // Read RCR parameters
-  this->Rp_rcr_base.reserve(this->nRCR);
-  this->Rd_rcr_base.reserve(this->nRCR);
-  this->C_rcr_base.reserve(this->nRCR);
-  for (int i = 0; i < this->nRCR; i++) {
-    block_name = "BC_RCR" + to_string(i+1);
-    this->interface.read_block_params(block_name, this->rcr_params);
-    this->Rp_rcr_base[i] = this->rcr_params[0];
-    this->C_rcr_base[i] = this->rcr_params[1];
-    this->Rd_rcr_base[i] = this->rcr_params[2];
-  }
-  
-  // Read closed-loop heart parameters
-  this->interface.read_block_params("CLH", this->heart_params);
-  this->Rrv_base = this->heart_params[9];
-  this->Rlv_base = this->heart_params[13];
-  this->Rpd_base = this->heart_params[16];
-  
-  // Read aorta parameters
-  this->interface.read_block_params("aorta", this->vessel_params);
+////TODO: The rest of this should go to model->setup_model
+//// Number of blocks and number of each type
+//this->num_blocks = this->interface.block_names_.size();
+//this->nCOR_l = 0;
+//this->nCOR_r = 0;
+//this->nCOR = 0;
+//this->nRCR = 0;
+//std::string block_name;
+//for (int i = 0; i < this->num_blocks; i++) {
+//  block_name = this->interface.block_names_[i];
+//  if (block_name.substr(0,6) == "BC_lca") {
+//    this->nCOR_l++;
+//  } else if (block_name.substr(0,6) == "BC_rca") {
+//    this->nCOR_r++;
+//  //} else if ((block_name.substr(0,6) == "BC_RCR") || (block_name.substr(0,8) == "BC_aorta")) {
+//  } else if (block_name.substr(0,6) == "BC_RCR") {
+//    this->nRCR++;
+//  } 
+//}
+//this->nCOR = this->nCOR_l + this->nCOR_r; 
+//      
+//this->coronary_params.resize(6);
+//this->rcr_params.resize(3);
+//this->heart_params.resize(27);
+//this->vessel_params.resize(4);
+/
+//// Initialize parameter vectors and read baseline block params
+//// Baseline parameters (named *_base) are set in the svZeroD config file
+////
+//// Read left coronary parameters
+//this->Ra_l_base.reserve(this->nCOR_l);
+//this->Ram_l_base.reserve(this->nCOR_l);
+//this->Rv_l_base.reserve(this->nCOR_l);
+//this->Ca_l_base.reserve(this->nCOR_l);
+//this->Cim_l_base.reserve(this->nCOR_l);
+//for (int i = 0; i < this->nCOR_l; i++) {
+//  block_name = "BC_lca" + to_string(i+1);
+//  this->interface.read_block_params(block_name, this->coronary_params);
+//  this->Ra_l_base[i] = this->coronary_params[0];
+//  this->Ram_l_base[i] = this->coronary_params[1];
+//  this->Rv_l_base[i] = this->coronary_params[2];
+//  this->Ca_l_base[i] = this->coronary_params[3];
+//  this->Cim_l_base[i] = this->coronary_params[4];
+//}
+//
+//// Read right coronary parameters
+//this->Ra_r_base.reserve(this->nCOR_r);
+//this->Ram_r_base.reserve(this->nCOR_r);
+//this->Rv_r_base.reserve(this->nCOR_r);
+//this->Ca_r_base.reserve(this->nCOR_r);
+//this->Cim_r_base.reserve(this->nCOR_r);
+//for (int i = 0; i < this->nCOR_r; i++) {
+//  block_name = "BC_rca" + to_string(i+1);
+//  this->interface.read_block_params(block_name, this->coronary_params);
+//  this->Ra_r_base[i] = this->coronary_params[0];
+//  this->Ram_r_base[i] = this->coronary_params[1];
+//  this->Rv_r_base[i] = this->coronary_params[2];
+//  this->Ca_r_base[i] = this->coronary_params[3];
+//  this->Cim_r_base[i] = this->coronary_params[4];
+//}
+//
+//// Read RCR parameters
+//this->Rp_rcr_base.reserve(this->nRCR);
+//this->Rd_rcr_base.reserve(this->nRCR);
+//this->C_rcr_base.reserve(this->nRCR);
+//for (int i = 0; i < this->nRCR; i++) {
+//  block_name = "BC_RCR" + to_string(i+1);
+//  this->interface.read_block_params(block_name, this->rcr_params);
+//  this->Rp_rcr_base[i] = this->rcr_params[0];
+//  this->C_rcr_base[i] = this->rcr_params[1];
+//  this->Rd_rcr_base[i] = this->rcr_params[2];
+//}
+//
+//// Read closed-loop heart parameters
+//this->interface.read_block_params("CLH", this->heart_params);
+//this->Rrv_base = this->heart_params[9];
+//this->Rlv_base = this->heart_params[13];
+//this->Rpd_base = this->heart_params[16];
+//
+//// Read aorta parameters
+//this->interface.read_block_params("aorta", this->vessel_params);
 
-  if (this->vessel_params[1] == 0) { // If C = 0
-    this->useRigidSurrogate = true;
-    this->useRigidSurrogate = false;
-  }
-  
-  // Save solution IDs corresponding to important quantities
-  this->Q_lca_ids.resize(this->nCOR_l, -1);
-  this->Q_rca_ids.resize(this->nCOR_r, -1);
-  this->Q_rcr_ids.resize(this->nRCR, -1);
-  int ct_lca = 0, ct_rca = 0, ct_rcr = 0;
-  string var_name;
-  bool lca_flag, rca_flag, rcr_flag, flow_flag;
-  for (int i = 0; i < this->interface.system_size_; i++) {
-    var_name = this->interface.variable_names_[i];
-    flow_flag = (var_name.substr(0,4) == "flow"); // Is this a flow variable?
-    // Find last occurence of ":" in variable name. 
-    // The rest of var_name is either the exit block name or the main block name (if it is an internal variable).
-    std::size_t blk_name_start = var_name.rfind(":");
-    if (blk_name_start == std::string::npos) {
-      throw std::runtime_error("Error: Invalid variable name format.");
-    }
-    // Search for specific patterns in variable name
-    lca_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); //string.compare() returns 0 for exact matches
-    rca_flag = !var_name.compare(blk_name_start+1,6,"BC_rca");
-    rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
+//if (this->vessel_params[1] == 0) { // If C = 0
+//  this->useRigidSurrogate = true;
+//  this->useRigidSurrogate = false;
+//}
+//
+//// Save solution IDs corresponding to important quantities
+//this->Q_lca_ids.resize(this->nCOR_l, -1);
+//this->Q_rca_ids.resize(this->nCOR_r, -1);
+//this->Q_rcr_ids.resize(this->nRCR, -1);
+//int ct_lca = 0, ct_rca = 0, ct_rcr = 0;
+//string var_name;
+//bool lca_flag, rca_flag, rcr_flag, flow_flag;
+//for (int i = 0; i < this->interface.system_size_; i++) {
+//  var_name = this->interface.variable_names_[i];
+//  flow_flag = (var_name.substr(0,4) == "flow"); // Is this a flow variable?
+//  // Find last occurence of ":" in variable name. 
+//  // The rest of var_name is either the exit block name or the main block name (if it is an internal variable).
+//  std::size_t blk_name_start = var_name.rfind(":");
+//  if (blk_name_start == std::string::npos) {
+//    throw std::runtime_error("Error: Invalid variable name format.");
+//  }
+//  // Search for specific patterns in variable name
+//  lca_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); //string.compare() returns 0 for exact matches
+//  rca_flag = !var_name.compare(blk_name_start+1,6,"BC_rca");
+//  rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
 
-    if (flow_flag && lca_flag) {
-      this->Q_lca_ids[ct_lca] = i;
-      ct_lca++;
-    } else if (flow_flag && rca_flag) {
-      this->Q_rca_ids[ct_rca] = i;
-      ct_rca++;
-    } else if (flow_flag && rcr_flag) {
-      this->Q_rcr_ids[ct_rcr] = i;
-      ct_rcr++;
-    } else if (var_name == "flow:J_heart_outlet:aorta") {
-      this->Q_aorta_id = i;
-    } else if (var_name == "pressure:J_heart_outlet:aorta") {
-      this->P_aorta_id = i;
-    } else if (var_name == "Q_LV:CLH") {
-      this->Q_LV_id = i;
-    } else if (var_name == "V_LV:CLH") {
-      this->V_LV_id = i;
-    } else if (var_name == "Q_LA:CLH") {
-      this->Q_LA_id = i;
-    } else if (var_name == "Q_RV:CLH") {
-      this->Q_RV_id = i;
-    } else if (var_name == "P_pul:CLH") {
-      this->P_pul_id = i;
-    } else if (var_name == "P_RV:CLH") {
-      this->P_RV_id = i;
-    } else if (var_name == "pressure:J_heart_inlet:CLH") {
-      this->P_RA_id = i;
-    }
-  }
-  //std::cout << "[cmLPN_svZeroD] Q_lca_ids.size() this->nCOR_l: " << Q_lca_ids.size() << ", "<< this->nCOR_l << std::endl;
-  
-  // Check to make sure all variables ids have been assigned
-  for (int i = 0; i < this->nCOR_l; i++) {
-    if (this->Q_lca_ids[i] < 0) {
-      std::cout << "Q_lca index: "<< i << std::endl;
-      throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_lca");
-    }
-  }
-  for (int i = 0; i < this->nCOR_r; i++) {
-    if (this->Q_rca_ids[i] < 0) {
-      throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_rca");
-    } 
-  }
-  for (int i = 0; i < this->nRCR; i++) {
-    if (this->Q_rcr_ids[i] < 0) {
-      throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_RCR");
-    }
-  }
-  if ((Q_aorta_id < 0) || (P_aorta_id < 0) || (Q_LV_id < 0) || (V_LV_id < 0) || (Q_LA_id < 0) || (Q_RV_id < 0) || (P_pul_id < 0) || (P_RV_id < 0) || (P_RA_id < 0)) {
-    std::cout << "[cmLPN_svZeroD] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
-    throw std::runtime_error("Error: Did not find all solution IDs for variables.");
-  }
+//  if (flow_flag && lca_flag) {
+//    this->Q_lca_ids[ct_lca] = i;
+//    ct_lca++;
+//  } else if (flow_flag && rca_flag) {
+//    this->Q_rca_ids[ct_rca] = i;
+//    ct_rca++;
+//  } else if (flow_flag && rcr_flag) {
+//    this->Q_rcr_ids[ct_rcr] = i;
+//    ct_rcr++;
+//  } else if (var_name == "flow:J_heart_outlet:aorta") {
+//    this->Q_aorta_id = i;
+//  } else if (var_name == "pressure:J_heart_outlet:aorta") {
+//    this->P_aorta_id = i;
+//  } else if (var_name == "Q_LV:CLH") {
+//    this->Q_LV_id = i;
+//  } else if (var_name == "V_LV:CLH") {
+//    this->V_LV_id = i;
+//  } else if (var_name == "Q_LA:CLH") {
+//    this->Q_LA_id = i;
+//  } else if (var_name == "Q_RV:CLH") {
+//    this->Q_RV_id = i;
+//  } else if (var_name == "P_pul:CLH") {
+//    this->P_pul_id = i;
+//  } else if (var_name == "P_RV:CLH") {
+//    this->P_RV_id = i;
+//  } else if (var_name == "pressure:J_heart_inlet:CLH") {
+//    this->P_RA_id = i;
+//  }
+//}
+////std::cout << "[cmLPN_svZeroD] Q_lca_ids.size() this->nCOR_l: " << Q_lca_ids.size() << ", "<< this->nCOR_l << std::endl;
+//
+//// Check to make sure all variables ids have been assigned
+//for (int i = 0; i < this->nCOR_l; i++) {
+//  if (this->Q_lca_ids[i] < 0) {
+//    std::cout << "Q_lca index: "<< i << std::endl;
+//    throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_lca");
+//  }
+//}
+//for (int i = 0; i < this->nCOR_r; i++) {
+//  if (this->Q_rca_ids[i] < 0) {
+//    throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_rca");
+//  } 
+//}
+//for (int i = 0; i < this->nRCR; i++) {
+//  if (this->Q_rcr_ids[i] < 0) {
+//    throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_RCR");
+//  }
+//}
+//if ((Q_aorta_id < 0) || (P_aorta_id < 0) || (Q_LV_id < 0) || (V_LV_id < 0) || (Q_LA_id < 0) || (Q_RV_id < 0) || (P_pul_id < 0) || (P_RV_id < 0) || (P_RA_id < 0)) {
+//  std::cout << "[cmLPN_svZeroD] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
+//  throw std::runtime_error("Error: Did not find all solution IDs for variables.");
+//}
 
 }
 
@@ -325,19 +327,20 @@ void cmLPN_svZeroD::readTargetsFromFile(string targetFileName)
 // ========================
 int cmLPN_svZeroD::getParameterTotal(){
   //return 38;
-  return this->model->getParameterTotal();
+  return this->zeroDmodel->getParameterTotal();
 }
 
 // ===================================
 // GET NUMBER OF PARAMETERS (UNKNOWNS)
 // ===================================
 int cmLPN_svZeroD::getStateTotal(){
-  return nUnknowns; 
+  //return nUnknowns; 
+  return this->zeroDmodel->getAuxTotal();
 }
 
 int cmLPN_svZeroD::getAuxStateTotal(){
   //return 50;
-  return this->model->getAuxTotal();
+  return this->zeroDmodel->getAuxTotal();
 }
 
 // ===========================
@@ -345,14 +348,14 @@ int cmLPN_svZeroD::getAuxStateTotal(){
 // ===========================
 int cmLPN_svZeroD::getResultTotal(){
   //return 29;  
-  return this->model->getResultTotal();
+  return this->zeroDmodel->getResultTotal();
 }
 
 // ==================
 // GET PARAMETER NAME
 // ==================
 string cmLPN_svZeroD::getParamName(int index){
-  return this->model->getParamName(index);
+  return this->zeroDmodel->getParamName(index);
 //string result;
 //switch(index){
 //  case 0: {          
@@ -477,7 +480,7 @@ string cmLPN_svZeroD::getParamName(int index){
 // GET RESULT NAME
 // ===============
 string cmLPN_svZeroD::getResultName(int index){
-  return this->model->getResultName(index);
+  return this->zeroDmodel->getResultName(index);
 //string result;
 //switch(index){
 //  case 0: {      
@@ -600,57 +603,57 @@ void cmLPN_svZeroD::readParamsFromFile(stdVec& inputs, std::string param_path) {
 // GET MODEL PARAMETERS
 // ====================
 void cmLPN_svZeroD::getDefaultParams(stdVec& zp){
-      
-      zp.resize(getParameterTotal());
+     this->zeroDmodel->getDefaultParams(zp); 
+//    zp.resize(getParameterTotal());
 
-      zp[0] = 0.4;  // Tsa
-      zp[1] = 8.00; // tpwave
+//    zp[0] = 0.4;  // Tsa
+//    zp[1] = 8.00; // tpwave
 
-      zp[2] = 0.25;  // Erv   
-      zp[3] = 1.25;  // Elv
-      zp[4] = 5.0;  // iml
+//    zp[2] = 0.25;  // Erv   
+//    zp[3] = 1.25;  // Elv
+//    zp[4] = 5.0;  // iml
 
-      zp[5] = 0.55; // Lrv_a
-      zp[6] = 1.0; // Rrv_a
+//    zp[5] = 0.55; // Lrv_a
+//    zp[6] = 1.0; // Rrv_a
 
-      zp[7] = 1.0;  // Lra_v
-      zp[8] = 5.0;  // Rra_v
+//    zp[7] = 1.0;  // Lra_v
+//    zp[8] = 5.0;  // Rra_v
 
-      zp[9] = 0.002;// Lla_v
-      zp[10] = 5.0; // Rla_v
+//    zp[9] = 0.002;// Lla_v
+//    zp[10] = 5.0; // Rla_v
 
-      zp[11] = 1.0;  // Rlv_ao
-      zp[12] = 1.0;   // Llv_a
+//    zp[11] = 1.0;  // Rlv_ao
+//    zp[12] = 1.0;   // Llv_a
 
-      zp[13] = 0.0; // Vrv_u
-      zp[14] = 0.0; // Vlv_u
+//    zp[13] = 0.0; // Vrv_u
+//    zp[14] = 0.0; // Vlv_u
 
-      zp[15] = 100.0; // Rpd
-      zp[16] = 1.0;   // Cp
-      zp[17] = 0.9;   // Cpa
-      zp[18] = 15.0; // R_inlet
+//    zp[15] = 100.0; // Rpd
+//    zp[16] = 1.0;   // Cp
+//    zp[17] = 0.9;   // Cpa
+//    zp[18] = 15.0; // R_inlet
 
-      zp[19] = 4.0;   // Kxp_ra
-      zp[20] = 0.005; // Kxv_ra
-      zp[21] = 0.2;   // Emax_ra
-      zp[22] = 0.0;   // Vaso_ra
+//    zp[19] = 4.0;   // Kxp_ra
+//    zp[20] = 0.005; // Kxv_ra
+//    zp[21] = 0.2;   // Emax_ra
+//    zp[22] = 0.0;   // Vaso_ra
 
-      zp[23] = 8.0;   // Kxp_la
-      zp[24] = 0.008;// Kxv_la
-      zp[25] = 0.3;   // Emax_la
-      zp[26] = 0.0;   // Vaso_la
+//    zp[23] = 8.0;   // Kxp_la
+//    zp[24] = 0.008;// Kxv_la
+//    zp[25] = 0.3;   // Emax_la
+//    zp[26] = 0.0;   // Vaso_la
 
-      zp[27] = 1.0;  // Ram_cor
-      zp[28] = 1.0;   // Rv_cor
-      zp[29] = 0.25;   // Cam_l
-      zp[30] = 1.0;   // Ca_l
-      zp[31] = 0.25;  // Cam_r
-      zp[32] = 1.0;  // Ca_r
-      zp[33] = 1.00;  // Rrcr
-      zp[34] = 1.0;  // Crcr
-      zp[35] = 0.11;  // Rprox_factor
-      zp[36] = 0.75;  // imr
-      zp[37] = 1.0; // init_volume_scaling
+//    zp[27] = 1.0;  // Ram_cor
+//    zp[28] = 1.0;   // Rv_cor
+//    zp[29] = 0.25;   // Cam_l
+//    zp[30] = 1.0;   // Ca_l
+//    zp[31] = 0.25;  // Cam_r
+//    zp[32] = 1.0;  // Ca_r
+//    zp[33] = 1.00;  // Rrcr
+//    zp[34] = 1.0;  // Crcr
+//    zp[35] = 0.11;  // Rprox_factor
+//    zp[36] = 0.75;  // imr
+//    zp[37] = 1.0; // init_volume_scaling
 }
 
 // ====================
@@ -658,55 +661,56 @@ void cmLPN_svZeroD::getDefaultParams(stdVec& zp){
 // ====================
 void cmLPN_svZeroD::getParameterLimits(stdVec& limits){
 
-  limits.resize(2*getParameterTotal());
+  this->zeroDmodel->getParameterLimits(limits);
+//limits.resize(2*getParameterTotal());
 
-  // Constrained ranges
-  limits[0]=0.4000;   limits[1]=0.4500; // Tsa
-  limits[2]=8.0000;   limits[3]=9.000; // tpwave
-  limits[4]=1.0000;   limits[5]=3.00; // Erv
-  limits[6]=1.5000;   limits[7]=5.00; // Elv
-  limits[8]=0.2000;   limits[9]=1.00; // iml
-  limits[10]=0.1;     limits[11]=0.5;   // Lrv_a
-  limits[12]=0.5;     limits[13]=1.5; // Rrv_a
-  limits[14]=0.001;   limits[15]=0.5;  // Lra_v
-  limits[16]=5.0;     limits[17]=12.0; // Rra_v
-  limits[18]=0.001;   limits[19]=0.5;  // Lla_v
-  limits[20]=5.0;     limits[21]=12.0; // Rla_v
-  limits[22]=0.5;     limits[23]=1.5; // Rlv_ao
-  limits[24]=0.1;     limits[25]=0.5;   // Llv_a
-  limits[26]=-10.0;   limits[27]=10.0; // Vrv_u
-  limits[28]=-10.0;   limits[29]=10.0; // Vlv_u
-  limits[30]=0.5000;  limits[31]=1.5; // Rpd
-  limits[32]=0.900;   limits[33]=1.1;   //Cp
-  limits[34]=0.08;    limits[35]=1.0;   //Cpa
-  limits[36]=0.0;     limits[37]=0.0; // R_inlet
-  limits[38]=0.001;   limits[39]=10.00; //Kxp_ra
-  limits[40]=0.003;   limits[41]=0.005; //Kxv_ra
-  limits[42]=0.2;     limits[43]=0.3;  //Emax_ra
-  limits[44]=-5.00;   limits[45]=5.00; //Vaso_ra
-  limits[46]=0.0001;  limits[47]=10.00; //Kxp_la
-  limits[48]=0.0075;  limits[49]=0.0085; //Kxv_la
-  limits[50]=0.29;    limits[51]=0.310; //Emax_la
-  limits[52]=-5.00;   limits[53]=10.00; //Vaso_la
-  limits[54]=0.0100;  limits[55]=10.0;  //Ram_cor
-  limits[56]=0.0001;  limits[57]=10.0;  //Rv_cor
-  limits[58]=0.0001;  limits[59]=10.0;  //Cam_l
-  limits[60]=0.0001;  limits[61]=10.0;  //Ca_l
-  limits[62]=0.0001;  limits[63]=10.0;  //Cam_r
-  limits[64]=0.0001;  limits[65]=10.0;  //Ca_r
-  limits[66]=0.1000;  limits[67]=10.0;  //Rrcr
-  limits[68]=0.0100;  limits[69]=1.1;  //Crcr
-  limits[70]=0.1;     limits[71]=0.2;   // Rprox_factor
-  limits[72]=0.2000;  limits[73]=1.000; // imr
-  limits[74]=0.3;     limits[75]=1.5;   // init_volume_scaling
+//// Constrained ranges
+//limits[0]=0.4000;   limits[1]=0.4500; // Tsa
+//limits[2]=8.0000;   limits[3]=9.000; // tpwave
+//limits[4]=1.0000;   limits[5]=3.00; // Erv
+//limits[6]=1.5000;   limits[7]=5.00; // Elv
+//limits[8]=0.2000;   limits[9]=1.00; // iml
+//limits[10]=0.1;     limits[11]=0.5;   // Lrv_a
+//limits[12]=0.5;     limits[13]=1.5; // Rrv_a
+//limits[14]=0.001;   limits[15]=0.5;  // Lra_v
+//limits[16]=5.0;     limits[17]=12.0; // Rra_v
+//limits[18]=0.001;   limits[19]=0.5;  // Lla_v
+//limits[20]=5.0;     limits[21]=12.0; // Rla_v
+//limits[22]=0.5;     limits[23]=1.5; // Rlv_ao
+//limits[24]=0.1;     limits[25]=0.5;   // Llv_a
+//limits[26]=-10.0;   limits[27]=10.0; // Vrv_u
+//limits[28]=-10.0;   limits[29]=10.0; // Vlv_u
+//limits[30]=0.5000;  limits[31]=1.5; // Rpd
+//limits[32]=0.900;   limits[33]=1.1;   //Cp
+//limits[34]=0.08;    limits[35]=1.0;   //Cpa
+//limits[36]=0.0;     limits[37]=0.0; // R_inlet
+//limits[38]=0.001;   limits[39]=10.00; //Kxp_ra
+//limits[40]=0.003;   limits[41]=0.005; //Kxv_ra
+//limits[42]=0.2;     limits[43]=0.3;  //Emax_ra
+//limits[44]=-5.00;   limits[45]=5.00; //Vaso_ra
+//limits[46]=0.0001;  limits[47]=10.00; //Kxp_la
+//limits[48]=0.0075;  limits[49]=0.0085; //Kxv_la
+//limits[50]=0.29;    limits[51]=0.310; //Emax_la
+//limits[52]=-5.00;   limits[53]=10.00; //Vaso_la
+//limits[54]=0.0100;  limits[55]=10.0;  //Ram_cor
+//limits[56]=0.0001;  limits[57]=10.0;  //Rv_cor
+//limits[58]=0.0001;  limits[59]=10.0;  //Cam_l
+//limits[60]=0.0001;  limits[61]=10.0;  //Ca_l
+//limits[62]=0.0001;  limits[63]=10.0;  //Cam_r
+//limits[64]=0.0001;  limits[65]=10.0;  //Ca_r
+//limits[66]=0.1000;  limits[67]=10.0;  //Rrcr
+//limits[68]=0.0100;  limits[69]=1.1;  //Crcr
+//limits[70]=0.1;     limits[71]=0.2;   // Rprox_factor
+//limits[72]=0.2000;  limits[73]=1.000; // imr
+//limits[74]=0.3;     limits[75]=1.5;   // init_volume_scaling
 
-  int currParam = 0;
-  for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
-  	currParam = frozenParamIDX[loopA];
-    // Assign the new lower and upper bounds to the center
-    limits[currParam*2]     = frozenParamVAL[loopA];
-    limits[currParam*2 + 1] = frozenParamVAL[loopA];
-  }
+//int currParam = 0;
+//for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
+//	currParam = frozenParamIDX[loopA];
+//  // Assign the new lower and upper bounds to the center
+//  limits[currParam*2]     = frozenParamVAL[loopA];
+//  limits[currParam*2 + 1] = frozenParamVAL[loopA];
+//}
 }
 
 void cmLPN_svZeroD::printResults(int totalResults, double* Xn) {
@@ -741,8 +745,10 @@ void writeAllDataFile(int totalSteps,int totalStates,int totAuxStates,double** o
 // ==========================================
 // MAIN FUNCTION FOR STAGE1-2BLOCKS LPN MODEL
 // ==========================================
-int cmLPN_svZeroD::solveCoronaryLPN(double* params, double* results){
+int cmLPN_svZeroD::solveLPN(double* params, double* results){
 
+    this->zeroDmodel->update_model_params(interface)
+    //TODO: Start update model params
   // Time parameters
   //double totalTime = numCycles * cycleTime;
   int totalStepsOnSingleCycle = this->interface.pts_per_cycle_;
@@ -750,10 +756,13 @@ int cmLPN_svZeroD::solveCoronaryLPN(double* params, double* results){
   int totOutputSteps = this->interface.num_output_steps_;
   //int totOutputCycleSteps = total3DSteps;
 
+  // TODO: Not in update model params
   int totalStates = getStateTotal();
   int totAuxStates = getAuxStateTotal();
   int totalResults = getResultTotal();
 
+  // TODO: Not in update model params
+  // TODO: Change outvals to stdMat type
   // State Variables
   double** outVals = NULL;
   outVals = new double*[totalStates];
@@ -829,6 +838,7 @@ int cmLPN_svZeroD::solveCoronaryLPN(double* params, double* results){
   this->heart_params[25] = params[22]; //Vaso_ra
   this->heart_params[26] = params[26]; //Vaso_la
   this->interface.update_block_params("CLH", this->heart_params);
+    //TODO: End update model params
   
   // Set up solution and time vectors, and run simulation
   std::vector<double> solutions(interface.system_size_*interface.num_output_steps_);
@@ -862,6 +872,9 @@ int cmLPN_svZeroD::solveCoronaryLPN(double* params, double* results){
   
 
 /*******************************Post-Processing Parameters here***********************************/
+
+    // TODO: results passed by ref/pointer
+    this->zeroDmodel->postprocess(interface, results)
 
   // SUM RCR FLUX
   double temp = 0.0;
@@ -1181,7 +1194,7 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
   // Solve coronary model
   int error = 0;
   try{
-    error = solveCoronaryLPN(paramsVals,results);
+    error = solveLPN(paramsVals,results);
   }catch(...){
     error = 1;
   }
@@ -1316,9 +1329,13 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
 }
 
 void cmLPN_svZeroD::getPriorMapping(int priorModelType,int* prPtr) {
+  std::cout<<"ERROR: cmLPN_svZeroD_coronary::getPriorMapping not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
   std::runtime_error("ERROR: cmLPN_svZeroD::getPriorMapping not implemented.");
 }
 
 void cmLPN_svZeroD::getDefaultParameterLimits(stdVec& limits) {
+  std::cout<<"ERROR: cmLPN_svZeroD_coronary::getDefaultParameterLimits not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
   std::runtime_error("ERROR: cmLPN_svZeroD::getDefaultParameterLimits not implemented.");
 }

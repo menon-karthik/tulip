@@ -2,12 +2,15 @@
 
 using namespace std;
 
-cmLPN_svZeroD_coronary::cmLPN_svZeroD_coronary(std::string model_path){
+cmLPN_svZeroD_coronary::cmLPN_svZeroD_coronary(){
+}
+
+cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
   
-  // Load shared library and get interface functions.
-  auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
-  this->interface.load_library(interface_lib);
-  this->interface.initialize(model_path);
+//// Load shared library and get interface functions.
+//auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
+//this->interface.load_library(interface_lib);
+//this->interface.initialize(model_path);
   this->nUnknowns = this->interface.system_size_;
   
   // Save initial state
@@ -1306,9 +1309,13 @@ double cmLPN_svZeroD_coronary::evalModelError(const stdVec& inputs, stdVec& outp
 }
 
 void cmLPN_svZeroD_coronary::getPriorMapping(int priorModelType,int* prPtr) {
+  std::cout<<"ERROR: cmLPN_svZeroD_coronary::getPriorMapping not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
   std::runtime_error("ERROR: cmLPN_svZeroD_coronary::getPriorMapping not implemented.");
 }
 
 void cmLPN_svZeroD_coronary::getDefaultParameterLimits(stdVec& limits) {
+  std::cout<<"ERROR: cmLPN_svZeroD_coronary::getDefaultParameterLimits not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
   std::runtime_error("ERROR: cmLPN_svZeroD_coronary::getDefaultParameterLimits not implemented.");
 }

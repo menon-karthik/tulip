@@ -30,7 +30,8 @@ class cmLPN_svZeroD: public cmModel {
    
   public:
 	//DEFAULT CONSTRUCTOR
-	cmLPN_svZeroD(std::string model_path);
+	//cmLPN_svZeroD_coronary(std::string model_path);
+	cmLPN_svZeroD_coronary();
 
 	// GET NUMBER OF PARAMETERS
 	virtual int getParameterTotal();
@@ -74,7 +75,7 @@ class cmLPN_svZeroD: public cmModel {
 
   protected:
 
-        LPNSolverInterface interface;
+        //LPNSolverInterface interface;
         int num_blocks;
         std::vector<double> init_state_y, init_state_ydot;
         std::vector<double> coronary_params;
