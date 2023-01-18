@@ -23,10 +23,10 @@ using namespace std;
 
 class svZeroDModel {
   public:
-	//DEFAULT CONSTRUCTOR
+	// CONSTRUCTOR
 	svZeroDModel();
 	
-    //DEFAULT DESTRUCTOR
+    // DESTRUCTOR
 	virtual ~svZeroDModel();
 
 	// GET NUMBER OF PARAMETERS
@@ -66,7 +66,11 @@ class svZeroDModel {
 
     virtual void getPriorMapping(int priorModelType,int* prPtr) = 0;
         
-    int  solveCoronaryLPN(double* params, double* results) = 0;
+    virtual void setModelParams(LPNSolverInterface& interface) = 0;
+
+    virtual void setupModel(LPNSolverInterface& interface) = 0;
+
+    virtual void postProcess(double timeStep, int totalStepsOnSingleCycle, int totalSteps, const stdVec& params, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
 
 };
 
