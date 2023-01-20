@@ -1,33 +1,23 @@
-#include "cmLPN_svZeroD_coronary.h"
+#include "svZeroD_ClosedLoopCoronary.h"
 
 using namespace std;
 
-cmLPN_svZeroD_coronary::cmLPN_svZeroD_coronary(){
+svZeroD_ClosedLoopCoronary::svZeroD_ClosedLoopCoronary(){
 }
 
-cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
+svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   
-//// Load shared library and get interface functions.
-//auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
-//this->interface.load_library(interface_lib);
-//this->interface.initialize(model_path);
-  this->nUnknowns = this->interface.system_size_;
+  this->nUnknowns = interface.system_size_;
   
-  // Save initial state
-  this->init_state_y.resize(this->nUnknowns);
-  this->init_state_ydot.resize(this->nUnknowns);
-  this->interface.return_y(init_state_y);
-  this->interface.return_ydot(init_state_ydot);
-
   // Number of blocks and number of each type
-  this->num_blocks = this->interface.block_names_.size();
+  this->num_blocks = interface.block_names_.size();
   this->nCOR_l = 0;
   this->nCOR_r = 0;
   this->nCOR = 0;
   this->nRCR = 0;
   std::string block_name;
   for (int i = 0; i < this->num_blocks; i++) {
-    block_name = this->interface.block_names_[i];
+    block_name = interface.block_names_[i];
     if (block_name.substr(0,6) == "BC_lca") {
       this->nCOR_l++;
     } else if (block_name.substr(0,6) == "BC_rca") {
@@ -55,7 +45,7 @@ cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
   this->Cim_l_base.reserve(this->nCOR_l);
   for (int i = 0; i < this->nCOR_l; i++) {
     block_name = "BC_lca" + to_string(i+1);
-    this->interface.read_block_params(block_name, this->coronary_params);
+    interface.read_block_params(block_name, this->coronary_params);
     this->Ra_l_base[i] = this->coronary_params[0];
     this->Ram_l_base[i] = this->coronary_params[1];
     this->Rv_l_base[i] = this->coronary_params[2];
@@ -71,7 +61,7 @@ cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
   this->Cim_r_base.reserve(this->nCOR_r);
   for (int i = 0; i < this->nCOR_r; i++) {
     block_name = "BC_rca" + to_string(i+1);
-    this->interface.read_block_params(block_name, this->coronary_params);
+    interface.read_block_params(block_name, this->coronary_params);
     this->Ra_r_base[i] = this->coronary_params[0];
     this->Ram_r_base[i] = this->coronary_params[1];
     this->Rv_r_base[i] = this->coronary_params[2];
@@ -85,20 +75,20 @@ cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
   this->C_rcr_base.reserve(this->nRCR);
   for (int i = 0; i < this->nRCR; i++) {
     block_name = "BC_RCR" + to_string(i+1);
-    this->interface.read_block_params(block_name, this->rcr_params);
+    interface.read_block_params(block_name, this->rcr_params);
     this->Rp_rcr_base[i] = this->rcr_params[0];
     this->C_rcr_base[i] = this->rcr_params[1];
     this->Rd_rcr_base[i] = this->rcr_params[2];
   }
   
   // Read closed-loop heart parameters
-  this->interface.read_block_params("CLH", this->heart_params);
+  interface.read_block_params("CLH", this->heart_params);
   this->Rrv_base = this->heart_params[9];
   this->Rlv_base = this->heart_params[13];
   this->Rpd_base = this->heart_params[16];
   
   // Read aorta parameters
-  this->interface.read_block_params("aorta", this->vessel_params);
+  interface.read_block_params("aorta", this->vessel_params);
 
   if (this->vessel_params[1] == 0) { // If C = 0
     this->useRigidSurrogate = true;
@@ -112,8 +102,8 @@ cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
   int ct_lca = 0, ct_rca = 0, ct_rcr = 0;
   string var_name;
   bool lca_flag, rca_flag, rcr_flag, flow_flag;
-  for (int i = 0; i < this->interface.system_size_; i++) {
-    var_name = this->interface.variable_names_[i];
+  for (int i = 0; i < interface.system_size_; i++) {
+    var_name = interface.variable_names_[i];
     flow_flag = (var_name.substr(0,4) == "flow"); // Is this a flow variable?
     // Find last occurence of ":" in variable name. 
     // The rest of var_name is either the exit block name or the main block name (if it is an internal variable).
@@ -155,7 +145,7 @@ cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
       this->P_RA_id = i;
     }
   }
-  //std::cout << "[cmLPN_svZeroD_coronary] Q_lca_ids.size() this->nCOR_l: " << Q_lca_ids.size() << ", "<< this->nCOR_l << std::endl;
+  //std::cout << "[svZeroD_ClosedLoopCoronary] Q_lca_ids.size() this->nCOR_l: " << Q_lca_ids.size() << ", "<< this->nCOR_l << std::endl;
   
   // Check to make sure all variables ids have been assigned
   for (int i = 0; i < this->nCOR_l; i++) {
@@ -175,7 +165,7 @@ cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
     }
   }
   if ((Q_aorta_id < 0) || (P_aorta_id < 0) || (Q_LV_id < 0) || (V_LV_id < 0) || (Q_LA_id < 0) || (Q_RV_id < 0) || (P_pul_id < 0) || (P_RV_id < 0) || (P_RA_id < 0)) {
-    std::cout << "[cmLPN_svZeroD_coronary] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
+    std::cout << "[svZeroD_ClosedLoopCoronary] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
     throw std::runtime_error("Error: Did not find all solution IDs for variables.");
   }
 
@@ -184,7 +174,7 @@ cmLPN_svZeroD_coronary::setup_model(LPNSolverInterface& interface){
 // ==========================
 // READ TARGET DATA FROM FILE
 // ==========================
-void cmLPN_svZeroD_coronary::readTargetsFromFile(string targetFileName)
+void svZeroD_ClosedLoopCoronary::readTargetsFromFile(string targetFileName)
 {
   std::ifstream read_file;
   read_file.open(targetFileName.c_str());
@@ -321,32 +311,32 @@ void cmLPN_svZeroD_coronary::readTargetsFromFile(string targetFileName)
 // ========================
 // GET NUMBER OF PARAMETERS
 // ========================
-int cmLPN_svZeroD_coronary::getParameterTotal(){
+int svZeroD_ClosedLoopCoronary::getParameterTotal(){
   return 38;
 }
 
 // ===================================
 // GET NUMBER OF PARAMETERS (UNKNOWNS)
 // ===================================
-int cmLPN_svZeroD_coronary::getStateTotal(){
+int svZeroD_ClosedLoopCoronary::getStateTotal(){
   return nUnknowns; 
 }
 
-int cmLPN_svZeroD_coronary::getAuxStateTotal(){
+int svZeroD_ClosedLoopCoronary::getAuxStateTotal(){
   return 50;
 }
 
 // ===========================
 // GET TOTAL NUMBER OF RESULTS
 // ===========================
-int cmLPN_svZeroD_coronary::getResultTotal(){
+int svZeroD_ClosedLoopCoronary::getResultTotal(){
   return 29;  
 }
 
 // ==================
 // GET PARAMETER NAME
 // ==================
-string cmLPN_svZeroD_coronary::getParamName(int index){
+string svZeroD_ClosedLoopCoronary::getParamName(int index){
   string result;
   switch(index){
     case 0: {          
@@ -470,7 +460,7 @@ string cmLPN_svZeroD_coronary::getParamName(int index){
 // ===============
 // GET RESULT NAME
 // ===============
-string cmLPN_svZeroD_coronary::getResultName(int index){
+string svZeroD_ClosedLoopCoronary::getResultName(int index){
   string result;
   switch(index){
     case 0: {      
@@ -565,7 +555,7 @@ string cmLPN_svZeroD_coronary::getResultName(int index){
 }
 
 // READ CORONARY PARAMETERS FROM FILE
-void cmLPN_svZeroD_coronary::readParamsFromFile(stdVec& inputs, std::string param_path) {
+void svZeroD_ClosedLoopCoronary::readParamsFromFile(stdVec& inputs, std::string param_path) {
    std::ifstream param_reader(param_path.c_str());
    std::string buffer;
    std::vector<std::string> tokens;
@@ -592,7 +582,7 @@ void cmLPN_svZeroD_coronary::readParamsFromFile(stdVec& inputs, std::string para
 // ====================
 // GET MODEL PARAMETERS
 // ====================
-void cmLPN_svZeroD_coronary::getDefaultParams(stdVec& zp){
+void svZeroD_ClosedLoopCoronary::getDefaultParams(stdVec& zp){
       
       zp.resize(getParameterTotal());
 
@@ -649,7 +639,7 @@ void cmLPN_svZeroD_coronary::getDefaultParams(stdVec& zp){
 // ====================
 // GET PARAMETER RANGES
 // ====================
-void cmLPN_svZeroD_coronary::getParameterLimits(stdVec& limits){
+void svZeroD_ClosedLoopCoronary::getParameterLimits(stdVec& limits){
 
   limits.resize(2*getParameterTotal());
 
@@ -702,7 +692,7 @@ void cmLPN_svZeroD_coronary::getParameterLimits(stdVec& limits){
   }
 }
 
-void cmLPN_svZeroD_coronary::printResults(int totalResults, double* Xn) {
+void svZeroD_ClosedLoopCoronary::printResults(int totalResults, double* Xn) {
   printf("RESULT PRINTOUT\n");
   for(int loopA = 0; loopA < totalResults; loopA++) {
     string s = getResultName(loopA);
@@ -732,28 +722,9 @@ void writeAllDataFile(int totalSteps,int totalStates,int totAuxStates,double** o
 }
 
 // ==========================================
-// MAIN FUNCTION FOR STAGE1-2BLOCKS LPN MODEL
+// UPDATE PARAMETERS OF THE ZEROD MODEL
 // ==========================================
-int cmLPN_svZeroD_coronary::solveCoronaryLPN(double* params, double* results){
-
-  // Time parameters
-  //double totalTime = numCycles * cycleTime;
-  int totalStepsOnSingleCycle = this->interface.pts_per_cycle_;
-  int numCycles = this->interface.num_cycles_;
-  int totOutputSteps = this->interface.num_output_steps_;
-  //int totOutputCycleSteps = total3DSteps;
-
-  int totalStates = getStateTotal();
-  int totAuxStates = getAuxStateTotal();
-  int totalResults = getResultTotal();
-
-  // State Variables
-  double** outVals = NULL;
-  outVals = new double*[totalStates];
-  for(int loopA=0;loopA<totalStates;loopA++){
-    outVals[loopA] = new double[totOutputSteps];
-  }
-  
+void setModelParams(LPNSolverInterface& interface, double* params) {
   std::string block_name;
   
   // Update the model parameters 
@@ -765,7 +736,7 @@ int cmLPN_svZeroD_coronary::solveCoronaryLPN(double* params, double* results){
     this->coronary_params[3] = this->Ca_l_base[i]*params[30]; //Ca
     this->coronary_params[4] = this->Cim_l_base[i]*params[29]; //Cim
     this->coronary_params[5] = params[4]; //iml
-    this->interface.update_block_params(block_name, this->coronary_params);
+    interface.update_block_params(block_name, this->coronary_params);
   }
   
   for (int i = 0; i < this->nCOR_r; i++) {
@@ -776,7 +747,7 @@ int cmLPN_svZeroD_coronary::solveCoronaryLPN(double* params, double* results){
     this->coronary_params[3] = this->Ca_r_base[i]*params[32]; //Ca
     this->coronary_params[4] = this->Cim_r_base[i]*params[31]; //Cim
     this->coronary_params[5] = params[36]; //imr
-    this->interface.update_block_params(block_name, this->coronary_params);
+    interface.update_block_params(block_name, this->coronary_params);
   }
   
   for (int i = 0; i < this->nRCR; i++) {
@@ -784,7 +755,7 @@ int cmLPN_svZeroD_coronary::solveCoronaryLPN(double* params, double* results){
     this->rcr_params[0] = this->Rp_rcr_base[i]*params[33]; //Rp
     this->rcr_params[1] = this->C_rcr_base[i]*params[34]; //C
     this->rcr_params[2] = this->Rd_rcr_base[i]*params[33]; //Rd
-    this->interface.update_block_params(block_name, this->rcr_params);
+    interface.update_block_params(block_name, this->rcr_params);
   }
   
   //std::cout << "[solveCoronaryLPN] 3 " << std::endl;
@@ -821,40 +792,19 @@ int cmLPN_svZeroD_coronary::solveCoronaryLPN(double* params, double* results){
   this->heart_params[24] = params[25]; //Emax_la
   this->heart_params[25] = params[22]; //Vaso_ra
   this->heart_params[26] = params[26]; //Vaso_la
-  this->interface.update_block_params("CLH", this->heart_params);
-  
-  // Set up solution and time vectors, and run simulation
-  std::vector<double> solutions(interface.system_size_*interface.num_output_steps_);
-  std::vector<double> times(interface.num_output_steps_);
-  int error_code = 0;
-  interface.update_state(init_state_y, init_state_ydot);
-  interface.run_simulation(0.0, times, solutions, error_code);
-  //std::cout << "[solveCoronaryLPN] error_code: " << error_code << std::endl;
+  interface.update_block_params("CLH", this->heart_params);
+}
 
-  // Parse the solution vector
-  int state, step;
-  double t[interface.num_output_steps_];
-  for (step = 0; step < totOutputSteps; step++) {
-    t[step] = times[step];
-  }
-  int sol_idx;
-  for (state = 0; state < totalStates; state++) {
-    for (step = 0; step < totOutputSteps; step++) {
-      sol_idx = step*totalStates + state;
-      outVals[state][step] = solutions[sol_idx];
-    }
-  }
-
-  if(error_code != 0) {
-    for(int loopA=0;loopA<totalStates;loopA++){
-      delete [] outVals[loopA];
-    }
-    delete [] outVals;
-    return 1;
-  }
-  
-
-/*******************************Post-Processing Parameters here***********************************/
+// ==========================================
+// POSTPROCESS ZEROD SIMULATION
+// ==========================================
+void postProcess(LPNSolverInterface& interface, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) {
+  // Time parameters
+  //double totalTime = numCycles * cycleTime;
+  int totalStepsOnSingleCycle = interface.pts_per_cycle_;
+  int numCycles = interface.num_cycles_;
+  int totOutputSteps = interface.num_output_steps_;
+  //int totOutputCycleSteps = total3DSteps;
 
   // SUM RCR FLUX
   double temp = 0.0;
@@ -1138,21 +1088,12 @@ int cmLPN_svZeroD_coronary::solveCoronaryLPN(double* params, double* results){
   results[27] = r_half_FF;
   results[28] = r_grad_ok;
 
-  // FREE MEMORY
-    for(int loopA=0;loopA<totalStates;loopA++){
-      delete [] outVals[loopA];
-    }
-  delete [] outVals;
-
-  //std::cout << "[solveCoronaryLPN] END " << std::endl;
-  // Solution Successful
-  return 0;
 }
 
 // =========================
 // EVAL MODEL ERROR FUNCTION
 // =========================
-double cmLPN_svZeroD_coronary::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode) {
+double svZeroD_ClosedLoopCoronary::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode) {
 
   int model = 0;
 
@@ -1308,14 +1249,14 @@ double cmLPN_svZeroD_coronary::evalModelError(const stdVec& inputs, stdVec& outp
   return result;
 }
 
-void cmLPN_svZeroD_coronary::getPriorMapping(int priorModelType,int* prPtr) {
-  std::cout<<"ERROR: cmLPN_svZeroD_coronary::getPriorMapping not implemented."<<std::endl;
+void svZeroD_ClosedLoopCoronary::getPriorMapping(int priorModelType,int* prPtr) {
+  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::getPriorMapping not implemented."<<std::endl;
   std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
-  std::runtime_error("ERROR: cmLPN_svZeroD_coronary::getPriorMapping not implemented.");
+  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::getPriorMapping not implemented.");
 }
 
-void cmLPN_svZeroD_coronary::getDefaultParameterLimits(stdVec& limits) {
-  std::cout<<"ERROR: cmLPN_svZeroD_coronary::getDefaultParameterLimits not implemented."<<std::endl;
+void svZeroD_ClosedLoopCoronary::getDefaultParameterLimits(stdVec& limits) {
+  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::getDefaultParameterLimits not implemented."<<std::endl;
   std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
-  std::runtime_error("ERROR: cmLPN_svZeroD_coronary::getDefaultParameterLimits not implemented.");
+  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::getDefaultParameterLimits not implemented.");
 }

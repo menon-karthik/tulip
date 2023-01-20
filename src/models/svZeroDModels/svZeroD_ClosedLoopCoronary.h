@@ -1,5 +1,5 @@
-#ifndef CMLPNSVZEROD_H
-#define CMLPNSVZEROD_H
+#ifndef SVZERODCLOSEDLOOPCORONARY_H
+#define SVZERODCLOSEDLOOPCORONARY_H
 
 # include <string>
 # include <vector>
@@ -25,7 +25,7 @@ using namespace std;
 const double pConv = 1.334E3;
 const double qConv = 1E0;
 
-class cmLPN_svZeroD: public cmModel {
+class svZeroD_ClosedLoopCoronary: public svZeroDModel {
 
    
   public:
@@ -72,6 +72,10 @@ class cmLPN_svZeroD: public cmModel {
     virtual void readTargetsFromFile(string targetFileName);
 
     virtual void getPriorMapping(int priorModelType,int* prPtr);
+
+    // Assign parameter values from input
+    //void assignParameters(double* params);
+    int  solveCoronaryLPN(double* params, double* results);
 
   protected:
 
@@ -122,10 +126,6 @@ class cmLPN_svZeroD: public cmModel {
         double targetEDV;
         double targetPaoMin;
         double targetPaoMax;
-
-        // Assign parameter values from input
-        //void assignParameters(double* params);
-        int  solveCoronaryLPN(double* params, double* results);
 };
 
-#endif // CMLPNSVZEROD_H
+#endif // SVZERODCLOSEDLOOPCORONARY_H
