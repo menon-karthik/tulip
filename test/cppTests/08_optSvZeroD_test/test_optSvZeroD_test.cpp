@@ -29,7 +29,8 @@
 # include "acAction.h"
 # include "acActionOPT_NM.h"
 
-#include "cmLPN_svZeroD_coronary.h"
+#include "cmLPN_svZeroD.h"
+#include "svZeroD_ClosedLoopCoronary.h"
 
 
 using namespace std;
@@ -63,9 +64,10 @@ int main(int argc, char* argv[]){
 
     // Create new LPN model
     std::string model_path = "svzerod_tuning.json";
+    svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
     //cmLPN_svZeroD_coronary* lpnModel(model_path);
-    cmLPN_svZeroD_coronary* lpnModel;
-    lpnModel = new cmLPN_svZeroD_coronary(model_path);
+    cmLPN_svZeroD* lpnModel;
+    lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel);
 
     // Assign Dataset to model
     int currPatient = 0;

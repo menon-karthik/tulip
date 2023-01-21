@@ -22,10 +22,6 @@
 
 using namespace std;
 
-// DEFINE CONVERSION CONSTANT
-const double pConv = 1.334E3;
-const double qConv = 1E0;
-
 class cmLPN_svZeroD: public cmModel {
 
    
