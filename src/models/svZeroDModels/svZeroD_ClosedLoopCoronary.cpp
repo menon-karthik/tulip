@@ -170,144 +170,6 @@ svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   }
 
 }
-
-// ==========================
-// READ TARGET DATA FROM FILE
-// ==========================
-void svZeroD_ClosedLoopCoronary::readTargetsFromFile(string targetFileName)
-{
-  std::ifstream read_file;
-  read_file.open(targetFileName.c_str());
-  
-  std::string buffer;
-  std::vector<std::string> tokens;
-  if(!read_file.is_open())
-    throw cmException("ERROR: Cannot open targets file");
-  if(read_file.eof())
-    throw cmException("ERROR: No targets found!");
-  
-  std::vector<double> targets;
-  while(std::getline(read_file,buffer))
-  {
-    cmUtils::schSplit(buffer,tokens,",");
-    targets.push_back(atof(tokens[2].c_str()));
-  }
-  
-  read_file.close();
-  
-  this->targetPaoMin = targets[0];
-  this->targetPaoMax = targets[2];
-  this->targetESV = targets[12];
-  this->targetEDV = targets[13];
-}
-
-//// ==================================
-//// ASSIGN PARAMETER VALUES FROM INPUT
-//// ==================================
-//void cmLPN_CoronaryProx::assignParameters(double* params) {
-
-//   this->Tsa_s = params[0];
-//   this->tpwave_s = params[1];
-//   this->Erv_s = params[2];
-//   this->Elv_s = params[3];
-//   this->iml = params[4];
-//   this->Lrv_a = params[5]/pConv;
-//   this->Rrv_a = params[6] * this->Rrv_base /pConv;
-//   this->Lra_v = params[7]/pConv;
-//   this->Rra_v = params[8]/pConv;
-//   this->Lla_v = params[9]/pConv;
-//   this->Rla_v = params[10]/pConv; 
-//   this->Rlv_ao = params[11] * this->Rlv_base /pConv;
-//   this->Llv_a = params[12]/pConv;
-//   this->Vrv_u = params[13];
-//   this->Vlv_u = params[14];
-//   this->Rpd = params[15] * this->Rpd_base /pConv;
-//   this->Cp = params[16];
-//   this->Cpa = params[17];
-//   this->R_inlet = params[18]/pConv;
-//   this->Kxp_ra = params[19];
-//   this->Kxv_ra = params[20];
-//   this->Emax_ra = params[21];
-//   this->Vaso_ra = params[22];
-//   this->Kxp_la = params[23];
-//   this->Kxv_la = params[24];
-//   this->Emax_la = params[25];
-//   this->Vaso_la = params[26];
-// 
-//  // Assign Curve Factors
-
-//   this->Ram_cor_Factor = params[27];
-//   this->Rlv_cor_Factor = params[28];
-//   this->Cam_l_Factor = params[29];
-//   this->Ca_l_Factor = params[30];
-//   this->Cam_r_Factor = params[31];
-//   this->Ca_r_Factor = params[32];
-//   this->Rrcr_Factor = params[33];
-//   this->Crcr_Factor = params[34];
-//   this->Rprox_Factor = params[35];
-//   this->imr = params[36];
-//   
-//   // Initial condition parameters
-//   
-//   this->init_volume_scaling = params[37];
-
-//  // Coronary boundary condition parameters
-//  this->Rprox.clear();
-//  this->Rrcr.clear();
-//  for(int i = 0; i < Rrcr_base.size(); i++) {
-//     this->Rrcr.push_back(Rrcr_Factor*Rrcr_base[i]);
-//     this->Rprox.push_back(this->Rprox_Factor*this->Rrcr[i]);
-//  }
-
-//  this->Crcr.clear();
-//  for(int i = 0; i < Crcr_base.size(); i++) {
-//     this->Crcr.push_back(Crcr_Factor*Crcr_base[i]);
-//  }
-//  
-//  this->Ram_l.clear();
-//  for(int i = 0; i < nCOR_l; i++) {
-//     this->Ram_l.push_back(Ram_cor_Factor*Ram_l_base[i]);
-//     this->Rprox.push_back(this->Rprox_Factor*this->Ram_l[i]);
-//  }
-
-//  this->Ram_r.clear();
-//  for(int i = 0; i < nCOR_r; i++) {
-//     this->Ram_r.push_back(Ram_cor_Factor*Ram_r_base[i]);
-//     this->Rprox.push_back(this->Rprox_Factor*this->Ram_r[i]);
-//  }
-//  this->Rprox.push_back(this->R_inlet);
-//  
-//  this->Rv_l.clear();
-//  for(int i = 0; i < Rv_l_base.size(); i++) {
-//     this->Rv_l.push_back(Rlv_cor_Factor*Rv_l_base[i]);
-//  }
-//  
-//  this->Rv_r.clear();
-//  for(int i = 0; i < Rv_r_base.size(); i++) {
-//     this->Rv_r.push_back(Rlv_cor_Factor*Rv_r_base[i]);
-//  }
-
-//  this->Cam_l.clear();
-//  for(int i = 0; i < Cam_l_base.size(); i++) {
-//     this->Cam_l.push_back(Cam_l_Factor*Cam_l_base[i]);
-//  }
-//  
-//  this->Ca_l.clear();
-//  for(int i = 0; i < Ca_l_base.size(); i++) {
-//     this->Ca_l.push_back(Ca_l_Factor*Ca_l_base[i]);
-//  }
-
-//  this->Cam_r.clear();
-//  for(int i = 0; i < Cam_r_base.size(); i++) {
-//     this->Cam_r.push_back(Cam_r_Factor*Cam_r_base[i]);
-//  }
-//  
-//  this->Ca_r.clear();
-//  for(int i = 0; i < Ca_r_base.size(); i++) {
-//     this->Ca_r.push_back(Ca_r_Factor*Ca_r_base[i]);
-//  }
-//}
-
 // ========================
 // GET NUMBER OF PARAMETERS
 // ========================
@@ -319,7 +181,7 @@ int svZeroD_ClosedLoopCoronary::getParameterTotal(){
 // GET NUMBER OF PARAMETERS (UNKNOWNS)
 // ===================================
 int svZeroD_ClosedLoopCoronary::getStateTotal(){
-  return nUnknowns; 
+  return this->nUnknowns; 
 }
 
 int svZeroD_ClosedLoopCoronary::getAuxStateTotal(){
@@ -554,31 +416,6 @@ string svZeroD_ClosedLoopCoronary::getResultName(int index){
   return result;
 }
 
-// READ CORONARY PARAMETERS FROM FILE
-void svZeroD_ClosedLoopCoronary::readParamsFromFile(stdVec& inputs, std::string param_path) {
-   std::ifstream param_reader(param_path.c_str());
-   std::string buffer;
-   std::vector<std::string> tokens;
-   if(!param_reader.is_open())
-      throw cmException("ERROR: Cannot open coronaryParams.txt");
-   if(param_reader.eof())
-      throw cmException("ERROR: No parameters found!");
-   inputs.resize(getParameterTotal());
-   int count = 0;
-   while(std::getline(param_reader,buffer)) {
-      inputs[count] = atof(buffer.c_str());
-      count++;
-   }
-
-   if(count != getParameterTotal()) {
-      std::cout << "Error: Number of coronary parameters does "
-         << "not match the expected number of " << getParameterTotal() << std::endl;
-      exit(1);
-   }
-
-   param_reader.close();
-}
-
 // ====================
 // GET MODEL PARAMETERS
 // ====================
@@ -692,39 +529,28 @@ void svZeroD_ClosedLoopCoronary::getParameterLimits(stdVec& limits){
   }
 }
 
-void svZeroD_ClosedLoopCoronary::printResults(int totalResults, double* Xn) {
-  printf("RESULT PRINTOUT\n");
-  for(int loopA = 0; loopA < totalResults; loopA++) {
-    string s = getResultName(loopA);
-    printf("%20s : %f\n",s.c_str(),Xn[loopA]);
-  }
+// ====================
+// GET DEFAULT RANGES
+// ====================
+void svZeroD_ClosedLoopCoronary::getDefaultParameterLimits(stdVec& limits) {
+  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::getDefaultParameterLimits not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::getDefaultParameterLimits not implemented.");
 }
 
-// ==================
-// SAVE ALL DATA FILE
-// ==================
-void writeAllDataFile(int totalSteps,int totalStates,int totAuxStates,double** outVals,double** auxOutVals){
-  FILE* outFile;
-  outFile = fopen("AllData","w");
-  for(int loopA=0;loopA<totalSteps;loopA++){
-    // Print State Variables
-    for(int loopB=0;loopB<totalStates;loopB++){
-      fprintf(outFile,"%e ",outVals[loopB][loopA]);
-    }
-    // Print Aux Variables
-    for(int loopB=0;loopB<totAuxStates;loopB++){
-      fprintf(outFile,"%e ",auxOutVals[loopB][loopA]);
-    }
-    fprintf(outFile,"\n");
-  }
-  // CLOSE THE FILE
-  fclose(outFile);
+// ====================
+// GET PRIOR MAPPING
+// ====================
+void svZeroD_ClosedLoopCoronary::getPriorMapping(int priorModelType,int* prPtr) {
+  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::getPriorMapping not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::getPriorMapping not implemented.");
 }
 
 // ==========================================
 // UPDATE PARAMETERS OF THE ZEROD MODEL
 // ==========================================
-void setModelParams(LPNSolverInterface& interface, double* params) {
+void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, double* params) {
   std::string block_name;
   
   // Update the model parameters 
@@ -798,7 +624,7 @@ void setModelParams(LPNSolverInterface& interface, double* params) {
 // ==========================================
 // POSTPROCESS ZEROD SIMULATION
 // ==========================================
-void postProcess(LPNSolverInterface& interface, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) {
+void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) {
   // Time parameters
   //double totalTime = numCycles * cycleTime;
   int totalStepsOnSingleCycle = interface.pts_per_cycle_;
@@ -1091,45 +917,9 @@ void postProcess(LPNSolverInterface& interface, const stdMat& outVals,const stdM
 }
 
 // =========================
-// EVAL MODEL ERROR FUNCTION
+// KEY/NAME FOR EACH TARGET QUANTITY
 // =========================
-double svZeroD_ClosedLoopCoronary::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode) {
-
-  int model = 0;
-
-  int totalParams = getParameterTotal();
-  int resultTotal   = getResultTotal();
-
-  // Create local copies of input parameters
-  double paramsVals[totalParams];
-  for(int loopA=0;loopA<totalParams;loopA++){
-    paramsVals[loopA] = inputs[loopA];
-  }
-  
-  // Results
-  double results[resultTotal];
-  for(int loopA=0;loopA<resultTotal;loopA++){
-    results[loopA] = 0.0;
-  }
-
-  // Solve coronary model
-  int error = 0;
-  try{
-    error = solveCoronaryLPN(paramsVals,results);
-  }catch(...){
-    error = 1;
-  }
-  errorCode.push_back(error);
-
-  // Store Results
-  outputs.clear();
-  for(int loopA=0;loopA<getResultTotal();loopA++){
-    outputs.push_back(results[loopA]);
-  }
-
-  //std::cout << "[evalModelError] 3 " << std::endl;
-  // KEYS
-  vector<string> keys;
+void svZeroD_ClosedLoopCoronary::getResultKeys(stdVec& keys) {
   keys.push_back(string("PaoMin"));
   keys.push_back(string("PaoMin_conv"));
   keys.push_back(string("PaoMax"));
@@ -1159,14 +949,12 @@ double svZeroD_ClosedLoopCoronary::evalModelError(const stdVec& inputs, stdVec& 
   keys.push_back(string("RThirdFF"));
   keys.push_back(string("RHalfFF"));
   keys.push_back(string("RGradOK"));
+}
 
-  stdVec computedValues;
-  for(int i = 0; i < resultTotal; i++) {
-     computedValues.push_back(results[i]);
-  }
-
-
-  stdVec stdFactors;
+// =========================
+// STANDARD DEVIATION OF EACH TARGET MEASUREMENT
+// =========================
+void svZeroD_ClosedLoopCoronary::getDataStd(stdVec& stdFactors) {
   stdFactors.push_back(8.1); // PaoMin
   stdFactors.push_back(8.1); // PaoMin_diff
   stdFactors.push_back(12.6); // PaoMax
@@ -1196,67 +984,42 @@ double svZeroD_ClosedLoopCoronary::evalModelError(const stdVec& inputs, stdVec& 
   stdFactors.push_back(0.07); // RThirdFF
   stdFactors.push_back(0.07); // RHalfFF
   stdFactors.push_back(1.00); // RGradOK
-  
-  stdVec weigths;
-  weigths.push_back(0.25);  // PaoMin
-  weigths.push_back(0.25);  // PaoMin_diff
-  weigths.push_back(0.25);  // PaoMax
-  weigths.push_back(0.25);  // PaoMax_diff
-  weigths.push_back(1.0); // PaoMean
-  weigths.push_back(0.25); // PaoMean_diff
-  weigths.push_back(1.0);  // AorCorSplit
-  weigths.push_back(0.5);  // AbsQin
-  weigths.push_back(0.25);  // AbsQin_diff
+}
+
+// =========================
+// INVERSE WEIGHT OF EACH TARGET QUANTITY IN LOG LIKELIHOOD
+// =========================
+void svZeroD_ClosedLoopCoronary::getResultWeights(stdVec& weights) {
+  weights.push_back(0.25);  // PaoMin
+  weights.push_back(0.25);  // PaoMin_diff
+  weights.push_back(0.25);  // PaoMax
+  weights.push_back(0.25);  // PaoMax_diff
+  weights.push_back(1.0); // PaoMean
+  weights.push_back(0.25); // PaoMean_diff
+  weights.push_back(1.0);  // AorCorSplit
+  weights.push_back(0.5);  // AbsQin
+  weights.push_back(0.25);  // AbsQin_diff
   if(this->useRigidSurrogate)
-    weigths.push_back(999999999.0);  // Qsystole_perc
+    weights.push_back(999999999.0);  // Qsystole_perc
   else
-    weigths.push_back(1.0);
-  weigths.push_back(2.0); // PpulMean
-  weigths.push_back(1.0);  // EFLV
-  weigths.push_back(0.5); // ESV
-  weigths.push_back(0.5); // EDV
-  weigths.push_back(2.0);  // QlaRatio
-  weigths.push_back(2.0);  // mitValveTime
-  weigths.push_back(2.0);  // aorValveTime
-  weigths.push_back(2.0);  // pulValveTime
-  weigths.push_back(1.0); // PraMean
-  weigths.push_back(0.5); // LCorMaxRatio
-  weigths.push_back(0.5); // LCorTotRatio
-  weigths.push_back(1.0); // LThirdFF
-  weigths.push_back(1.0); // LHalfFF
-  weigths.push_back(1.0); // LGradOK
-  weigths.push_back(0.5); // RCorMaxRatio
-  weigths.push_back(0.5); // RCorTotRatio
-  weigths.push_back(1.0); // RThirdFF
-  weigths.push_back(1.0); // RHalfFF
-  weigths.push_back(1.0); // RGradOK
-
-  // Print and compare
-  double result = 0.0;
-  if(data != NULL){
-
-    // Print Info
-    //data->printAndCompare(datasetColumn,keys,computedValues,weigths);
-    data->printAndCompare(keys,computedValues,weigths);
-    // Evaluate Log Likelihood
-
-    //std::cout << "[evalModelError] 6 " << std::endl;
-    //result = data->evalLogLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
-    result = data->evalLogLikelihood(keys,computedValues,stdFactors,weigths);
-  }
-
-  //std::cout << "[evalModelError] END " << std::endl;
-  return result;
-}
-
-void svZeroD_ClosedLoopCoronary::getPriorMapping(int priorModelType,int* prPtr) {
-  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::getPriorMapping not implemented."<<std::endl;
-  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
-  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::getPriorMapping not implemented.");
-}
-
-void svZeroD_ClosedLoopCoronary::getDefaultParameterLimits(stdVec& limits) {
-  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::getDefaultParameterLimits not implemented."<<std::endl;
-  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
-  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::getDefaultParameterLimits not implemented.");
+    weights.push_back(1.0);
+  weights.push_back(2.0); // PpulMean
+  weights.push_back(1.0);  // EFLV
+  weights.push_back(0.5); // ESV
+  weights.push_back(0.5); // EDV
+  weights.push_back(2.0);  // QlaRatio
+  weights.push_back(2.0);  // mitValveTime
+  weights.push_back(2.0);  // aorValveTime
+  weights.push_back(2.0);  // pulValveTime
+  weights.push_back(1.0); // PraMean
+  weights.push_back(0.5); // LCorMaxRatio
+  weights.push_back(0.5); // LCorTotRatio
+  weights.push_back(1.0); // LThirdFF
+  weights.push_back(1.0); // LHalfFF
+  weights.push_back(1.0); // LGradOK
+  weights.push_back(0.5); // RCorMaxRatio
+  weights.push_back(0.5); // RCorTotRatio
+  weights.push_back(1.0); // RThirdFF
+  weights.push_back(1.0); // RHalfFF
+  weights.push_back(1.0); // RGradOK
 }
