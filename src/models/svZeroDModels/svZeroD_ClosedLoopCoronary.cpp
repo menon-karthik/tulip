@@ -5,9 +5,10 @@ using namespace std;
 svZeroD_ClosedLoopCoronary::svZeroD_ClosedLoopCoronary(){
 }
 
-svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
+void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   
   this->nUnknowns = interface.system_size_;
+  std::cout<<"nUnknowns: "<<this->nUnknowns<<std::endl;
   
   // Number of blocks and number of each type
   this->num_blocks = interface.block_names_.size();
@@ -520,13 +521,13 @@ void svZeroD_ClosedLoopCoronary::getParameterLimits(stdVec& limits){
   limits[72]=0.2000;  limits[73]=1.000; // imr
   limits[74]=0.3;     limits[75]=1.5;   // init_volume_scaling
 
-  int currParam = 0;
-  for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
-  	currParam = frozenParamIDX[loopA];
-    // Assign the new lower and upper bounds to the center
-    limits[currParam*2]     = frozenParamVAL[loopA];
-    limits[currParam*2 + 1] = frozenParamVAL[loopA];
-  }
+//int currParam = 0;
+//for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
+//	currParam = frozenParamIDX[loopA];
+//  // Assign the new lower and upper bounds to the center
+//  limits[currParam*2]     = frozenParamVAL[loopA];
+//  limits[currParam*2 + 1] = frozenParamVAL[loopA];
+//}
 }
 
 // ====================
@@ -624,7 +625,7 @@ void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, d
 // ==========================================
 // POSTPROCESS ZEROD SIMULATION
 // ==========================================
-void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) {
+void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) {
   // Time parameters
   //double totalTime = numCycles * cycleTime;
   int totalStepsOnSingleCycle = interface.pts_per_cycle_;
@@ -851,7 +852,7 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
   double ao_valve[totalStepsOnSingleCycle] = {0};
   double pul_valve[totalStepsOnSingleCycle] = {0};
   int step_ct = 0;
-  for(step = totOutputSteps-totalStepsOnSingleCycle-1; step < totOutputSteps-1; step++) {
+  for(auto step = totOutputSteps-totalStepsOnSingleCycle-1; step < totOutputSteps-1; step++) {
       if(outVals[this->Q_LV_id][step] > small_number && outVals[this->Q_LV_id][step+1] > small_number) {
 	  ao_valve[step_ct] = 1.0;
       }
@@ -919,7 +920,7 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
 // =========================
 // KEY/NAME FOR EACH TARGET QUANTITY
 // =========================
-void svZeroD_ClosedLoopCoronary::getResultKeys(stdVec& keys) {
+void svZeroD_ClosedLoopCoronary::getResultKeys(vector<string> keys) {
   keys.push_back(string("PaoMin"));
   keys.push_back(string("PaoMin_conv"));
   keys.push_back(string("PaoMax"));

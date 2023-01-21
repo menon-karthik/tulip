@@ -24,50 +24,50 @@ using namespace std;
 class svZeroDModel {
   public:
 	// CONSTRUCTOR
-	svZeroDModel();
+    svZeroDModel();
 	
     // DESTRUCTOR
-	virtual ~svZeroDModel();
+    virtual ~svZeroDModel();
 
     // SET UP MODEL PARAMETERS
     virtual void setupModel(LPNSolverInterface& interface) = 0;
 
-	// GET NUMBER OF PARAMETERS
-	virtual int getParameterTotal() = 0;
+    // GET NUMBER OF PARAMETERS
+    virtual int getParameterTotal() = 0;
 
-	// GET NUMBER OF PARAMETERS (UKNOWNS)
-	virtual int getStateTotal() = 0;
+    // GET NUMBER OF PARAMETERS (UKNOWNS)
+    virtual int getStateTotal() = 0;
   
     // RETURN THE NUMBER OF EXTRA OUTPUTS
     virtual int  getAuxStateTotal() = 0;
 
-	// GET TOTAL NUMBER OF RESULTS
-	virtual int getResultTotal() = 0;
+    // GET TOTAL NUMBER OF RESULTS
+    virtual int getResultTotal() = 0;
 
-	// GET THE PARAMETER NAMES
-	virtual string getParamName(int index) = 0;
+    // GET THE PARAMETER NAMES
+    virtual string getParamName(int index) = 0;
 
-	// GET RESULT NAME
-	virtual string getResultName(int index) = 0;
+    // GET RESULT NAME
+    virtual string getResultName(int index) = 0;
 
-	// GET PARAMETER SETS FOR THE LPN MODELS     
-	virtual void getDefaultParams(stdVec& zp) = 0;
+    // GET PARAMETER SETS FOR THE LPN MODELS     
+    virtual void getDefaultParams(stdVec& zp) = 0;
 
-	// GET THE PARAMETER RANGES FOR THE LPN MODELS
-	virtual void getParameterLimits(stdVec& limits) = 0;
+    // GET THE PARAMETER RANGES FOR THE LPN MODELS
+    virtual void getParameterLimits(stdVec& limits) = 0;
 
     virtual void getDefaultParameterLimits(stdVec& limits) = 0;
 
     virtual void getPriorMapping(int priorModelType,int* prPtr) = 0;
         
     // UPDATE ZEROD MODEL PARAMETERS
-    virtual void setModelParams(LPNSolverInterface& interface) = 0;
+    virtual void setModelParams(LPNSolverInterface& interface, double* params) = 0;
 
     // POSTPROCESS ZEROD SIMULATION
-    virtual void postProcess(LPNSolverInterface& interface, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
+    virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
 
     // KEY/NAME FOR EACH TARGET QUANTITY
-    virtual void getResultKeys(stdVec& keys) = 0;
+    virtual void getResultKeys(vector<string> keys) = 0;
 
     // STANDARD DEVIATION OF EACH TARGET MEASUREMENT
     virtual void getDataStd(stdVec& stdFactors) = 0;

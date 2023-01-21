@@ -51,10 +51,10 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     virtual void setModelParams(LPNSolverInterface& interface, double* params);
 
     // POSTPROCESS ZEROD SIMULATION
-    virtual void postProcess(LPNSolverInterface& interface, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
+    virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
 
     // KEY/NAME FOR EACH TARGET QUANTITY
-    virtual void getResultKeys(stdVec& keys);
+    virtual void getResultKeys(vector<string> keys);
 
     // STANDARD DEVIATION OF EACH TARGET MEASUREMENT
     virtual void getDataStd(stdVec& stdFactors);

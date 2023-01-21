@@ -13,17 +13,18 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model){
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
   this->interface.load_library(interface_lib);
   this->interface.initialize(model_path);
-  this->nUnknowns = this->interface.system_size_;
+  auto nUnknowns = this->interface.system_size_;
+  std::cout<<"nUnknowns: "<<nUnknowns<<std::endl;
 
   // Save initial state
-  this->init_state_y.resize(this->nUnknowns);
-  this->init_state_ydot.resize(this->nUnknowns);
+  this->init_state_y.resize(nUnknowns);
+  this->init_state_ydot.resize(nUnknowns);
   this->interface.return_y(init_state_y);
   this->interface.return_ydot(init_state_ydot);
   
   // Set svZeroD model
   this->zeroDmodel = model;
-  this->zeroDmodel->setup_model(interface);
+  this->zeroDmodel->setupModel(interface);
 }
 
 // ========================
@@ -45,12 +46,12 @@ int cmLPN_svZeroD::getParameterTotal(){
 // ===================================
 int cmLPN_svZeroD::getStateTotal(){
   //return nUnknowns; 
-  return this->zeroDmodel->getAuxTotal();
+  return this->zeroDmodel->getStateTotal();
 }
 
 int cmLPN_svZeroD::getAuxStateTotal(){
   //return 50;
-  return this->zeroDmodel->getAuxTotal();
+  return this->zeroDmodel->getAuxStateTotal();
 }
 
 // ===========================
@@ -87,6 +88,15 @@ void cmLPN_svZeroD::getDefaultParams(stdVec& zp){
 // ====================
 void cmLPN_svZeroD::getParameterLimits(stdVec& limits){
   this->zeroDmodel->getParameterLimits(limits);
+
+  // Change the limits bases on the Fixed Parameter List
+  int currParam = 0;
+  for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
+    currParam = frozenParamIDX[loopA];
+    // Assign the new lower and upper bounds to the center
+    limits[currParam*2]     = frozenParamVAL[loopA];
+    limits[currParam*2 + 1] = frozenParamVAL[loopA];
+  }  
 }
 
 // ====================
@@ -111,19 +121,34 @@ void cmLPN_svZeroD::printResults(int totalResults, double* Xn) {
 // ==========================================
 // MAIN FUNCTION FOR STAGE1-2BLOCKS LPN MODEL
 // ==========================================
-int cmLPN_svZeroD::solveLPN(double* params, double* results){
+//int cmLPN_svZeroD::solveLPN(double* params, double* results){
+int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
 
   int totalStates = getStateTotal();
+  int totalAuxStates = getAuxStateTotal();
   int totOutputSteps = interface.num_output_steps_;
-  // TODO: Change outvals to stdMat type
-  // State Variables
-  double** outVals = NULL;
-  outVals = new double*[totalStates];
+
+//// TODO: Change outvals to stdMat type
+//// State Variables
+//double** outVals = NULL;
+//outVals = new double*[totalStates];
+//for(int loopA=0;loopA<totalStates;loopA++){
+//  outVals[loopA] = new double[totOutputSteps];
+//}
+  
+  stdMat auxOutVals;
+  stdMat outVals;
+  // Initialize the outputs
+  outVals.resize(totalStates);
+  auxOutVals.resize(totalAuxStates);
   for(int loopA=0;loopA<totalStates;loopA++){
-    outVals[loopA] = new double[totOutputSteps];
+    outVals[loopA].resize(totOutputSteps);
+  }
+  for(int loopA=0;loopA<totalAuxStates;loopA++){
+    auxOutVals[loopA].resize(totOutputSteps);
   }
   
-  this->zeroDmodel->setModelParams(interface, params)
+  this->zeroDmodel->setModelParams(interface, params);
   
   // Set up solution and time vectors, and run simulation
   std::vector<double> solutions(interface.system_size_*interface.num_output_steps_);
@@ -135,7 +160,9 @@ int cmLPN_svZeroD::solveLPN(double* params, double* results){
 
   // Parse the solution vector
   int state, step;
-  double t[interface.num_output_steps_];
+  //double t[interface.num_output_steps_];
+  stdVec t;
+  t.resize(totOutputSteps);
   for (step = 0; step < totOutputSteps; step++) {
     t[step] = times[step];
   }
@@ -148,21 +175,21 @@ int cmLPN_svZeroD::solveLPN(double* params, double* results){
   }
 
   if(error_code != 0) {
-    for(int loopA=0;loopA<totalStates;loopA++){
-      delete [] outVals[loopA];
-    }
-    delete [] outVals;
+//  for(int loopA=0;loopA<totalStates;loopA++){
+//    delete [] outVals[loopA];
+//  }
+//  delete [] outVals;
     return 1;
   }
 
   // TODO: results passed by ref/pointer
-  this->zeroDmodel->postprocess(interface, outVals, auxOutVals, results)
+  this->zeroDmodel->postProcess(interface, t, outVals, auxOutVals, results);
 
-  // FREE MEMORY
-    for(int loopA=0;loopA<totalStates;loopA++){
-      delete [] outVals[loopA];
-    }
-  delete [] outVals;
+//// FREE MEMORY
+//  for(int loopA=0;loopA<totalStates;loopA++){
+//    delete [] outVals[loopA];
+//  }
+//delete [] outVals;
 
   //std::cout << "[solveCoronaryLPN] END " << std::endl;
   // Solution Successful
@@ -177,7 +204,7 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
   int model = 0;
 
   int totalParams = getParameterTotal();
-  int resultTotal   = getResultTotal();
+  int resultTotal = getResultTotal();
 
   // Create local copies of input parameters
   double paramsVals[totalParams];
@@ -186,25 +213,30 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
   }
   
   // Results
-  double results[resultTotal];
-  for(int loopA=0;loopA<resultTotal;loopA++){
-    results[loopA] = 0.0;
-  }
+//double results[resultTotal];
+//for(int loopA=0;loopA<resultTotal;loopA++){
+//  results[loopA] = 0.0;
+//}
+
+  //TODO: Does this need to be done every time this fn is called?
+  outputs.clear();
+  outputs.resize(resultTotal);
 
   // Solve coronary model
   int error = 0;
   try{
-    error = solveLPN(paramsVals,results);
+    //error = solveLPN(paramsVals,results);
+    error = solveLPN(paramsVals,outputs);
   }catch(...){
     error = 1;
   }
   errorCode.push_back(error);
 
-  // Store Results
-  outputs.clear();
-  for(int loopA=0;loopA<getResultTotal();loopA++){
-    outputs.push_back(results[loopA]);
-  }
+//// Store Results
+//outputs.clear();
+//for(int loopA=0;loopA<getResultTotal();loopA++){
+//  outputs.push_back(results[loopA]);
+//}
 
   //std::cout << "[evalModelError] 3 " << std::endl;
   // KEYS
@@ -213,7 +245,8 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
 
   stdVec computedValues;
   for(int i = 0; i < resultTotal; i++) {
-     computedValues.push_back(results[i]);
+     //computedValues.push_back(results[i]);
+     computedValues.push_back(outputs[i]);
   }
 
   stdVec stdFactors;
@@ -228,12 +261,12 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
 
     // Print Info
     //data->printAndCompare(datasetColumn,keys,computedValues,weigths);
-    data->printAndCompare(keys,computedValues,weigths);
+    data->printAndCompare(keys,computedValues,weights);
     // Evaluate Log Likelihood
 
     //std::cout << "[evalModelError] 6 " << std::endl;
     //result = data->evalLogLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
-    result = data->evalLogLikelihood(keys,computedValues,stdFactors,weigths);
+    result = data->evalLogLikelihood(keys,computedValues,stdFactors,weights);
   }
 
   //std::cout << "[evalModelError] END " << std::endl;
@@ -241,13 +274,13 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
 }
 
 void cmLPN_svZeroD::getPriorMapping(int priorModelType,int* prPtr) {
-  this->zeroDmodel->getProrMapping(priorModelType, prPtr);
+  this->zeroDmodel->getPriorMapping(priorModelType, prPtr);
 }
 
 // ==================
 // SAVE ALL DATA FILE
 // ==================
-void writeAllDataFile(int totalSteps,int totalStates,int totAuxStates,double** outVals,double** auxOutVals){
+void writeAllDataFile(int totalSteps,int totalStates,int totAuxStates,const stdMat& outVals,const stdMat& auxOutVals){
   FILE* outFile;
   outFile = fopen("AllData","w");
   for(int loopA=0;loopA<totalSteps;loopA++){

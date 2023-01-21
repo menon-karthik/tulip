@@ -68,7 +68,7 @@ class cmLPN_svZeroD: public cmModel {
     virtual void printResults(int totalResults, double *Xn);
 
     // SETUP, RUN AND POSTPROCESS THE ZEROD MODEL
-    int  solveLPN(double* params, double* results);
+    int  solveLPN(double* params, stdVec& results);
 
 	// SOLVE MODEL AND GET LOG LIKELIHOOD TO INTERFACE WITH DREAM
 	virtual double evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode);
@@ -82,7 +82,7 @@ class cmLPN_svZeroD: public cmModel {
     svZeroDModel* zeroDmodel;
 
 //      int num_blocks;
-//      std::vector<double> init_state_y, init_state_ydot;
+        std::vector<double> init_state_y, init_state_ydot;
 //      std::vector<double> coronary_params;
 //      std::vector<double> rcr_params;
 //      std::vector<double> heart_params;
