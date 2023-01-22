@@ -14,7 +14,7 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model){
   this->interface.load_library(interface_lib);
   this->interface.initialize(model_path);
   auto nUnknowns = this->interface.system_size_;
-  std::cout<<"nUnknowns: "<<nUnknowns<<std::endl;
+  //std::cout<<"nUnknowns: "<<nUnknowns<<std::endl;
 
   // Save initial state
   this->init_state_y.resize(nUnknowns);
@@ -124,6 +124,8 @@ void cmLPN_svZeroD::printResults(int totalResults, double* Xn) {
 //int cmLPN_svZeroD::solveLPN(double* params, double* results){
 int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
 
+  //std::cout << "[solveCoronaryLPN] START " << std::endl;
+
   int totalStates = getStateTotal();
   int totalAuxStates = getAuxStateTotal();
   int totOutputSteps = interface.num_output_steps_;
@@ -147,8 +149,10 @@ int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
   for(int loopA=0;loopA<totalAuxStates;loopA++){
     auxOutVals[loopA].resize(totOutputSteps);
   }
+  //std::cout << "[solveCoronaryLPN] 1 " << std::endl;
   
   this->zeroDmodel->setModelParams(interface, params);
+  //std::cout << "[solveCoronaryLPN] 2 " << std::endl;
   
   // Set up solution and time vectors, and run simulation
   std::vector<double> solutions(interface.system_size_*interface.num_output_steps_);
@@ -156,6 +160,7 @@ int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
   int error_code = 0;
   interface.update_state(init_state_y, init_state_ydot);
   interface.run_simulation(0.0, times, solutions, error_code);
+  
   //std::cout << "[solveCoronaryLPN] error_code: " << error_code << std::endl;
 
   // Parse the solution vector
@@ -201,6 +206,7 @@ int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
 // =========================
 double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode) {
 
+  //std::cout << "[evalModelError] START " << std::endl;
   int model = 0;
 
   int totalParams = getParameterTotal();
@@ -211,6 +217,7 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
   for(int loopA=0;loopA<totalParams;loopA++){
     paramsVals[loopA] = inputs[loopA];
   }
+  //std::cout << "[evalModelError] 1 " << std::endl;
   
   // Results
 //double results[resultTotal];
@@ -222,6 +229,7 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
   outputs.clear();
   outputs.resize(resultTotal);
 
+  //std::cout << "[evalModelError] 2 " << std::endl;
   // Solve coronary model
   int error = 0;
   try{
@@ -254,6 +262,10 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
   
   stdVec weights;
   this->zeroDmodel->getResultWeights(weights);
+
+  //std::cout<<"keys.size() = "<<keys.size()<<std::endl;
+  //std::cout<<"computedValues.size() = "<<computedValues.size()<<std::endl;
+  //std::cout<<"weights.size() = "<<weights.size()<<std::endl;
 
   // Print and compare
   double result = 0.0;

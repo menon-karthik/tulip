@@ -8,7 +8,7 @@ svZeroD_ClosedLoopCoronary::svZeroD_ClosedLoopCoronary(){
 void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   
   this->nUnknowns = interface.system_size_;
-  std::cout<<"nUnknowns: "<<this->nUnknowns<<std::endl;
+  //std::cout<<"nUnknowns: "<<this->nUnknowns<<std::endl;
   
   // Number of blocks and number of each type
   this->num_blocks = interface.block_names_.size();
@@ -920,7 +920,7 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
 // =========================
 // KEY/NAME FOR EACH TARGET QUANTITY
 // =========================
-void svZeroD_ClosedLoopCoronary::getResultKeys(vector<string> keys) {
+void svZeroD_ClosedLoopCoronary::getResultKeys(vector<string>& keys) {
   keys.push_back(string("PaoMin"));
   keys.push_back(string("PaoMin_conv"));
   keys.push_back(string("PaoMax"));

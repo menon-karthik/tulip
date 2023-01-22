@@ -67,7 +67,7 @@ class svZeroDModel {
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;
 
     // KEY/NAME FOR EACH TARGET QUANTITY
-    virtual void getResultKeys(vector<string> keys) = 0;
+    virtual void getResultKeys(vector<string>& keys) = 0;
 
     // STANDARD DEVIATION OF EACH TARGET MEASUREMENT
     virtual void getDataStd(stdVec& stdFactors) = 0;
