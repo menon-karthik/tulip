@@ -56,12 +56,13 @@ class svZeroDModel {
     // GET THE PARAMETER RANGES FOR THE LPN MODELS
     virtual void getParameterLimits(stdVec& limits) = 0;
 
+    // GET THE DEFAULT PARAMETER RANGES FOR THE LPN MODELS (NOT USED CURRENTLY)
     virtual void getDefaultParameterLimits(stdVec& limits) = 0;
 
     virtual void getPriorMapping(int priorModelType,int* prPtr) = 0;
         
     // UPDATE ZEROD MODEL PARAMETERS
-    virtual void setModelParams(LPNSolverInterface& interface, double* params) = 0;
+    virtual void setModelParams(LPNSolverInterface& interface, const stdVec& params) = 0;
 
     // POSTPROCESS ZEROD SIMULATION
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;

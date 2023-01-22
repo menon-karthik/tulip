@@ -8,7 +8,6 @@ svZeroD_ClosedLoopCoronary::svZeroD_ClosedLoopCoronary(){
 void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   
   this->nUnknowns = interface.system_size_;
-  //std::cout<<"nUnknowns: "<<this->nUnknowns<<std::endl;
   
   // Number of blocks and number of each type
   this->num_blocks = interface.block_names_.size();
@@ -23,7 +22,6 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
       this->nCOR_l++;
     } else if (block_name.substr(0,6) == "BC_rca") {
       this->nCOR_r++;
-    //} else if ((block_name.substr(0,6) == "BC_RCR") || (block_name.substr(0,8) == "BC_aorta")) {
     } else if (block_name.substr(0,6) == "BC_RCR") {
       this->nRCR++;
     } 
@@ -520,14 +518,6 @@ void svZeroD_ClosedLoopCoronary::getParameterLimits(stdVec& limits){
   limits[70]=0.1;     limits[71]=0.2;   // Rprox_factor
   limits[72]=0.2000;  limits[73]=1.000; // imr
   limits[74]=0.3;     limits[75]=1.5;   // init_volume_scaling
-
-//int currParam = 0;
-//for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
-//	currParam = frozenParamIDX[loopA];
-//  // Assign the new lower and upper bounds to the center
-//  limits[currParam*2]     = frozenParamVAL[loopA];
-//  limits[currParam*2 + 1] = frozenParamVAL[loopA];
-//}
 }
 
 // ====================
@@ -551,7 +541,7 @@ void svZeroD_ClosedLoopCoronary::getPriorMapping(int priorModelType,int* prPtr) 
 // ==========================================
 // UPDATE PARAMETERS OF THE ZEROD MODEL
 // ==========================================
-void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, double* params) {
+void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, const stdVec& params) {
   std::string block_name;
   
   // Update the model parameters 
@@ -627,25 +617,19 @@ void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, d
 // ==========================================
 void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) {
   // Time parameters
-  //double totalTime = numCycles * cycleTime;
   int totalStepsOnSingleCycle = interface.pts_per_cycle_;
   int numCycles = interface.num_cycles_;
   int totOutputSteps = interface.num_output_steps_;
-  //int totOutputCycleSteps = total3DSteps;
 
   // SUM RCR FLUX
   double temp = 0.0;
   double Q_rcr = 0.0;
-  //std::cout << "[solveCoronaryLPN] 3.1 " << std::endl;
   for(int loopA=0;loopA<nRCR;loopA++){
-    //std::cout << "[solveCoronaryLPN] this->Q_rcr_ids[loopA] " << this->Q_rcr_ids[loopA] << std::endl;
-  //std::cout << "[solveCoronaryLPN] 3.2 " << std::endl;
     temp = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rcr_ids[loopA]]);
     Q_rcr += temp;
   }
 
   // SUM LEFT CORONARY FLUX
-  //double left_check[nCOR_l];
   double Q_lcor = 0.0;
   for(int loopA=0;loopA<nCOR_l;loopA++){    
     temp = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_lca_ids[loopA]]);

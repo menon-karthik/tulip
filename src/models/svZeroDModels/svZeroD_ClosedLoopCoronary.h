@@ -14,41 +14,41 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
   public:
 	
     // DEFAULT CONSTRUCTOR
-	svZeroD_ClosedLoopCoronary();
+    svZeroD_ClosedLoopCoronary();
 
     // SET UP MODEL PARAMETERS
     virtual void setupModel(LPNSolverInterface& interface);
 
-	// GET NUMBER OF PARAMETERS
-	virtual int getParameterTotal();
+    // GET NUMBER OF PARAMETERS
+    virtual int getParameterTotal();
 
-	// GET NUMBER OF PARAMETERS (UKNOWNS)
-	virtual int getStateTotal();
+    // GET NUMBER OF PARAMETERS (UKNOWNS)
+    virtual int getStateTotal();
   
     // RETURN THE NUMBER OF EXTRA OUTPUTS
     virtual int  getAuxStateTotal();
 
-	// GET TOTAL NUMBER OF RESULTS
-	virtual int getResultTotal();
+    // GET TOTAL NUMBER OF RESULTS
+    virtual int getResultTotal();
 
-	// GET THE PARAMETER NAMES
-	virtual string getParamName(int index);
+    // GET THE PARAMETER NAMES
+    virtual string getParamName(int index);
 
-	// GET RESULT NAME
-	virtual string getResultName(int index);
+    // GET RESULT NAME
+    virtual string getResultName(int index);
 
-	// GET PARAMETER SETS FOR THE LPN MODELS     
-	virtual void getDefaultParams(stdVec& zp);
+    // GET PARAMETER SETS FOR THE LPN MODELS     
+    virtual void getDefaultParams(stdVec& zp);
 
-	// GET THE PARAMETER RANGES FOR THE LPN MODELS
-	virtual void getParameterLimits(stdVec& limits);
+    // GET THE PARAMETER RANGES FOR THE LPN MODELS
+    virtual void getParameterLimits(stdVec& limits);
 
     virtual void getDefaultParameterLimits(stdVec& limits);
 
     virtual void getPriorMapping(int priorModelType,int* prPtr);
 
     // UPDATE ZEROD MODEL PARAMETERS
-    virtual void setModelParams(LPNSolverInterface& interface, double* params);
+    virtual void setModelParams(LPNSolverInterface& interface, const stdVec& params);
 
     // POSTPROCESS ZEROD SIMULATION
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
@@ -74,10 +74,9 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     std::vector<int> Q_lca_ids;
     std::vector<int> Q_rca_ids;
     int Q_aorta_id = -1, P_aorta_id = -1, P_pul_id = -1, Q_LV_id = -1, Q_LA_id = -1, Q_RV_id = -1, V_LV_id = -1, P_RA_id = -1, P_RV_id = -1;
-
-  	int numCycles;
-  	int total3DSteps;
-  	int total0DSteps;
+    int numCycles;
+    int total3DSteps;
+    int total0DSteps;
     // Number of outlets and unknowns
     int nUnknowns;
     int nFaces;
@@ -104,7 +103,6 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     double Rpd_base;
     // Flag which determines which surrogate model to run
     bool useRigidSurrogate;
-    
     // Target data needed for setting initial conditions
     double targetESV;
     double targetEDV;

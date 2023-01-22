@@ -1,5 +1,5 @@
 // TEST CASE 7 - Tune parameters of svZeroD coronary closed-loop model using Nelder Mead
-// Karthik Menon, Dec 2022
+// Karthik Menon, Jan 2023
 
 # include <stdlib.h>
 # include <stdio.h>
@@ -12,24 +12,15 @@
 # include "uqTypes.h"
 # include "uqConstants.h"
 
-# include "odeModel.h"
-# include "odeNormalAdultSimplePA.h"
-
-# include "odeIntegrator.h"
-# include "odeIntegratorRK4.h"
-
 # include "cmException.h"
 # include "cmUtils.h"
-# include "cmModel.h"
-# include "cmLPNModel.h"
 
-# include "daData.h"
 # include "daData_multiple_Table.h"
 
-# include "acAction.h"
 # include "acActionOPT_NM.h"
 
-#include "cmLPN_svZeroD_coronary.h"
+#include "cmLPN_svZeroD.h"
+#include "svZeroD_ClosedLoopCoronary.h"
 
 
 using namespace std;
@@ -43,29 +34,19 @@ int main(int argc, char* argv[]){
     // Create new data object
     int keyColumn = 0;
     int timeStampColumn = 0;
-    int columnID = 1; //TODO: Not sure
+    int columnID = 1; // N-1 after column with keys
     bool useSingleColumn = true;
-    string currPatientFile("coronary.csv"); //TODO
+    string currPatientFile("coronary.csv");
     daData* data = new daData_multiple_Table(useSingleColumn,columnID);
     data->readFromFile(currPatientFile);
 
-//  // Create a ODE Model
-//  odeModel* ode = new odeNormalAdultSimplePA(0001,ipTargetConfig_IncludeAll);
-
-//  // Create a ODE Model Integrator
-//  double timeStep = 0.01;
-//  int totalCycles = 5;
-//  odeIntegrator* rk4 = new odeIntegratorRK4(ode,timeStep,totalCycles);
-
-//  // Create new LPN model
-//  cmModel* lpnModel;
-//  lpnModel = new cmLPNModel(rk4);
-
     // Create new LPN model
+    // svZeroD json file
     std::string model_path = "svzerod_tuning.json";
-    //cmLPN_svZeroD_coronary* lpnModel(model_path);
-    cmLPN_svZeroD_coronary* lpnModel;
-    lpnModel = new cmLPN_svZeroD_coronary(model_path);
+    // Type of svZeroD model
+    svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
+    cmLPN_svZeroD* lpnModel;
+    lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel);
 
     // Assign Dataset to model
     int currPatient = 0;

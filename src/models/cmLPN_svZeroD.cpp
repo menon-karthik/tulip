@@ -7,14 +7,11 @@ using namespace std;
 // ========================
 cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model){
   
-  //TODO: Maybe interface should be created in svZeroD model? Or it at least needs to be accessible by the model
-  //TODO: Try to handle all interface bookkeeping here and pass interface to model for specific things
   // Load shared library and get interface functions.
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
   this->interface.load_library(interface_lib);
   this->interface.initialize(model_path);
   auto nUnknowns = this->interface.system_size_;
-  //std::cout<<"nUnknowns: "<<nUnknowns<<std::endl;
 
   // Save initial state
   this->init_state_y.resize(nUnknowns);
@@ -30,14 +27,13 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model){
 // ========================
 // DESTRUCTOR
 // ========================
-cmLPN_svZeroD::~cmLPN_svZeroD(){
+cmLPN_svZeroD::~cmLPN_svZeroD() {
 }
 
 // ========================
 // GET NUMBER OF PARAMETERS
 // ========================
 int cmLPN_svZeroD::getParameterTotal(){
-  //return 38;
   return this->zeroDmodel->getParameterTotal();
 }
 
@@ -45,12 +41,10 @@ int cmLPN_svZeroD::getParameterTotal(){
 // GET NUMBER OF PARAMETERS (UNKNOWNS)
 // ===================================
 int cmLPN_svZeroD::getStateTotal(){
-  //return nUnknowns; 
   return this->zeroDmodel->getStateTotal();
 }
 
 int cmLPN_svZeroD::getAuxStateTotal(){
-  //return 50;
   return this->zeroDmodel->getAuxStateTotal();
 }
 
@@ -58,7 +52,6 @@ int cmLPN_svZeroD::getAuxStateTotal(){
 // GET TOTAL NUMBER OF RESULTS
 // ===========================
 int cmLPN_svZeroD::getResultTotal(){
-  //return 29;  
   return this->zeroDmodel->getResultTotal();
 }
 
@@ -80,7 +73,7 @@ string cmLPN_svZeroD::getResultName(int index){
 // GET MODEL PARAMETERS
 // ====================
 void cmLPN_svZeroD::getDefaultParams(stdVec& zp){
-     this->zeroDmodel->getDefaultParams(zp); 
+  this->zeroDmodel->getDefaultParams(zp); 
 }
 
 // ====================
@@ -109,38 +102,26 @@ void cmLPN_svZeroD::getDefaultParameterLimits(stdVec& limits) {
 // ====================
 // PRINT RESULTS
 // ====================
-// TODO: Xn = results should be std::vector?
-void cmLPN_svZeroD::printResults(int totalResults, double* Xn) {
+void cmLPN_svZeroD::printResults(const int totalResults, const stdVec results) {
   printf("RESULT PRINTOUT\n");
   for(int loopA = 0; loopA < totalResults; loopA++) {
     string s = getResultName(loopA);
-    printf("%20s : %f\n",s.c_str(),Xn[loopA]);
+    printf("%20s : %f\n",s.c_str(),results[loopA]);
   }
 }
 
 // ==========================================
 // MAIN FUNCTION FOR STAGE1-2BLOCKS LPN MODEL
 // ==========================================
-//int cmLPN_svZeroD::solveLPN(double* params, double* results){
-int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
-
-  //std::cout << "[solveCoronaryLPN] START " << std::endl;
+int cmLPN_svZeroD::solveLPN(const stdVec& params, stdVec& results){
 
   int totalStates = getStateTotal();
   int totalAuxStates = getAuxStateTotal();
   int totOutputSteps = interface.num_output_steps_;
-
-//// TODO: Change outvals to stdMat type
-//// State Variables
-//double** outVals = NULL;
-//outVals = new double*[totalStates];
-//for(int loopA=0;loopA<totalStates;loopA++){
-//  outVals[loopA] = new double[totOutputSteps];
-//}
   
+  // Initialize the outputs
   stdMat auxOutVals;
   stdMat outVals;
-  // Initialize the outputs
   outVals.resize(totalStates);
   auxOutVals.resize(totalAuxStates);
   for(int loopA=0;loopA<totalStates;loopA++){
@@ -149,10 +130,9 @@ int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
   for(int loopA=0;loopA<totalAuxStates;loopA++){
     auxOutVals[loopA].resize(totOutputSteps);
   }
-  //std::cout << "[solveCoronaryLPN] 1 " << std::endl;
-  
+ 
+  // Update the model parameters based on input params argument
   this->zeroDmodel->setModelParams(interface, params);
-  //std::cout << "[solveCoronaryLPN] 2 " << std::endl;
   
   // Set up solution and time vectors, and run simulation
   std::vector<double> solutions(interface.system_size_*interface.num_output_steps_);
@@ -160,12 +140,9 @@ int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
   int error_code = 0;
   interface.update_state(init_state_y, init_state_ydot);
   interface.run_simulation(0.0, times, solutions, error_code);
-  
-  //std::cout << "[solveCoronaryLPN] error_code: " << error_code << std::endl;
 
   // Parse the solution vector
   int state, step;
-  //double t[interface.num_output_steps_];
   stdVec t;
   t.resize(totOutputSteps);
   for (step = 0; step < totOutputSteps; step++) {
@@ -180,23 +157,12 @@ int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
   }
 
   if(error_code != 0) {
-//  for(int loopA=0;loopA<totalStates;loopA++){
-//    delete [] outVals[loopA];
-//  }
-//  delete [] outVals;
     return 1;
   }
 
-  // TODO: results passed by ref/pointer
+  // Postprocess raw simulation outputs (outVals) and compute target quantities (results)
   this->zeroDmodel->postProcess(interface, t, outVals, auxOutVals, results);
 
-//// FREE MEMORY
-//  for(int loopA=0;loopA<totalStates;loopA++){
-//    delete [] outVals[loopA];
-//  }
-//delete [] outVals;
-
-  //std::cout << "[solveCoronaryLPN] END " << std::endl;
   // Solution Successful
   return 0;
 }
@@ -206,83 +172,54 @@ int cmLPN_svZeroD::solveLPN(double* params, stdVec& results){
 // =========================
 double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode) {
 
-  //std::cout << "[evalModelError] START " << std::endl;
   int model = 0;
 
   int totalParams = getParameterTotal();
   int resultTotal = getResultTotal();
-
-  // Create local copies of input parameters
-  double paramsVals[totalParams];
-  for(int loopA=0;loopA<totalParams;loopA++){
-    paramsVals[loopA] = inputs[loopA];
-  }
-  //std::cout << "[evalModelError] 1 " << std::endl;
   
-  // Results
-//double results[resultTotal];
-//for(int loopA=0;loopA<resultTotal;loopA++){
-//  results[loopA] = 0.0;
-//}
-
   //TODO: Does this need to be done every time this fn is called?
   outputs.clear();
   outputs.resize(resultTotal);
 
-  //std::cout << "[evalModelError] 2 " << std::endl;
   // Solve coronary model
   int error = 0;
   try{
-    //error = solveLPN(paramsVals,results);
-    error = solveLPN(paramsVals,outputs);
+    error = solveLPN(inputs,outputs);
   }catch(...){
     error = 1;
   }
   errorCode.push_back(error);
 
-//// Store Results
-//outputs.clear();
-//for(int loopA=0;loopA<getResultTotal();loopA++){
-//  outputs.push_back(results[loopA]);
+////TODO: Is this needed?
+//stdVec computedValues;
+//for(int i = 0; i < resultTotal; i++) {
+//   computedValues.push_back(outputs[i]);
 //}
 
-  //std::cout << "[evalModelError] 3 " << std::endl;
-  // KEYS
+  // Keys/names for each target quantity
   vector<string> keys;
   this->zeroDmodel->getResultKeys(keys);
 
-  stdVec computedValues;
-  for(int i = 0; i < resultTotal; i++) {
-     //computedValues.push_back(results[i]);
-     computedValues.push_back(outputs[i]);
-  }
-
+  // Standard deviation for measured targets
   stdVec stdFactors;
   this->zeroDmodel->getDataStd(stdFactors);
   
+  // Weights for target quantities in error function
   stdVec weights;
   this->zeroDmodel->getResultWeights(weights);
 
-  //std::cout<<"keys.size() = "<<keys.size()<<std::endl;
-  //std::cout<<"computedValues.size() = "<<computedValues.size()<<std::endl;
-  //std::cout<<"weights.size() = "<<weights.size()<<std::endl;
-
   // Print and compare
-  double result = 0.0;
+  double logLikelihood = 0.0;
   if(data != NULL){
 
     // Print Info
-    //data->printAndCompare(datasetColumn,keys,computedValues,weigths);
-    data->printAndCompare(keys,computedValues,weights);
+    data->printAndCompare(keys,outputs,weights);
+    
     // Evaluate Log Likelihood
-
-    //std::cout << "[evalModelError] 6 " << std::endl;
-    //result = data->evalLogLikelihood(datasetColumn,keys,computedValues,stdFactors,weigths);
-    result = data->evalLogLikelihood(keys,computedValues,stdFactors,weights);
+    logLikelihood = data->evalLogLikelihood(keys,outputs,stdFactors,weights);
   }
 
-  //std::cout << "[evalModelError] END " << std::endl;
-  return result;
+  return logLikelihood;
 }
 
 void cmLPN_svZeroD::getPriorMapping(int priorModelType,int* prPtr) {
