@@ -65,6 +65,7 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
   protected:
 
     int num_blocks;
+    bool use_CCO;
     std::vector<double> init_state_y, init_state_ydot;
     std::vector<double> coronary_params;
     std::vector<double> rcr_params;
@@ -80,10 +81,14 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     // Number of outlets and unknowns
     int nUnknowns;
     int nFaces;
-    int nCOR;
-    int nCOR_l;
-    int nCOR_r;
-    int nRCR;
+    int n_corBC;
+    int n_corBC_l;
+    int n_corBC_r;
+    int n_cor3d_l;
+    int n_cor3d_r;
+    int n_RCR;
+    // Names of coronary BC blocks
+    std::vector<std::string> names_corBC_l, names_corBC_r;
     // Base vectors to store raw output from reading mesh data
     std::vector<double> Ra_l_base;
     std::vector<double> Ra_r_base;

@@ -1,4 +1,4 @@
-#include "svZeroD_ClosedLoopCoronary.h"
+#include "svZeroD_ClosedLoopCoronary_CCO.h"
 
 using namespace std;
 
@@ -8,42 +8,102 @@ svZeroD_ClosedLoopCoronary::svZeroD_ClosedLoopCoronary(){
 void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   
   this->nUnknowns = interface.system_size_;
-  
+  this->use_CCO = false; //TODO
+
   // Number of blocks and number of each type
   this->num_blocks = interface.block_names_.size();
-  this->nCOR_l = 0;
-  this->nCOR_r = 0;
-  this->nCOR = 0;
-  this->nRCR = 0;
+  this->n_corBC_l = 0; // Number of left coronary BC blocks
+  this->n_corBC_r = 0; // Number of right coronary BC blocks
+  this->n_cor3d_l = 0; // Number of left coronary 3D segmented outlets
+  this->n_cor3d_r = 0; // Number of right coronary 3D segmented outlets
+  this->n_corBC = 0;
+  this->n_RCR = 0;
   std::string block_name;
   for (int i = 0; i < this->num_blocks; i++) {
     block_name = interface.block_names_[i];
-    if (block_name.substr(0,6) == "BC_lca") {
-      this->nCOR_l++;
-    } else if (block_name.substr(0,6) == "BC_rca") {
-      this->nCOR_r++;
-    } else if (block_name.substr(0,6) == "BC_RCR") {
-      this->nRCR++;
-    } 
+   
+    if (this->use_CCO) { //TODO: Remove this condition?
+      if (block_name.substr(0,6) == "BC_lca") { // Left coronary BC block
+	this->n_corBC_l++;
+	this->names_corBC_l.push_back(block_name)
+	std::cout<<"KMENON n_corBC_l: "<<block_name<<std::endl;
+      
+      } else if (block_name.substr(0,3) == "lca") { // Left coronary 3D segmented outlet
+	// Search for string "cco" in block name
+	std::size_t search_cco = block_name.find("cco",3)
+	if (search_cco == std::string::npos) { // Does the block correspond to a non-CCO vessel?
+	  this->n_cor3d_l++;
+	  std::cout<<"KMENON n_cor3d_l: "<<block_name<<std::endl;
+	} //search_cco
+
+      } else if (block_name.substr(0,6) == "BC_rca") { // Right coronary BC block
+	this->n_corBC_r++;
+	this->names_corBC_r.push_back(block_name)
+	std::cout<<"KMENON n_corBC_r: "<<block_name<<std::endl;
+      
+      } else if (block_name.substr(0,3) == "rca") { // Right coronary 3D segmented outlet
+	// Search for string "cco" in block name
+	std::size_t search_cco = block_name.find("cco",3)
+	if (search_cco == std::string::npos) { // Does the block correspond to a non-CCO vessel?
+	  this->n_cor3d_r++;
+	  std::cout<<"KMENON n_cor3d_r: "<<block_name<<std::endl;
+	} //search_cco
+      
+      } else if (block_name.substr(0,6) == "BC_RCR") {
+	this->n_RCR++;
+      } 
+    
+    } else {
+      if (block_name.substr(0,6) == "BC_lca") {
+	this->n_corBC_l++;
+      } else if (block_name.substr(0,6) == "BC_rca") {
+	this->n_corBC_r++;
+      } else if (block_name.substr(0,6) == "BC_RCR") {
+	this->n_RCR++;
+      } 
+    } // use_CCO
   }
-  this->nCOR = this->nCOR_l + this->nCOR_r; 
+  this->n_corBC = this->n_corBC_l + this->n_corBC_r; 
+
+  std::cout<<"Number of left and right coronary BC blocks: "<<this->n_corBC_l<<" , "<<this->n_corBC_r<<std:endl;
+  std::cout<<"Number of left and right coronary 3D outlets: "<<this->n_cor3d_l<<" , "<<this->n_cor3d_r<<std:endl;
+  std::cout<<"Number of RCR BC blocks: "<<this->n_RCR<<std:endl;
+
+  //TODO
+  this->n_cor3d_l = this->n_corBC_l;
+  this->n_cor3d_r = this->n_corBC_r;
+//if (this->n_corBC_l == this->n_cor3d_l) {
+//  if (this->n_corBC_r == this->n_cor3d_r) {
+//    this->use_CCO = false;
+//  } else {
+//    throw std::runtime_error("ERROR: n_corBC_l == n_cor3d_l but n_corBC_r != n_cor3d_r");
+//  }
+//} else if (this->n_corBC_l > this->n_cor3d_l) {
+//  this->use_CCO = true;
+//} else {
+//  throw std::runtime_error("ERROR: n_corBC_l < this->n_cor3d_l");
+//}
         
+  // Initialize parameter vectors and read baseline block params
   this->coronary_params.resize(6);
   this->rcr_params.resize(3);
   this->heart_params.resize(27);
   this->vessel_params.resize(4);
  
-  // Initialize parameter vectors and read baseline block params
   // Baseline parameters (named *_base) are set in the svZeroD config file
   //
   // Read left coronary parameters
-  this->Ra_l_base.reserve(this->nCOR_l);
-  this->Ram_l_base.reserve(this->nCOR_l);
-  this->Rv_l_base.reserve(this->nCOR_l);
-  this->Ca_l_base.reserve(this->nCOR_l);
-  this->Cim_l_base.reserve(this->nCOR_l);
-  for (int i = 0; i < this->nCOR_l; i++) {
-    block_name = "BC_lca" + to_string(i+1);
+  this->Ra_l_base.reserve(this->n_corBC_l);
+  this->Ram_l_base.reserve(this->n_corBC_l);
+  this->Rv_l_base.reserve(this->n_corBC_l);
+  this->Ca_l_base.reserve(this->n_corBC_l);
+  this->Cim_l_base.reserve(this->n_corBC_l);
+  for (int i = 0; i < this->n_corBC_l; i++) {
+    if (this->use_CCO == false) { //TODO: Remove this?
+      block_name = "BC_lca" + to_string(i+1);
+    } else {
+      block_name = this->names_corBC_l[i];
+    }
     interface.read_block_params(block_name, this->coronary_params);
     this->Ra_l_base[i] = this->coronary_params[0];
     this->Ram_l_base[i] = this->coronary_params[1];
@@ -53,13 +113,17 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   }
   
   // Read right coronary parameters
-  this->Ra_r_base.reserve(this->nCOR_r);
-  this->Ram_r_base.reserve(this->nCOR_r);
-  this->Rv_r_base.reserve(this->nCOR_r);
-  this->Ca_r_base.reserve(this->nCOR_r);
-  this->Cim_r_base.reserve(this->nCOR_r);
-  for (int i = 0; i < this->nCOR_r; i++) {
-    block_name = "BC_rca" + to_string(i+1);
+  this->Ra_r_base.reserve(this->n_corBC_r);
+  this->Ram_r_base.reserve(this->n_corBC_r);
+  this->Rv_r_base.reserve(this->n_corBC_r);
+  this->Ca_r_base.reserve(this->n_corBC_r);
+  this->Cim_r_base.reserve(this->n_corBC_r);
+  for (int i = 0; i < this->n_corBC_r; i++) {
+    if (this->use_CCO == false) { //TODO: Remove this?
+      block_name = "BC_rca" + to_string(i+1);
+    } else {
+      block_name = this->names_corBC_r[i];
+    }
     interface.read_block_params(block_name, this->coronary_params);
     this->Ra_r_base[i] = this->coronary_params[0];
     this->Ram_r_base[i] = this->coronary_params[1];
@@ -69,10 +133,10 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   }
   
   // Read RCR parameters
-  this->Rp_rcr_base.reserve(this->nRCR);
-  this->Rd_rcr_base.reserve(this->nRCR);
-  this->C_rcr_base.reserve(this->nRCR);
-  for (int i = 0; i < this->nRCR; i++) {
+  this->Rp_rcr_base.reserve(this->n_RCR);
+  this->Rd_rcr_base.reserve(this->n_RCR);
+  this->C_rcr_base.reserve(this->n_RCR);
+  for (int i = 0; i < this->n_RCR; i++) {
     block_name = "BC_RCR" + to_string(i+1);
     interface.read_block_params(block_name, this->rcr_params);
     this->Rp_rcr_base[i] = this->rcr_params[0];
@@ -95,35 +159,78 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   }
   
   // Save solution IDs corresponding to important quantities
-  this->Q_lca_ids.resize(this->nCOR_l, -1);
-  this->Q_rca_ids.resize(this->nCOR_r, -1);
-  this->Q_rcr_ids.resize(this->nRCR, -1);
+  // TODO: Q_lca_ids[0] and Q_rca_ids[0] should correspond to lca1/rca1?
+  this->Q_lca_ids.resize(this->n_cor3d_l, -1);
+  this->Q_rca_ids.resize(this->n_cor3d_r, -1);
+  this->Q_rcr_ids.resize(this->n_RCR, -1);
   int ct_lca = 0, ct_rca = 0, ct_rcr = 0;
   string var_name;
   bool lca_flag, rca_flag, rcr_flag, flow_flag;
+
+  // Iterate through the names of variables in the 0D system
   for (int i = 0; i < interface.system_size_; i++) {
     var_name = interface.variable_names_[i];
     flow_flag = (var_name.substr(0,4) == "flow"); // Is this a flow variable?
+    
     // Find last occurence of ":" in variable name. 
     // The rest of var_name is either the exit block name or the main block name (if it is an internal variable).
     std::size_t blk_name_start = var_name.rfind(":");
     if (blk_name_start == std::string::npos) {
       throw std::runtime_error("Error: Invalid variable name format.");
     }
-    // Search for specific patterns in variable name
-    lca_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); //string.compare() returns 0 for exact matches
-    rca_flag = !var_name.compare(blk_name_start+1,6,"BC_rca");
-    rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
+    // Find variables that correspond to segmented (not CCO) branch outlets
+    if (this->use_CCO == false) { //TODO: remove this?
+      // Outlet block should be a coronary/RCR BC
+      lca_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); //string.compare() returns 0 for exact matches
+      rca_flag = !var_name.compare(blk_name_start+1,6,"BC_rca");
+      rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
+    } else {
+      // Outlet block should be a CCO tree root, RCR BC, or coronary BC that is not connected to a CCO vessel
+      auto str_len = var_name.size();
+      if (str_len < 7) {
+	std::cout << "Variable name: "<< var_name << std::endl;
+	throw std::runtime_error("Error: Variable name is too short.");
+      } //str_len
+      auto cco_root_flag = !var_name.compare(str_len-6,6,"_cco_0"); // Is the outlet a CCO root?
+      auto cco_lca_flag = !var_name.compare(blk_name_start+1,6,"lca"); // Is the outlet a lca?
+      auto lca_bc_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); // Is the outlet a BC_lca?
+      lca_flag = false;
+      if (cco_root_flag && cco_lca_flag) { // For outlets with CCO trees
+	lca_flag = true;
+      } else if (lca_bc_flag) { // For outlets without CCO trees
+	// Search for string "cco" in exit block name
+	std::size_t search_cco = var_name.find("cco",blk_name_start+1)
+	if (search_cco == std::string::npos) { // Does the outlet correspond to a non-CCO block?
+	  lca_flag = true;
+	} //search_cco
+      } 
+      auto cco_rca_flag = !var_name.compare(blk_name_start+1,6,"rca"); // Is the outlet a rca?
+      auto rca_bc_flag = !var_name.compare(blk_name_start+1,6,"BC_rca"); // Is the outlet a BC_rca?
+      rca_flag = false;
+      if (cco_root_flag && cco_rca_flag) { // For outlets with CCO trees
+	rca_flag = true;
+      } else if (rca_bc_flag) { // For outlets without CCO trees
+	// Search for string "cco" in exit block name
+	std::size_t search_cco = var_name.find("cco",blk_name_start+1)
+	if (search_cco == std::string::npos) { // Does the outlet correspond to a non-CCO block?
+	  rca_flag = true;
+	} // search_cco
+      }
+      rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
+    } // use_CCO
 
     if (flow_flag && lca_flag) {
       this->Q_lca_ids[ct_lca] = i;
       ct_lca++;
+      std::cout<<"KMENON "<<var_name<<std::endl;
     } else if (flow_flag && rca_flag) {
       this->Q_rca_ids[ct_rca] = i;
       ct_rca++;
+      std::cout<<"KMENON "<<var_name<<std::endl;
     } else if (flow_flag && rcr_flag) {
       this->Q_rcr_ids[ct_rcr] = i;
       ct_rcr++;
+      std::cout<<"KMENON "<<var_name<<std::endl;
     } else if (var_name == "flow:J_heart_outlet:aorta") {
       this->Q_aorta_id = i;
     } else if (var_name == "pressure:J_heart_outlet:aorta") {
@@ -144,22 +251,24 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
       this->P_RA_id = i;
     }
   }
-  //std::cout << "[svZeroD_ClosedLoopCoronary] Q_lca_ids.size() this->nCOR_l: " << Q_lca_ids.size() << ", "<< this->nCOR_l << std::endl;
+  //std::cout << "[svZeroD_ClosedLoopCoronary] Q_lca_ids.size() this->n_cor3d_l: " << Q_lca_ids.size() << ", "<< this->n_cor3d_l << std::endl;
   
   // Check to make sure all variables ids have been assigned
-  for (int i = 0; i < this->nCOR_l; i++) {
+  for (int i = 0; i < this->Q_lca_ids.size(); i++) { 
     if (this->Q_lca_ids[i] < 0) {
       std::cout << "Q_lca index: "<< i << std::endl;
       throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_lca");
     }
   }
-  for (int i = 0; i < this->nCOR_r; i++) {
+  for (int i = 0; i < this->Q_rca_ids.size(); i++) {
     if (this->Q_rca_ids[i] < 0) {
+      std::cout << "Q_rca index: "<< i << std::endl;
       throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_rca");
     } 
   }
-  for (int i = 0; i < this->nRCR; i++) {
+  for (int i = 0; i < this->Q_rcr_ids.size(); i++) {
     if (this->Q_rcr_ids[i] < 0) {
+      std::cout << "Q_rcr index: "<< i << std::endl;
       throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_RCR");
     }
   }
@@ -545,7 +654,7 @@ void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, c
   std::string block_name;
   
   // Update the model parameters 
-  for (int i = 0; i < this->nCOR_l; i++) {
+  for (int i = 0; i < this->n_corBC_l; i++) {
     block_name = "BC_lca" + to_string(i+1);
     this->coronary_params[0] = this->Ra_l_base[i]*params[27]; //Ra
     this->coronary_params[1] = this->Ram_l_base[i]*params[27]; //Ram
@@ -556,7 +665,7 @@ void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, c
     interface.update_block_params(block_name, this->coronary_params);
   }
   
-  for (int i = 0; i < this->nCOR_r; i++) {
+  for (int i = 0; i < this->n_corBC_r; i++) {
     block_name = "BC_rca" + to_string(i+1);
     this->coronary_params[0] = this->Ra_r_base[i]*params[27]; //Ra
     this->coronary_params[1] = this->Ram_r_base[i]*params[27]; //Ram
@@ -567,7 +676,7 @@ void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, c
     interface.update_block_params(block_name, this->coronary_params);
   }
   
-  for (int i = 0; i < this->nRCR; i++) {
+  for (int i = 0; i < this->n_RCR; i++) {
     block_name = "BC_RCR" + to_string(i+1);
     this->rcr_params[0] = this->Rp_rcr_base[i]*params[33]; //Rp
     this->rcr_params[1] = this->C_rcr_base[i]*params[34]; //C
@@ -620,34 +729,50 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
   int totalStepsOnSingleCycle = interface.pts_per_cycle_;
   int numCycles = interface.num_cycles_;
   int totOutputSteps = interface.num_output_steps_;
-
+  // IDs of main lca/rca
+  int lca_main_id = 0;
+  int rca_main_id = 0;
+  double max_flow = 0.0;
+    
   // SUM RCR FLUX
   double temp = 0.0;
   double Q_rcr = 0.0;
-  for(int loopA=0;loopA<nRCR;loopA++){
+  for(int loopA=0;loopA<n_RCR;loopA++){
     temp = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rcr_ids[loopA]]);
     Q_rcr += temp;
   }
 
   // SUM LEFT CORONARY FLUX
   double Q_lcor = 0.0;
-  for(int loopA=0;loopA<nCOR_l;loopA++){    
+  max_flow = 0.0;
+  for(int loopA=0;loopA<n_cor3d_l;loopA++){    
     temp = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_lca_ids[loopA]]);
     Q_lcor = Q_lcor + temp;
+//  if (std::fabs(temp) > max_flow) { //TODO
+//    max_flow = std::fabs(temp);
+//    lca_main_id = loopA;
+//  }
   }
+  std::cout<<"KMENON lca_main_id: "<<lca_main_id<<std::endl;
 
   // INTEGRATE MAIN FLOW
-  double lmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_lca_ids[0]]);
+  double lmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_lca_ids[lca_main_id]]);
 
   // SUM RIGHT CORONARY FLUX
   double Q_rcor = 0.0;
-  for(int loopA=0;loopA<nCOR_r;loopA++){    
+  max_flow = 0.0;
+  for(int loopA=0;loopA<n_cor3d_r;loopA++){    
     temp = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rca_ids[loopA]]);
     Q_rcor = Q_rcor + temp;
+//  if (std::fabs(temp) > max_flow) { // TODO
+//    max_flow = std::fabs(temp);
+//    rca_main_id = loopA;
+//  }
   }
+  std::cout<<"KMENON rca_main_id: "<<rca_main_id<<std::endl;
 
   // SUM RIGHT CORONARY FLUX
-  double rmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rca_ids[0]]);
+  double rmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rca_ids[rca_main_id]]);
 
   // FIND THE END OF SYSTOLE
   double small_number = 1e-4;
@@ -692,17 +817,17 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
   int aor_half = round((ao_open+systole_end)/(double)2.0);
     
   // CALCULATE MAX AND TOTAL CORONARY FLOW DURING SYSTOLE
-  double l_cor_qmax_s = cmUtils::getMax(systole_start, systole_end,outVals[this->Q_lca_ids[0]]);
-  double l_cor_qtot_s = cmUtils::trapz(systole_start, systole_end,t,outVals[this->Q_lca_ids[0]]);
-  double r_cor_qmax_s = cmUtils::getMax(systole_start, systole_end,outVals[this->Q_rca_ids[0]]);
-  double r_cor_qtot_s = cmUtils::trapz(systole_start, systole_end,t,outVals[this->Q_rca_ids[0]]);
+  double l_cor_qmax_s = cmUtils::getMax(systole_start, systole_end,outVals[this->Q_lca_ids[lca_main_id]]);
+  double l_cor_qtot_s = cmUtils::trapz(systole_start, systole_end,t,outVals[this->Q_lca_ids[lca_main_id]]);
+  double r_cor_qmax_s = cmUtils::getMax(systole_start, systole_end,outVals[this->Q_rca_ids[rca_main_id]]);
+  double r_cor_qtot_s = cmUtils::trapz(systole_start, systole_end,t,outVals[this->Q_rca_ids[rca_main_id]]);
     
   // CALCULATE MAX AND TOTAL CORONARY FLOW DURING DIASTOLE
   int sys_buffer = totalStepsOnSingleCycle/10;
-  double l_cor_qmax_d = max(cmUtils::getMax(systole_end + sys_buffer, totOutputSteps,outVals[this->Q_lca_ids[0]]),cmUtils::getMax(totOutputSteps - totalStepsOnSingleCycle - 1, systole_start,outVals[this->Q_lca_ids[0]]));
-  double l_cor_qtot_d = cmUtils::trapz(systole_end, totOutputSteps,t,outVals[this->Q_lca_ids[0]]) + cmUtils::trapz(totOutputSteps - totalStepsOnSingleCycle - 1, systole_start,t,outVals[this->Q_lca_ids[0]]);  
-  double r_cor_qmax_d = max(cmUtils::getMax(systole_end + sys_buffer, totOutputSteps,outVals[this->Q_rca_ids[0]]),cmUtils::getMax(totOutputSteps - totalStepsOnSingleCycle - 1, systole_start,outVals[this->Q_rca_ids[0]]));
-  double r_cor_qtot_d = cmUtils::trapz(systole_end, totOutputSteps,t,outVals[this->Q_rca_ids[0]]) + cmUtils::trapz(totOutputSteps - totalStepsOnSingleCycle - 1, systole_start,t,outVals[this->Q_rca_ids[0]]);
+  double l_cor_qmax_d = max(cmUtils::getMax(systole_end + sys_buffer, totOutputSteps,outVals[this->Q_lca_ids[lca_main_id]]),cmUtils::getMax(totOutputSteps - totalStepsOnSingleCycle - 1, systole_start,outVals[this->Q_lca_ids[lca_main_id]]));
+  double l_cor_qtot_d = cmUtils::trapz(systole_end, totOutputSteps,t,outVals[this->Q_lca_ids[lca_main_id]]) + cmUtils::trapz(totOutputSteps - totalStepsOnSingleCycle - 1, systole_start,t,outVals[this->Q_lca_ids[lca_main_id]]);  
+  double r_cor_qmax_d = max(cmUtils::getMax(systole_end + sys_buffer, totOutputSteps,outVals[this->Q_rca_ids[rca_main_id]]),cmUtils::getMax(totOutputSteps - totalStepsOnSingleCycle - 1, systole_start,outVals[this->Q_rca_ids[rca_main_id]]));
+  double r_cor_qtot_d = cmUtils::trapz(systole_end, totOutputSteps,t,outVals[this->Q_rca_ids[rca_main_id]]) + cmUtils::trapz(totOutputSteps - totalStepsOnSingleCycle - 1, systole_start,t,outVals[this->Q_rca_ids[rca_main_id]]);
 
   // FIND HOW MANY PEAKS AND VALLEYS IN THE CORONARY WAVEFORMS
   int l_grad_check[5];
@@ -712,17 +837,17 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
     l_grad_check[i] = -1;
     r_grad_check[i] = -1;
   }
-  double l_last = (outVals[this->Q_lca_ids[0]][totOutputSteps - totalStepsOnSingleCycle - 1]
-    - outVals[this->Q_lca_ids[0]][totOutputSteps - totalStepsOnSingleCycle - 2])/
+  double l_last = (outVals[this->Q_lca_ids[lca_main_id]][totOutputSteps - totalStepsOnSingleCycle - 1]
+    - outVals[this->Q_lca_ids[lca_main_id]][totOutputSteps - totalStepsOnSingleCycle - 2])/
     (t[1] - t[0]);
-  double r_last = (outVals[this->Q_rca_ids[0]][totOutputSteps - totalStepsOnSingleCycle - 1]
-    - outVals[this->Q_rca_ids[0]][totOutputSteps - totalStepsOnSingleCycle - 2])/
+  double r_last = (outVals[this->Q_rca_ids[rca_main_id]][totOutputSteps - totalStepsOnSingleCycle - 1]
+    - outVals[this->Q_rca_ids[rca_main_id]][totOutputSteps - totalStepsOnSingleCycle - 2])/
     (t[1] - t[0]);
   double l_grad, r_grad;
   for(int i = totOutputSteps - totalStepsOnSingleCycle; i < totOutputSteps; i++)
   {
-    l_grad = (outVals[this->Q_lca_ids[0]][i] - outVals[this->Q_lca_ids[0]][i - 1])/(t[1] - t[0]);
-    r_grad = (outVals[this->Q_rca_ids[0]][i] - outVals[this->Q_rca_ids[0]][i - 1])/(t[1] - t[0]);
+    l_grad = (outVals[this->Q_lca_ids[lca_main_id]][i] - outVals[this->Q_lca_ids[lca_main_id]][i - 1])/(t[1] - t[0]);
+    r_grad = (outVals[this->Q_rca_ids[rca_main_id]][i] - outVals[this->Q_rca_ids[rca_main_id]][i - 1])/(t[1] - t[0]);
 
     // Checking the gradients on the left side
     if(l_grad > 0 && l_last <= 0 && l_grad_check[0] == -1) //valley
@@ -801,16 +926,16 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
   int thirdcyc = round(totalStepsOnSingleCycle/3);
   int halfcyc = round(totalStepsOnSingleCycle/2);
   if(systole_end+thirdcyc-1 < totOutputSteps) {
-     r_third_FF = cmUtils::trapz(systole_end-1, systole_end+thirdcyc,t,outVals[this->Q_rca_ids[0]])/rmain_flow;
-     l_third_FF = cmUtils::trapz(systole_end-1, systole_end+thirdcyc,t,outVals[this->Q_lca_ids[0]])/lmain_flow;
+     r_third_FF = cmUtils::trapz(systole_end-1, systole_end+thirdcyc,t,outVals[this->Q_rca_ids[rca_main_id]])/rmain_flow;
+     l_third_FF = cmUtils::trapz(systole_end-1, systole_end+thirdcyc,t,outVals[this->Q_lca_ids[lca_main_id]])/lmain_flow;
   } else {
      r_third_FF = 0;
      l_third_FF = 0;
   }
 
   if(systole_end+halfcyc-1 < totOutputSteps) {
-     r_half_FF = cmUtils::trapz(systole_end-1, systole_end+halfcyc,t,outVals[this->Q_rca_ids[0]])/rmain_flow;
-     l_half_FF = cmUtils::trapz(systole_end-1, systole_end+halfcyc,t,outVals[this->Q_lca_ids[0]])/lmain_flow;
+     r_half_FF = cmUtils::trapz(systole_end-1, systole_end+halfcyc,t,outVals[this->Q_rca_ids[rca_main_id]])/rmain_flow;
+     l_half_FF = cmUtils::trapz(systole_end-1, systole_end+halfcyc,t,outVals[this->Q_lca_ids[lca_main_id]])/lmain_flow;
   } else {
      r_half_FF = 0;
      l_half_FF = 0;
