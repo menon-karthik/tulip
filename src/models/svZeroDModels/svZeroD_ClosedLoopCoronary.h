@@ -81,6 +81,10 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     // Number of outlets and unknowns
     int nUnknowns;
     int nFaces;
+    int nCOR;
+    int nCOR_l;
+    int nCOR_r;
+    int nRCR;
     int n_corBC;
     int n_corBC_l;
     int n_corBC_r;
@@ -107,7 +111,7 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     double Rlv_base;
     double Rpd_base;
     // Flag which determines which surrogate model to run
-    bool useRigidSurrogate;
+    bool useRigidSurrogate = false;
     // Target data needed for setting initial conditions
     double targetESV;
     double targetEDV;

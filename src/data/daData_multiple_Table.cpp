@@ -198,6 +198,7 @@ double daData_multiple_Table::evalLogLikelihood(const stdStringVec& keys,const s
             perc = -1.0*(- 0.5 * log(2.0 * M_PI * (stdDev * stdDev) * weightVal) - 0.5*(computed - measured)*(computed - measured)/((stdDev * stdDev) * weightVal));
             // printf("%f\n",perc);          
             result += perc;
+            //std::cout<<"KMENON: "<<computed<<" "<<measured<<" "<<stdDev<<" "<<weightVal<<std::endl;
             count++;
           }catch(...){
           }
