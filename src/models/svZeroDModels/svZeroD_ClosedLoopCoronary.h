@@ -81,10 +81,10 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     // Number of outlets and unknowns
     int nUnknowns;
     int nFaces;
-    int nCOR;
-    int nCOR_l;
-    int nCOR_r;
-    int nRCR;
+//  int nCOR;
+//  int nCOR_l;
+//  int nCOR_r;
+//  int nRCR;
     int n_corBC;
     int n_corBC_l;
     int n_corBC_r;

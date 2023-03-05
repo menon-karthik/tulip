@@ -8,7 +8,7 @@ svZeroD_ClosedLoopCoronary::svZeroD_ClosedLoopCoronary(){
 void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   
   this->nUnknowns = interface.system_size_;
-  this->use_CCO = false; //TODO
+  this->use_CCO = false; 
 
   // Number of blocks and number of each type
   this->num_blocks = interface.block_names_.size();
@@ -65,24 +65,25 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   }
   this->n_corBC = this->n_corBC_l + this->n_corBC_r; 
 
-  std::cout<<"Number of left and right coronary BC blocks: "<<this->n_corBC_l<<" , "<<this->n_corBC_r<<std::endl;
+  std::cout<<"\nNumber of left and right coronary BC blocks: "<<this->n_corBC_l<<" , "<<this->n_corBC_r<<std::endl;
   std::cout<<"Number of left and right coronary 3D outlets: "<<this->n_cor3d_l<<" , "<<this->n_cor3d_r<<std::endl;
   std::cout<<"Number of RCR BC blocks: "<<this->n_RCR<<std::endl;
 
   //TODO
-  this->n_cor3d_l = this->n_corBC_l;
-  this->n_cor3d_r = this->n_corBC_r;
-//if (this->n_corBC_l == this->n_cor3d_l) {
-//  if (this->n_corBC_r == this->n_cor3d_r) {
-//    this->use_CCO = false;
-//  } else {
-//    throw std::runtime_error("ERROR: n_corBC_l == n_cor3d_l but n_corBC_r != n_cor3d_r");
-//  }
-//} else if (this->n_corBC_l > this->n_cor3d_l) {
-//  this->use_CCO = true;
-//} else {
-//  throw std::runtime_error("ERROR: n_corBC_l < this->n_cor3d_l");
-//}
+//this->n_cor3d_l = this->n_corBC_l;
+//this->n_cor3d_r = this->n_corBC_r;
+  if (this->n_corBC_l == this->n_cor3d_l) {
+    if (this->n_corBC_r == this->n_cor3d_r) {
+      this->use_CCO = false;
+    } else {
+      throw std::runtime_error("ERROR: n_corBC_l == n_cor3d_l but n_corBC_r != n_cor3d_r");
+    }
+  } else if (this->n_corBC_l > this->n_cor3d_l) {
+    this->use_CCO = true;
+    std::cout<<"Using CCO."<<std::endl;
+  } else {
+    throw std::runtime_error("ERROR: n_corBC_l < this->n_cor3d_l");
+  }
         
   // Initialize parameter vectors and read baseline block params
   this->coronary_params.resize(6);
@@ -188,12 +189,16 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
       // Outlet block should be a CCO tree root, RCR BC, or coronary BC that is not connected to a CCO vessel
       auto str_len = var_name.size();
       if (str_len < 7) {
-        std::cout << "Variable name: "<< var_name << std::endl;
+        std::cout << "\nVariable name: "<< var_name << std::endl;
+        std::cout << "Error: Variable name is too short." << std::endl;
         throw std::runtime_error("Error: Variable name is too short.");
       } //str_len
       auto cco_root_flag = !var_name.compare(str_len-6,6,"_cco_0"); // Is the outlet a CCO root?
-      auto cco_lca_flag = !var_name.compare(blk_name_start+1,6,"lca"); // Is the outlet a lca?
+      auto cco_lca_flag = !var_name.compare(blk_name_start+1,3,"lca"); // Is the outlet a lca?
       auto lca_bc_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); // Is the outlet a BC_lca?
+      if (var_name == "flow:J36:lca1_cco_0") {
+        std::cout<<"KMENON "<<cco_root_flag<<" "<<cco_lca_flag<<std::endl;
+      }
       lca_flag = false;
       if (cco_root_flag && cco_lca_flag) { // For outlets with CCO trees
         lca_flag = true;
@@ -204,7 +209,7 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
           lca_flag = true;
         } //search_cco
       } 
-      auto cco_rca_flag = !var_name.compare(blk_name_start+1,6,"rca"); // Is the outlet a rca?
+      auto cco_rca_flag = !var_name.compare(blk_name_start+1,3,"rca"); // Is the outlet a rca?
       auto rca_bc_flag = !var_name.compare(blk_name_start+1,6,"BC_rca"); // Is the outlet a BC_rca?
       rca_flag = false;
       if (cco_root_flag && cco_rca_flag) { // For outlets with CCO trees
@@ -257,18 +262,21 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   for (int i = 0; i < this->Q_lca_ids.size(); i++) { 
     if (this->Q_lca_ids[i] < 0) {
       std::cout << "Q_lca index: "<< i << std::endl;
+      std::cout << "Error: Did not find all solution IDs for variables named BC_lca" << std::endl;
       throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_lca");
     }
   }
   for (int i = 0; i < this->Q_rca_ids.size(); i++) {
     if (this->Q_rca_ids[i] < 0) {
       std::cout << "Q_rca index: "<< i << std::endl;
+      std::cout << "Error: Did not find all solution IDs for variables named BC_rca" << std::endl;
       throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_rca");
     } 
   }
   for (int i = 0; i < this->Q_rcr_ids.size(); i++) {
     if (this->Q_rcr_ids[i] < 0) {
       std::cout << "Q_rcr index: "<< i << std::endl;
+      std::cout << "Error: Did not find all solution IDs for variables named BC_RCR" << std::endl;
       throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_RCR");
     }
   }
