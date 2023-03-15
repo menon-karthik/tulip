@@ -28,7 +28,7 @@ class cmLPN_svZeroD: public cmModel {
   public:
 
     // DEFAULT CONSTRUCTOR
-    cmLPN_svZeroD(std::string model_path, svZeroDModel* model);
+    cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib);
     
     // DESTRUCTOR
     virtual ~cmLPN_svZeroD();
