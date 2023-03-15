@@ -41,12 +41,14 @@ int main(int argc, char* argv[]){
     data->readFromFile(currPatientFile);
 
     // Create new LPN model
+    // svZeroDPlus interface library
+    auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
     // svZeroD json file
     std::string model_path = "svzerod_tuning.json";
     // Type of svZeroD model
     svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
     cmLPN_svZeroD* lpnModel;
-    lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel);
+    lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib);
 
     // Assign Dataset to model
     int currPatient = 0;

@@ -5,10 +5,10 @@ using namespace std;
 // ========================
 // CONSTRUCTOR
 // ========================
-cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model){
+cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib){
   
   // Load shared library and get interface functions.
-  auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
+  //auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
   this->interface.load_library(interface_lib);
   this->interface.initialize(model_path);
   auto nUnknowns = this->interface.system_size_;
