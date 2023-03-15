@@ -22,56 +22,43 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   for (int i = 0; i < this->num_blocks; i++) {
     block_name = interface.block_names_[i];
    
-//  if (this->use_CCO) { //TODO: Remove this condition?
-      if (block_name.substr(0,6) == "BC_lca") { // Left coronary BC block
-        this->n_corBC_l++;
-        this->names_corBC_l.push_back(block_name);
-        std::cout<<"KMENON n_corBC_l: "<<block_name<<std::endl;
-      
-      } else if (block_name.substr(0,3) == "lca") { // Left coronary 3D segmented outlet
-        // Search for string "cco" in block name
-        std::size_t search_cco = block_name.find("cco",3);
-        if (search_cco == std::string::npos) { // Does the block correspond to a non-CCO vessel?
-          this->n_cor3d_l++;
-          std::cout<<"KMENON n_cor3d_l: "<<block_name<<std::endl;
-        } //search_cco
-
-      } else if (block_name.substr(0,6) == "BC_rca") { // Right coronary BC block
-        this->n_corBC_r++;
-        this->names_corBC_r.push_back(block_name);
-        std::cout<<"KMENON n_corBC_r: "<<block_name<<std::endl;
-      
-      } else if (block_name.substr(0,3) == "rca") { // Right coronary 3D segmented outlet
-        // Search for string "cco" in block name
-        std::size_t search_cco = block_name.find("cco",3);
-        if (search_cco == std::string::npos) { // Does the block correspond to a non-CCO vessel?
-          this->n_cor3d_r++;
-          std::cout<<"KMENON n_cor3d_r: "<<block_name<<std::endl;
-        } //search_cco
-      
-      } else if (block_name.substr(0,6) == "BC_RCR") {
-        this->n_RCR++;
-      } 
+    if (block_name.substr(0,6) == "BC_lca") { // Left coronary BC block
+      this->n_corBC_l++;
+      this->names_corBC_l.push_back(block_name);
+      std::cout<<"n_corBC_l: "<<block_name<<std::endl;
     
-//  } else {
-//    if (block_name.substr(0,6) == "BC_lca") {
-//      this->n_corBC_l++;
-//    } else if (block_name.substr(0,6) == "BC_rca") {
-//      this->n_corBC_r++;
-//    } else if (block_name.substr(0,6) == "BC_RCR") {
-//      this->n_RCR++;
-//    } 
-//  } // use_CCO
-  }
+    } else if (block_name.substr(0,3) == "lca") { // Left coronary 3D segmented outlet
+      // Search for string "cco" in block name
+      std::size_t search_cco = block_name.find("cco",3);
+      if (search_cco == std::string::npos) { // Does the block correspond to a non-CCO vessel?
+        this->n_cor3d_l++;
+        std::cout<<"n_cor3d_l: "<<block_name<<std::endl;
+      } //search_cco
+
+    } else if (block_name.substr(0,6) == "BC_rca") { // Right coronary BC block
+      this->n_corBC_r++;
+      this->names_corBC_r.push_back(block_name);
+      std::cout<<"n_corBC_r: "<<block_name<<std::endl;
+    
+    } else if (block_name.substr(0,3) == "rca") { // Right coronary 3D segmented outlet
+      // Search for string "cco" in block name
+      std::size_t search_cco = block_name.find("cco",3);
+      if (search_cco == std::string::npos) { // Does the block correspond to a non-CCO vessel?
+        this->n_cor3d_r++;
+        std::cout<<"n_cor3d_r: "<<block_name<<std::endl;
+      } //search_cco
+    
+    } else if (block_name.substr(0,6) == "BC_RCR") {
+      this->n_RCR++;
+    } 
+    
+  } // for (int i = 0; i < this->num_blocks; i++)
   this->n_corBC = this->n_corBC_l + this->n_corBC_r; 
 
   std::cout<<"\nNumber of left and right coronary BC blocks: "<<this->n_corBC_l<<" , "<<this->n_corBC_r<<std::endl;
   std::cout<<"Number of left and right coronary 3D outlets: "<<this->n_cor3d_l<<" , "<<this->n_cor3d_r<<std::endl;
   std::cout<<"Number of RCR BC blocks: "<<this->n_RCR<<std::endl;
 
-  //TODO
-//this->n_cor3d_l = this->n_corBC_l;
-//this->n_cor3d_r = this->n_corBC_r;
   if (this->n_corBC_l == this->n_cor3d_l) {
     if (this->n_corBC_r == this->n_cor3d_r) {
       this->use_CCO = false;
@@ -100,11 +87,7 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   this->Ca_l_base.reserve(this->n_corBC_l);
   this->Cim_l_base.reserve(this->n_corBC_l);
   for (int i = 0; i < this->n_corBC_l; i++) {
-//  if (this->use_CCO == false) { //TODO: Remove this?
-//    block_name = "BC_lca" + to_string(i+1);
-//  } else {
-      block_name = this->names_corBC_l[i];
-//  }
+    block_name = this->names_corBC_l[i];
     interface.read_block_params(block_name, this->coronary_params);
     this->Ra_l_base[i] = this->coronary_params[0];
     this->Ram_l_base[i] = this->coronary_params[1];
@@ -120,11 +103,7 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
   this->Ca_r_base.reserve(this->n_corBC_r);
   this->Cim_r_base.reserve(this->n_corBC_r);
   for (int i = 0; i < this->n_corBC_r; i++) {
-//  if (this->use_CCO == false) { //TODO: Remove this?
-//    block_name = "BC_rca" + to_string(i+1);
-//  } else {
-      block_name = this->names_corBC_r[i];
-//  }
+    block_name = this->names_corBC_r[i];
     interface.read_block_params(block_name, this->coronary_params);
     this->Ra_r_base[i] = this->coronary_params[0];
     this->Ram_r_base[i] = this->coronary_params[1];
@@ -179,63 +158,51 @@ void svZeroD_ClosedLoopCoronary::setupModel(LPNSolverInterface& interface){
     if (blk_name_start == std::string::npos) {
       throw std::runtime_error("Error: Invalid variable name format.");
     }
-//  // Find variables that correspond to segmented (not CCO) branch outlets
-//  if (this->use_CCO == false) { //TODO: remove this?
-//    // Outlet block should be a coronary/RCR BC
-//    lca_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); //string.compare() returns 0 for exact matches
-//    rca_flag = !var_name.compare(blk_name_start+1,6,"BC_rca");
-//    rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
-//  } else {
-      // Outlet block should be a CCO tree root, RCR BC, or coronary BC that is not connected to a CCO vessel
-      auto str_len = var_name.size();
-      if (str_len < 7) {
-        std::cout << "\nVariable name: "<< var_name << std::endl;
-        std::cout << "Error: Variable name is too short." << std::endl;
-        throw std::runtime_error("Error: Variable name is too short.");
-      } //str_len
-      auto cco_root_flag = !var_name.compare(str_len-6,6,"_cco_0"); // Is the outlet a CCO root?
-      auto cco_lca_flag = !var_name.compare(blk_name_start+1,3,"lca"); // Is the outlet a lca?
-      auto lca_bc_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); // Is the outlet a BC_lca?
-      if (var_name == "flow:J36:lca1_cco_0") {
-        std::cout<<"KMENON "<<cco_root_flag<<" "<<cco_lca_flag<<std::endl;
-      }
-      lca_flag = false;
-      if (cco_root_flag && cco_lca_flag) { // For outlets with CCO trees
+    // Outlet block should be a CCO tree root, RCR BC, or coronary BC that is not connected to a CCO vessel
+    auto str_len = var_name.size();
+    if (str_len < 7) {
+      std::cout << "\nVariable name: "<< var_name << std::endl;
+      std::cout << "Error: Variable name is too short." << std::endl;
+      throw std::runtime_error("Error: Variable name is too short.");
+    } //str_len
+    auto cco_root_flag = !var_name.compare(str_len-6,6,"_cco_0"); // Is the outlet a CCO root?
+    auto cco_lca_flag = !var_name.compare(blk_name_start+1,3,"lca"); // Is the outlet a lca?
+    auto lca_bc_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); // Is the outlet a BC_lca?
+    lca_flag = false;
+    if (cco_root_flag && cco_lca_flag) { // For outlets with CCO trees
+      lca_flag = true;
+    } else if (lca_bc_flag) { // For outlets without CCO trees
+      // Search for string "cco" in exit block name
+      std::size_t search_cco = var_name.find("cco",blk_name_start+1);
+      if (search_cco == std::string::npos) { // Does the outlet correspond to a non-CCO block?
         lca_flag = true;
-      } else if (lca_bc_flag) { // For outlets without CCO trees
-        // Search for string "cco" in exit block name
-        std::size_t search_cco = var_name.find("cco",blk_name_start+1);
-        if (search_cco == std::string::npos) { // Does the outlet correspond to a non-CCO block?
-          lca_flag = true;
-        } //search_cco
-      } 
-      auto cco_rca_flag = !var_name.compare(blk_name_start+1,3,"rca"); // Is the outlet a rca?
-      auto rca_bc_flag = !var_name.compare(blk_name_start+1,6,"BC_rca"); // Is the outlet a BC_rca?
-      rca_flag = false;
-      if (cco_root_flag && cco_rca_flag) { // For outlets with CCO trees
+      } //search_cco
+    } 
+    auto cco_rca_flag = !var_name.compare(blk_name_start+1,3,"rca"); // Is the outlet a rca?
+    auto rca_bc_flag = !var_name.compare(blk_name_start+1,6,"BC_rca"); // Is the outlet a BC_rca?
+    rca_flag = false;
+    if (cco_root_flag && cco_rca_flag) { // For outlets with CCO trees
+      rca_flag = true;
+    } else if (rca_bc_flag) { // For outlets without CCO trees
+      // Search for string "cco" in exit block name
+      std::size_t search_cco = var_name.find("cco",blk_name_start+1);
+      if (search_cco == std::string::npos) { // Does the outlet correspond to a non-CCO block?
         rca_flag = true;
-      } else if (rca_bc_flag) { // For outlets without CCO trees
-        // Search for string "cco" in exit block name
-        std::size_t search_cco = var_name.find("cco",blk_name_start+1);
-        if (search_cco == std::string::npos) { // Does the outlet correspond to a non-CCO block?
-          rca_flag = true;
-        } // search_cco
-      }
-      rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
-//  } // use_CCO
+      } // search_cco
+    }
+    rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
 
     if (flow_flag && lca_flag) {
       this->Q_lca_ids[ct_lca] = i;
       ct_lca++;
-      std::cout<<"KMENON "<<var_name<<std::endl;
+      std::cout<<"Q_rca: "<<ct_lca<<" "<<i<<" "<<var_name<<std::endl;
     } else if (flow_flag && rca_flag) {
       this->Q_rca_ids[ct_rca] = i;
       ct_rca++;
-      std::cout<<"KMENON "<<var_name<<std::endl;
+      std::cout<<"Q_rca: "<<ct_rca<<" "<<i<<" "<<var_name<<std::endl;
     } else if (flow_flag && rcr_flag) {
       this->Q_rcr_ids[ct_rcr] = i;
       ct_rcr++;
-      std::cout<<"KMENON "<<var_name<<std::endl;
     } else if (var_name == "flow:J_heart_outlet:aorta") {
       this->Q_aorta_id = i;
     } else if (var_name == "pressure:J_heart_outlet:aorta") {
@@ -694,7 +661,6 @@ void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, c
     interface.update_block_params(block_name, this->rcr_params);
   }
   
-  //std::cout << "[solveCoronaryLPN] 3 " << std::endl;
   this->heart_params[0]  = params[0]; //Tsa_s
   this->heart_params[1]  = params[1]; //tpwave_s
   this->heart_params[2]  = params[2]; //Erv_s
@@ -763,7 +729,6 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
 //    lca_main_id = loopA;
 //  }
   }
-//std::cout<<"KMENON lca_main_id: "<<lca_main_id<<std::endl;
 
   // INTEGRATE MAIN FLOW
   double lmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_lca_ids[lca_main_id]]);
@@ -779,7 +744,6 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
 //    rca_main_id = loopA;
 //  }
   }
-//std::cout<<"KMENON rca_main_id: "<<rca_main_id<<std::endl;
 
   // SUM RIGHT CORONARY FLUX
   double rmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rca_ids[rca_main_id]]);
@@ -794,8 +758,6 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
         break;
      }
   }
-//std::cout << "[solveCoronaryLPN] dt: " << t[systole_end]-t[systole_end-1]<<std::endl;
-//std::cout << "[solveCoronaryLPN] t[systole_end]: " << t[systole_end]<<std::endl;
 
   // FIND THE START OF SYSTOLE
   int systole_start = totOutputSteps - totalStepsOnSingleCycle - 1;
@@ -806,7 +768,6 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
         break;
      }
   }
-//std::cout << "[solveCoronaryLPN] t[systole_start]: " << t[systole_start]<<std::endl;
 
   // FIND WHEN AORTIC VALVE OPENS
   int ao_open = systole_start;
@@ -819,7 +780,6 @@ void svZeroD_ClosedLoopCoronary::postProcess(LPNSolverInterface& interface, cons
         break;
      }
   }
-  //std::cout << "[solveCoronaryLPN] t[mit_open]: " << t[mit_open]<<std::endl;
 
   // COUNT PERCENTAGE OF
   // Find midpoint of duration when these valves are open 
