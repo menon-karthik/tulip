@@ -42,7 +42,7 @@ int main(int argc, char* argv[]){
 
     // Create new LPN model
     // svZeroDPlus interface library
-    auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
+    auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
     // svZeroD json file
     std::string model_path = "svzerod_tuning.json";
     // Type of svZeroD model
