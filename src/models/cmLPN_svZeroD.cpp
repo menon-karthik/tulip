@@ -5,7 +5,7 @@ using namespace std;
 // ========================
 // CONSTRUCTOR
 // ========================
-cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib){
+cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib, bool custom_error_eval){
   
   // Load shared library and get interface functions.
   //auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
@@ -22,6 +22,9 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::s
   // Set svZeroD model
   this->zeroDmodel = model;
   this->zeroDmodel->setupModel(interface);
+
+  // Does this model use a custom error evaluation?
+  this->custom_error_eval = custom_error_eval;
 }
 
 // ========================
@@ -189,37 +192,45 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
     error = 1;
   }
   errorCode.push_back(error);
-
-////TODO: Is this needed?
-//stdVec computedValues;
-//for(int i = 0; i < resultTotal; i++) {
-//   computedValues.push_back(outputs[i]);
-//}
-
-  // Keys/names for each target quantity
-  vector<string> keys;
-  this->zeroDmodel->getResultKeys(keys);
-
-  // Standard deviation for measured targets
-  stdVec stdFactors;
-  this->zeroDmodel->getDataStd(stdFactors);
-  
-  // Weights for target quantities in error function
-  stdVec weights;
-  this->zeroDmodel->getResultWeights(weights);
-
-  // Print and compare
-  double logLikelihood = 0.0;
-  if(data != NULL){
-
-    // Print Info
-    data->printAndCompare(keys,outputs,weights);
     
-    // Evaluate Log Likelihood
-    logLikelihood = data->evalLogLikelihood(keys,outputs,stdFactors,weights);
+  double model_error = 0.0;
+
+  if (this->custom_error_eval) {
+
+    model_error = this->zeroDmodel->evalModelError(outputs);
+
+  } else {
+
+  ////TODO: Is this needed?
+  //stdVec computedValues;
+  //for(int i = 0; i < resultTotal; i++) {
+  //   computedValues.push_back(outputs[i]);
+  //}
+
+    // Keys/names for each target quantity
+    vector<string> keys;
+    this->zeroDmodel->getResultKeys(keys);
+
+    // Standard deviation for measured targets
+    stdVec stdFactors;
+    this->zeroDmodel->getDataStd(stdFactors);
+    
+    // Weights for target quantities in error function
+    stdVec weights;
+    this->zeroDmodel->getResultWeights(weights);
+
+    // Print and compare
+    if(data != NULL){
+
+      // Print Info
+      data->printAndCompare(keys,outputs,weights);
+      
+      // Evaluate Log Likelihood
+      model_error = data->evalLogLikelihood(keys,outputs,stdFactors,weights);
+    }
   }
 
-  return logLikelihood;
+  return model_error;
 }
 
 void cmLPN_svZeroD::getPriorMapping(int priorModelType,int* prPtr) {

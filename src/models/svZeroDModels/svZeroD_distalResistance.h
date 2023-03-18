@@ -46,8 +46,7 @@ class svZeroD_distalResistance: public svZeroDModel {
     // POSTPROCESS ZEROD SIMULATION
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
 
-    // SOLVE MODEL AND GET LOG LIKELIHOOD TO INTERFACE WITH DREAM
-    //virtual double evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode);
+    // CUSTOM ERROR EVALUATION FOR SPECIFIC MODELS
     virtual double evalModelError(std::vector<double>& results);
 
     // SET 3D MODEL SURROGATE FILE

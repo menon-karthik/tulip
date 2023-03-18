@@ -28,7 +28,7 @@ class cmLPN_svZeroD: public cmModel {
   public:
 
     // DEFAULT CONSTRUCTOR
-    cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib);
+    cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib, bool custom_error_eval = false);
     
     // DESTRUCTOR
     virtual ~cmLPN_svZeroD();
@@ -76,6 +76,7 @@ class cmLPN_svZeroD: public cmModel {
     LPNSolverInterface interface;
     svZeroDModel* zeroDmodel;
     std::vector<double> init_state_y, init_state_ydot;
+    bool custom_error_eval= false;
 };
 
 #endif // CMLPNSVZEROD_H

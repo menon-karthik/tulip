@@ -1112,3 +1112,13 @@ void svZeroD_ClosedLoopCoronary::getSpecifiedParameter(string& specifier, double
   std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
   std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::getSpecifiedParameter not implemented.");
 }
+
+//// ====================
+//// CUSTOM ERROR EVALUATION
+//// ====================
+double svZeroD_ClosedLoopCoronary::evalModelError(std::vector<double>& results) {
+  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::evalModelError not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::evalModelError not implemented.");
+  return 0.0;
+}

@@ -65,6 +65,9 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
     virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param);
 
+    // CUSTOM ERROR EVALUATION FOR SPECIFIC MODELS
+    virtual double evalModelError(std::vector<double>& results);
+
   protected:
 
     int num_blocks;
