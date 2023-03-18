@@ -2,9 +2,8 @@
 
 using namespace std;
 
-svZeroD_distalResistance::svZeroD_distalResistance(std::string input_target_file, std::string input_perfusion_volumes_file) {
-  this-> target_file = input_target_file;
-  this->perfusion_volumes_file = input_perfusion_volumes_file;
+svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std::string perfusion_volumes_file) {
+  this->readTargetsFromFile(target_file);
   if (perfusion_volumes_file != "None") {
     std::cout<<"Using perfusion data"<<std::endl;
     this->use_perfusion = true;
@@ -18,7 +17,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
 //auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
 //this->interface.load_library(interface_lib);
 //this->interface.initialize(model_path);
-  this->nUnknowns = this->interface.system_size_;
+  this->nUnknowns = interface.system_size_;
   
 //// Save initial state
 //this->init_state_y.resize(this->nUnknowns);
@@ -46,12 +45,12 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
 //}
 
   // Number of blocks and number of each type
-  this->num_blocks = this->interface.block_names_.size();
+  this->num_blocks = interface.block_names_.size();
   this->n_corBC_l = 0;
   this->n_corBC_r = 0;
   std::string block_name, branch_name;
   for (int i = 0; i < this->num_blocks; i++) {
-    block_name = this->interface.block_names_[i];
+    block_name = interface.block_names_[i];
     if (block_name.substr(0,6) == "BC_lca") {
       if (!this->use_perfusion) {
         this->n_corBC_l++;
@@ -114,7 +113,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   this->iml_base.reserve(this->n_corBC_l);
   for (int i = 0; i < this->n_corBC_l; i++) {
     block_name = this->names_corBC_l[i];
-    this->interface.read_block_params(block_name, this->coronary_params);
+    interface.read_block_params(block_name, this->coronary_params);
     this->Ra_l_base[i] = this->coronary_params[0];
     this->Ram_l_base[i] = this->coronary_params[1];
     this->Rv_l_base[i] = this->coronary_params[2];
@@ -133,7 +132,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   this->imr_base.reserve(this->n_corBC_r);
   for (int i = 0; i < this->n_corBC_r; i++) {
     block_name = this->names_corBC_r[i];
-    this->interface.read_block_params(block_name, this->coronary_params);
+    interface.read_block_params(block_name, this->coronary_params);
     this->Ra_r_base[i] = this->coronary_params[0];
     this->Ram_r_base[i] = this->coronary_params[1];
     this->Rv_r_base[i] = this->coronary_params[2];
@@ -182,8 +181,8 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   //bool rcr_flag;
   
   // Iterate through the names of variables in the 0D system
-  for (int i = 0; i < this->interface.system_size_; i++) {
-    var_name = this->interface.variable_names_[i];
+  for (int i = 0; i < interface.system_size_; i++) {
+    var_name = interface.variable_names_[i];
     flow_flag = (var_name.substr(0,4) == "flow"); // Is this a flow variable?
 
     // Find last occurence of ":" in variable name. 
@@ -254,7 +253,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
 
 
   // Read targets and discard targets without perfusion data if required
-  this->readTargetsFromFile(target_file);
+  //this->readTargetsFromFile(target_file);
   if (this->use_perfusion) {
     std::vector<double> all_targets = this->target_flows;
     std::vector<std::string> all_outlet_names = this->outlet_names;
@@ -332,7 +331,7 @@ void svZeroD_distalResistance::readTargetsFromFile(string targetFileName)
   this->total_target_flow = 0.0;
   while(std::getline(read_file,buffer))
   {
-    schSplit(buffer,tokens," ");
+    cmUtils::schSplit(buffer,tokens," ");
     this->target_flows.push_back(atof(tokens[1].c_str()));
     this->outlet_names.push_back(tokens[0].c_str());
     this->total_target_flow += atof(tokens[1].c_str());
@@ -360,7 +359,7 @@ void svZeroD_distalResistance::readPerfusionFile(string perfusionFileName)
   while(std::getline(read_file,buffer))
   {
     if (line_ct > 0) { //skip header
-      schSplit(buffer,tokens," ");
+      cmUtils::schSplit(buffer,tokens," ");
       //this->target_flows.push_back(atof(tokens[1].c_str()));
       //this->outlet_names.push_back(tokens[0].c_str());
       this->perfusion_data.insert({tokens[0].c_str(),atof(tokens[1].c_str())});
@@ -405,7 +404,7 @@ string svZeroD_distalResistance::getParamName(int index) {
   } else if ((index >= this->n_corBC_l) && (index < this->n_corBC_r)) {
     return this->Q_rca_ids_names[index-this->n_corBC_l];
   } else {
-    throw std::runtime_error("ERROR: Invalid index in svZeroD_distalResistance::getParamName(index)")
+    throw std::runtime_error("ERROR: Invalid index in svZeroD_distalResistance::getParamName(index)");
   }
 }
 
@@ -418,7 +417,7 @@ string svZeroD_distalResistance::getResultName(int index) {
   } else if ((index >= this->n_corBC_l) && (index < this->n_corBC_r)) {
     return this->Q_rca_ids_names[index-this->n_corBC_l];
   } else {
-    throw std::runtime_error("ERROR: Invalid index in svZeroD_distalResistance::getResultName(index)")
+    throw std::runtime_error("ERROR: Invalid index in svZeroD_distalResistance::getResultName(index)");
   }
 }
 
@@ -427,6 +426,17 @@ string svZeroD_distalResistance::getResultName(int index) {
 double svZeroD_distalResistance::getRScaling(){
   return this->R_scaling;  
   //std::cout<<"hi"<<std::endl;
+}
+
+//// ====================
+//// RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
+//// ====================
+void svZeroD_distalResistance::getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param) {
+  if (specifier == "RScaling") {
+    return_db_param = this->R_scaling;
+  } else {
+    throw std::runtime_error("ERROR: Invalid specifier in svZeroD_distalResistance::getSpecifiedParameter.");
+  }
 }
 
 //// ====================
@@ -523,7 +533,7 @@ void svZeroD_distalResistance::setModelParams(LPNSolverInterface& interface, con
     this->coronary_params[3] = this->Ca_l_base[i]; //Ca
     this->coronary_params[4] = this->Cim_l_base[i]; //Cim
     this->coronary_params[5] = this->iml_base[i]; //iml
-    this->interface.update_block_params(block_name, this->coronary_params);
+    interface.update_block_params(block_name, this->coronary_params);
     R_total_inv += 1.0/(this->coronary_params[0] + this->coronary_params[1] + this->coronary_params[2]);
   }
   
@@ -536,7 +546,7 @@ void svZeroD_distalResistance::setModelParams(LPNSolverInterface& interface, con
     this->coronary_params[3] = this->Ca_r_base[i]; //Ca
     this->coronary_params[4] = this->Cim_r_base[i]; //Cim
     this->coronary_params[5] = this->imr_base[i]; //imr
-    this->interface.update_block_params(block_name, this->coronary_params);
+    interface.update_block_params(block_name, this->coronary_params);
     R_total_inv += 1.0/(this->coronary_params[0] + this->coronary_params[1] + this->coronary_params[2]);
   }
   //std::cout<<"[solveCoronaryLPN] Total assigned coronary resistance = "<<(1.0/R_total_inv)<<std::endl;
@@ -546,6 +556,9 @@ void svZeroD_distalResistance::setModelParams(LPNSolverInterface& interface, con
 // POSTPROCESS ZEROD SIMULATION
 // ==========================================
 void svZeroD_distalResistance::postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) {
+  int totOutputSteps = interface.num_output_steps_;
+  int totalStepsOnSingleCycle = interface.pts_per_cycle_;
+  
   double mean_branch_flow;
   double total_flow = 0.0;
   for(int i = 0; i < n_corBC_l; i++){    
@@ -750,4 +763,53 @@ double svZeroD_distalResistance::evalModelError(std::vector<double>& results) {
 
   //std::cout << "[evalModelError] END " << std::endl;
   return loss;
+}
+
+// ====================
+// GET DEFAULT RANGES
+// ====================
+void svZeroD_distalResistance::getDefaultParameterLimits(stdVec& limits) {
+  std::cout<<"ERROR: svZeroD_distalResistance::getDefaultParameterLimits not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_distalResistance::getDefaultParameterLimits not implemented.");
+}
+
+// ====================
+// GET PRIOR MAPPING
+// ====================
+void svZeroD_distalResistance::getPriorMapping(int priorModelType,int* prPtr) {
+  std::cout<<"ERROR: svZeroD_distalResistance::getPriorMapping not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_distalResistance::getPriorMapping not implemented.");
+}
+
+int svZeroD_distalResistance::getAuxStateTotal(){
+  return 50;
+}
+
+// =========================
+// KEY/NAME FOR EACH TARGET QUANTITY
+// =========================
+void svZeroD_distalResistance::getResultKeys(vector<string>& keys) {
+  std::cout<<"ERROR: svZeroD_distalResistance::getResultKeys not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_distalResistance::getResultKeys not implemented.");
+}
+
+// =========================
+// STANDARD DEVIATION OF EACH TARGET MEASUREMENT
+// =========================
+void svZeroD_distalResistance::getDataStd(stdVec& stdFactors) {
+  std::cout<<"ERROR: svZeroD_distalResistance::getDataStd not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_distalResistance::getDataStd not implemented.");
+}
+
+// =========================
+// INVERSE WEIGHT OF EACH TARGET QUANTITY IN LOG LIKELIHOOD
+// =========================
+void svZeroD_distalResistance::getResultWeights(stdVec& weights) {
+  std::cout<<"ERROR: svZeroD_distalResistance::getResultWeights not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_distalResistance::getResultWeights not implemented.");
 }

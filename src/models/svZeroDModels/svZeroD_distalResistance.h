@@ -17,7 +17,7 @@ class svZeroD_distalResistance: public svZeroDModel {
     svZeroD_distalResistance(std::string input_target_file, std::string input_perufusion_volumes_file);
 
     // SET UP MODEL PARAMETERS
-    virtual void setupModel(LPNSolverInterface& interface, std::vector<std::string> string_inputs);
+    virtual void setupModel(LPNSolverInterface& interface);
 
     // GET NUMBER OF PARAMETERS
     virtual int getParameterTotal();
@@ -47,7 +47,8 @@ class svZeroD_distalResistance: public svZeroDModel {
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
 
     // SOLVE MODEL AND GET LOG LIKELIHOOD TO INTERFACE WITH DREAM
-    virtual double evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode);
+    //virtual double evalModelError(stdVec inputs, stdVec& outputs, stdIntVec& errorCode);
+    virtual double evalModelError(std::vector<double>& results);
 
     // SET 3D MODEL SURROGATE FILE
     //void set3DSurrogateFile(string surrModelFileName);
@@ -69,6 +70,25 @@ class svZeroD_distalResistance: public svZeroDModel {
 
     // RETURN SCALING FACTOR FOR TOTAL RESISTANCE
     double getRScaling();
+
+    virtual void getDefaultParameterLimits(stdVec& limits);
+
+    virtual void getPriorMapping(int priorModelType,int* prPtr);
+
+    // RETURN THE NUMBER OF EXTRA OUTPUTS
+    virtual int  getAuxStateTotal();
+
+    // KEY/NAME FOR EACH TARGET QUANTITY
+    virtual void getResultKeys(vector<string>& keys);
+
+    // STANDARD DEVIATION OF EACH TARGET MEASUREMENT
+    virtual void getDataStd(stdVec& stdFactors);
+
+    // INVERSE WEIGHT OF EACH TARGET QUANTITY IN LOG LIKELIHOOD
+    virtual void getResultWeights(stdVec& weights);
+
+    // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
+    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param);
 
   protected:
 
@@ -95,8 +115,8 @@ class svZeroD_distalResistance: public svZeroDModel {
     int nUnknowns;
     int nFaces;
     int nCOR;
-    int nCOR_l;
-    int nCOR_r;
+    int n_corBC_l;
+    int n_corBC_r;
     //int nRCR;
     std::vector<std::string> names_corBC_l, names_corBC_r;
     // Base vectors to store raw output from reading mesh data

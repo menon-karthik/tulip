@@ -20,7 +20,7 @@
 # include "acActionOPT_NM.h"
 
 #include "cmLPN_svZeroD.h"
-#include "svZeroD_ClosedLoopCoronary.h"
+#include "svZeroD_distalResistance.h"
 
 using namespace std;
 
@@ -141,13 +141,18 @@ int main(int argc, char* argv[]){
   fin_file << "COMPLETE" << std::endl;
   fin_file.close();
 
+  // Write RScaling parameter to end of optParams.txt
   FILE *f;
+  double RScaling = 0.0;
+  int dummy  = 0;
+  std::string specifier = "RScaling";
   //f = fopen(fileName.c_str(), "w");
   f = fopen("optParams.txt", "a");
   //double test = lpnModel->getRScaling;
   //lpnModel->getRScaling();
 //fprintf(f,"%f\n",lpnModel->getRScaling());
-  fprintf(f,"%f\n",zeroDmodel->getRScaling());
+  zeroDmodel->getSpecifiedParameter(specifier,RScaling,dummy);
+  fprintf(f,"%f\n",RScaling);
   fclose(f);
 
   printf("\n");

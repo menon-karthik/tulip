@@ -61,6 +61,9 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
 
     // INVERSE WEIGHT OF EACH TARGET QUANTITY IN LOG LIKELIHOOD
     virtual void getResultWeights(stdVec& weights);
+    
+    // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
+    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param);
 
   protected:
 

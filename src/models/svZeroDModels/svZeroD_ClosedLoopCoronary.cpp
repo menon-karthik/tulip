@@ -1103,3 +1103,12 @@ void svZeroD_ClosedLoopCoronary::getResultWeights(stdVec& weights) {
   weights.push_back(1.0); // RHalfFF
   weights.push_back(1.0); // RGradOK
 }
+
+//// ====================
+//// RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
+//// ====================
+void svZeroD_ClosedLoopCoronary::getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param) {
+  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::getSpecifiedParameter not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::getSpecifiedParameter not implemented.");
+}

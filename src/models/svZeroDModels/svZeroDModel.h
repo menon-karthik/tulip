@@ -76,6 +76,9 @@ class svZeroDModel {
     // INVERSE WEIGHT OF EACH TARGET QUANTITY IN LOG LIKELIHOOD
     virtual void getResultWeights(stdVec& weights) = 0;
 
+    // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
+    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param) = 0;
+
 };
 
 #endif // SVZERODMODEL_H
