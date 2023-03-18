@@ -1,0 +1,2 @@
+ADD_EXECUTABLE(optSvZeroD_distalR ${CMAKE_SOURCE_DIR}/test/cppTests/08_optSvZeroD_distalR/test_optSvZeroD_distalR.cpp)
+TARGET_LINK_LIBRARIES(optSvZeroD_distalR tulip armadillo)
