@@ -567,7 +567,8 @@ void svZeroD_distalResistance::postProcess(LPNSolverInterface& interface, const 
       mean_branch_flow += outVals[this->Q_lca_ids[i]][t];
     }
     mean_branch_flow = mean_branch_flow/(double)(totalStepsOnSingleCycle - 1);
-    results.push_back(mean_branch_flow);
+    //results.push_back(mean_branch_flow);
+    results[i] = mean_branch_flow;
     total_flow += mean_branch_flow;
   }
   for(int i = 0; i < n_corBC_r; i++){    
@@ -576,13 +577,15 @@ void svZeroD_distalResistance::postProcess(LPNSolverInterface& interface, const 
       mean_branch_flow += outVals[this->Q_rca_ids[i]][t];
     }
     mean_branch_flow = mean_branch_flow/(double)(totalStepsOnSingleCycle - 1);
-    results.push_back(mean_branch_flow);
+    //results.push_back(mean_branch_flow);
+    results[n_corBC_l+i] = mean_branch_flow;
     total_flow += mean_branch_flow;
   }
   //std::cout<<"Total coronary flow = "<<total_flow<<std::endl;
   
   for(int i = 0; i < results.size(); i++) {
     results[i] = results[i]/total_flow;
+    //std::cout<<i<<" "<<results[i]<<std::endl;
   }
 }
 
@@ -749,6 +752,7 @@ double svZeroD_distalResistance::evalModelError(std::vector<double>& results) {
   double loss = 0.0;
   double sq_pct_error = 0.0, pct_error = 0.0;
   for(int i=0; i < resultTotal; i++){
+    //std::cout<<results[i]<<std::endl;
     //loss += (results[i] - this->target_flows[i])*(results[i] - this->target_flows[i])/(this->target_flows[i]*this->target_flows[i]);
     //sq_pct_error = (results[i] - this->target_flows[i])*(results[i] - this->target_flows[i])/(this->target_flows[i]*this->target_flows[i]);
     sq_pct_error = (results[i] - this->target_flow_fracs[i])*(results[i] - this->target_flow_fracs[i])/(this->target_flow_fracs[i]*this->target_flow_fracs[i]);
