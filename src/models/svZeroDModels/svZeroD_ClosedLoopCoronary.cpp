@@ -261,7 +261,7 @@ int svZeroD_ClosedLoopCoronary::getParameterTotal(){
 }
 
 // ===================================
-// GET NUMBER OF PARAMETERS (UNKNOWNS)
+// GET NUMBER OF UNKNOWNS
 // ===================================
 int svZeroD_ClosedLoopCoronary::getStateTotal(){
   return this->nUnknowns; 
@@ -500,7 +500,7 @@ string svZeroD_ClosedLoopCoronary::getResultName(int index){
 }
 
 // ====================
-// GET MODEL PARAMETERS
+// GET DEFAULT MODEL PARAMETERS
 // ====================
 void svZeroD_ClosedLoopCoronary::getDefaultParams(stdVec& zp){
       
@@ -630,7 +630,6 @@ void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, c
   
   // Update the model parameters 
   for (int i = 0; i < this->n_corBC_l; i++) {
-    //block_name = "BC_lca" + to_string(i+1);
     block_name = this->names_corBC_l[i];
     this->coronary_params[0] = this->Ra_l_base[i]*params[27]; //Ra
     this->coronary_params[1] = this->Ram_l_base[i]*params[27]; //Ram
@@ -642,7 +641,6 @@ void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, c
   }
   
   for (int i = 0; i < this->n_corBC_r; i++) {
-    //block_name = "BC_rca" + to_string(i+1);
     block_name = this->names_corBC_r[i];
     this->coronary_params[0] = this->Ra_r_base[i]*params[27]; //Ra
     this->coronary_params[1] = this->Ram_r_base[i]*params[27]; //Ram

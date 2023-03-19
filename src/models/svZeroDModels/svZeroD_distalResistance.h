@@ -49,15 +49,6 @@ class svZeroD_distalResistance: public svZeroDModel {
     // CUSTOM ERROR EVALUATION FOR SPECIFIC MODELS
     virtual double evalModelError(std::vector<double>& results);
 
-    // SET 3D MODEL SURROGATE FILE
-    //void set3DSurrogateFile(string surrModelFileName);
-
-    // RETURN THE NUMBER OF EXTRA OUTPUTS
-    //int  getAuxStateTotal();
-
-    // READ CORONARY PARAMETERS FROM FILE
-    //void readParamsFromFile(stdVec& inputs, std::string param_path);
-
     // PRINT OUT RESULTS
     void printResults(int totalResults, double *Xn);
 
@@ -67,9 +58,7 @@ class svZeroD_distalResistance: public svZeroDModel {
     // READ PERFUSION DATA FROM A FILE
     void readPerfusionFile(string perfusionFileName);
 
-    // RETURN SCALING FACTOR FOR TOTAL RESISTANCE
-    double getRScaling();
-
+    // GET THE DEFAULT PARAMETER RANGES FOR THE LPN MODELS (NOT USED)
     virtual void getDefaultParameterLimits(stdVec& limits);
 
     virtual void getPriorMapping(int priorModelType,int* prPtr);
@@ -112,8 +101,6 @@ class svZeroD_distalResistance: public svZeroDModel {
     int total0DSteps;
     // Number of outlets and unknowns
     int nUnknowns;
-    int nFaces;
-    int nCOR;
     int n_corBC_l;
     int n_corBC_r;
     //int nRCR;

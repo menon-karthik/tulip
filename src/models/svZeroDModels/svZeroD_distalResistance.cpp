@@ -11,39 +11,14 @@ svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std:
   }
 }
 
+// ==========================
+// SET UP MODEL-SPECIFIC PARAMETERS FOR OPTIMIZATION
+// ==========================
 void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   
-//// Load shared library and get interface functions.
-//auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
-//this->interface.load_library(interface_lib);
-//this->interface.initialize(model_path);
+  // Load shared library and get interface functions.
   this->nUnknowns = interface.system_size_;
   
-//// Save initial state
-//this->init_state_y.resize(this->nUnknowns);
-//this->init_state_ydot.resize(this->nUnknowns);
-//this->interface.return_y(init_state_y);
-//this->interface.return_ydot(init_state_ydot);
-
-  // String inputs should be <path_to_flow_targets> and <path_to_perfusion_file> (optional)
-//if ((string_inputs.size() < 1) || (string_inputs.size() > 2)) {
-//  throw std::runtime_error("ERROR: String inputs should be <path_to_flow_targets> and <path_to_perfusion_file> (optional)")
-//} else {
-//  std::string target_file = string_inputs[0];
-//  if (string_inputs.size() == 2) {
-//    std::string perfusion_volumes_file = string_inputs[1];
-//    std::cout<<"Using perfusion data"<<std::endl;
-//    this->use_perfusion = true;
-//    this->readPerfusionFile(perfusion_volumes_file);
-//  }
-//}
-
-//if (perfusion_volumes_file != "None") {
-//  std::cout<<"Using perfusion data"<<std::endl;
-//  this->use_perfusion = true;
-//  this->readPerfusionFile(perfusion_volumes_file);
-//}
-
   // Number of blocks and number of each type
   this->num_blocks = interface.block_names_.size();
   this->n_corBC_l = 0;
@@ -92,14 +67,10 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   for (int i = 0; i < this->n_corBC_r; i++) {
     block_name = this->names_corBC_r[i];
     branch_file << block_name <<"\n";
-    //fprintf(fp,"%15s\n",block_name);
   }
   fclose(fp);
 
   this->coronary_params.resize(6);
-//this->rcr_params.resize(3);
-//this->heart_params.resize(27);
-//this->vessel_params.resize(4);
   this->R_total_inv_base = 0.0;
   // Initialize parameter vectors and read baseline block params
   // Baseline parameters (named *_base) are set in the svZeroD config file
@@ -143,42 +114,14 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   }
   std::cout<<"Total baseline coronary resistance = "<<(1.0/this->R_total_inv_base)<<std::endl;
   
-  // Read RCR parameters
-//this->Rp_rcr_base.reserve(this->nRCR);
-//this->Rd_rcr_base.reserve(this->nRCR);
-//this->C_rcr_base.reserve(this->nRCR);
-//for (int i = 0; i < this->nRCR; i++) {
-//  block_name = "BC_RCR" + to_string(i+1);
-//  this->interface.read_block_params(block_name, this->rcr_params);
-//  this->Rp_rcr_base[i] = this->rcr_params[0];
-//  this->C_rcr_base[i] = this->rcr_params[1];
-//  this->Rd_rcr_base[i] = this->rcr_params[2];
-//}
-  
-//// Read closed-loop heart parameters
-//this->interface.read_block_params("CLH", this->heart_params);
-//this->Rrv_base = this->heart_params[9];
-//this->Rlv_base = this->heart_params[13];
-//this->Rpd_base = this->heart_params[16];
-  
-  // Read aorta parameters
-//this->interface.read_block_params("aorta", this->vessel_params);
-
-//if (this->vessel_params[1] == 0) { // If C = 0
-//  this->useRigidSurrogate = true;
-//}
-  
   // Save solution IDs corresponding to important quantities
   this->Q_lca_ids.resize(this->n_corBC_l, -1);
   this->Q_rca_ids.resize(this->n_corBC_r, -1);
   this->Q_lca_ids_names.resize(this->n_corBC_l);
   this->Q_rca_ids_names.resize(this->n_corBC_r);
-//this->Q_rcr_ids.resize(this->nRCR, -1);
   int ct_lca = 0, ct_rca = 0;
-  //int ct_rcr = 0;
   string var_name;
   bool lca_flag, rca_flag, flow_flag, perfusion_flag;
-  //bool rcr_flag;
   
   // Iterate through the names of variables in the 0D system
   for (int i = 0; i < interface.system_size_; i++) {
@@ -195,8 +138,6 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
     // Search for specific patterns in variable name
     lca_flag = !var_name.compare(blk_name_start+1,6,"BC_lca"); //string.compare() returns 0 for exact matches
     rca_flag = !var_name.compare(blk_name_start+1,6,"BC_rca");
-//  rcr_flag = !var_name.compare(blk_name_start+1,6,"BC_RCR");
-//
     if (this->use_perfusion && (lca_flag || rca_flag)) {
       branch_name = var_name.substr(blk_name_start+4,var_name.length()-1);
       if (this->perfusion_data.at(branch_name) > 0.0) {
@@ -237,20 +178,6 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
       throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_rca");
     } 
   }
-//for (int i = 0; i < this->nRCR; i++) {
-//  if (this->Q_rcr_ids[i] < 0) {
-//    throw std::runtime_error("Error: Did not find all solution IDs for variables named BC_RCR");
-//  }
-//}
-//if (Q_aorta_id < 0) {
-//  std::cout << "[svZeroD_distalResistance] Variable IDs: " << Q_aorta_id << std::endl;
-//  throw std::runtime_error("Error: Did not find all solution IDs for variables.");
-//}
-//if ((Q_aorta_id < 0) || (P_aorta_id < 0) || (Q_LV_id < 0) || (V_LV_id < 0) || (Q_LA_id < 0) || (Q_RV_id < 0) || (P_pul_id < 0) || (P_RV_id < 0) || (P_RA_id < 0)) {
-//  std::cout << "[cmLPN_svZeroD] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
-//  throw std::runtime_error("Error: Did not find all solution IDs for variables.");
-//}
-
 
   // Read targets and discard targets without perfusion data if required
   //this->readTargetsFromFile(target_file);
@@ -326,8 +253,6 @@ void svZeroD_distalResistance::readTargetsFromFile(string targetFileName)
   if(read_file.eof())
     throw cmException("ERROR: No targets found!");
   
-  //std::vector<double> targets;
-  //std::vector<std::string> outlet_names;
   this->total_target_flow = 0.0;
   while(std::getline(read_file,buffer))
   {
@@ -360,8 +285,6 @@ void svZeroD_distalResistance::readPerfusionFile(string perfusionFileName)
   {
     if (line_ct > 0) { //skip header
       cmUtils::schSplit(buffer,tokens," ");
-      //this->target_flows.push_back(atof(tokens[1].c_str()));
-      //this->outlet_names.push_back(tokens[0].c_str());
       this->perfusion_data.insert({tokens[0].c_str(),atof(tokens[1].c_str())});
     }
     line_ct++;
@@ -383,10 +306,6 @@ int svZeroD_distalResistance::getParameterTotal(){
 int svZeroD_distalResistance::getStateTotal(){
   return this->nUnknowns; 
 }
-
-//int cmLPN_svZeroD::getAuxStateTotal(){
-//  return 50;
-//}
 
 // ===========================
 // GET TOTAL NUMBER OF RESULTS
@@ -421,16 +340,9 @@ string svZeroD_distalResistance::getResultName(int index) {
   }
 }
 
-
-//void svZeroD_distalResistance::getRScaling(){
-double svZeroD_distalResistance::getRScaling(){
-  return this->R_scaling;  
-  //std::cout<<"hi"<<std::endl;
-}
-
-//// ====================
-//// RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
-//// ====================
+// ====================
+// RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
+// ====================
 void svZeroD_distalResistance::getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param) {
   if (specifier == "RScaling") {
     return_db_param = this->R_scaling;
@@ -439,9 +351,9 @@ void svZeroD_distalResistance::getSpecifiedParameter(string& specifier, double& 
   }
 }
 
-//// ====================
-//// GET MODEL PARAMETERS
-//// ====================
+// ====================
+// GET MODEL PARAMETERS
+// ====================
 void svZeroD_distalResistance::getDefaultParams(stdVec& default_params){
       
   default_params.resize(getParameterTotal());
@@ -567,7 +479,6 @@ void svZeroD_distalResistance::postProcess(LPNSolverInterface& interface, const 
       mean_branch_flow += outVals[this->Q_lca_ids[i]][t];
     }
     mean_branch_flow = mean_branch_flow/(double)(totalStepsOnSingleCycle - 1);
-    //results.push_back(mean_branch_flow);
     results[i] = mean_branch_flow;
     total_flow += mean_branch_flow;
   }
@@ -577,7 +488,6 @@ void svZeroD_distalResistance::postProcess(LPNSolverInterface& interface, const 
       mean_branch_flow += outVals[this->Q_rca_ids[i]][t];
     }
     mean_branch_flow = mean_branch_flow/(double)(totalStepsOnSingleCycle - 1);
-    //results.push_back(mean_branch_flow);
     results[n_corBC_l+i] = mean_branch_flow;
     total_flow += mean_branch_flow;
   }
@@ -589,165 +499,15 @@ void svZeroD_distalResistance::postProcess(LPNSolverInterface& interface, const 
   }
 }
 
-  
-////int svZeroD_distalResistance::solveCoronaryLPN(double* params, double* results){
-//int svZeroD_distalResistance::solveCoronaryLPN(std::vector<double> params, std::vector<double>& results){
-
-//  //std::cout << "[solveCoronaryLPN] START " << std::endl;
-//  // Time parameters
-//  //double totalTime = numCycles * cycleTime;
-//  int totalStepsOnSingleCycle = this->interface.pts_per_cycle_;
-//  int numCycles = this->interface.num_cycles_;
-//  int totOutputSteps = this->interface.num_output_steps_;
-
-//  int totalStates = getStateTotal();
-//  int totalResults = getResultTotal();
-
-//  // State Variables
-////double** outVals = NULL;
-////outVals = new double*[totalStates];
-////for(int loopA=0;loopA<totalStates;loopA++){
-////  outVals[loopA] = new double[totOutputSteps];
-////}
-
-//  //std::cout << "[solveCoronaryLPN] 1 " << std::endl;
-//  std::vector<std::vector<double>> outVals(totalStates, std::vector<double> (totOutputSteps, 0));
-
-//  // Scale each resistance so the total coronary resistance remains the same
-//  double R_total_inv = 0.0;
-//  double outlet_R;
-//  for (int i = 0; i < this->n_corBC_l; i++) {
-//    outlet_R = (this->Ra_l_base[i]+this->Ram_l_base[i]+this->Rv_l_base[i])*params[i];
-//    R_total_inv += 1.0/outlet_R;
-//  }
-//  for (int i = 0; i < this->n_corBC_r; i++) {
-//    outlet_R = (this->Ra_r_base[i]+this->Ram_r_base[i]+this->Rv_r_base[i])*params[n_corBC_l+i];
-//    R_total_inv += 1.0/outlet_R;
-//  }
-//  this->R_scaling = R_total_inv/this->R_total_inv_base;
-//  //std::cout<<"[solveCoronaryLPN] R scaling: "<<R_scaling<<std::endl;
-
-//  std::string block_name;
-//  
-//  R_total_inv = 0.0;
-//  // Update the model parameters 
-//  for (int i = 0; i < this->n_corBC_l; i++) {
-//    //std::cout<<"params["<<i<<"]: "<<params[i]<<std::endl;
-//    block_name = this->names_corBC_l[i];
-//    this->coronary_params[0] = this->Ra_l_base[i]*params[i]*this->R_scaling; //Ra
-//    this->coronary_params[1] = this->Ram_l_base[i]*params[i]*this->R_scaling; //Ram
-//    this->coronary_params[2] = this->Rv_l_base[i]*params[i]*this->R_scaling; //Rv
-//    this->coronary_params[3] = this->Ca_l_base[i]; //Ca
-//    this->coronary_params[4] = this->Cim_l_base[i]; //Cim
-//    this->coronary_params[5] = this->iml_base[i]; //iml
-//    this->interface.update_block_params(block_name, this->coronary_params);
-//    R_total_inv += 1.0/(this->coronary_params[0] + this->coronary_params[1] + this->coronary_params[2]);
-//  }
-//  
-//  for (int i = 0; i < this->n_corBC_r; i++) {
-//    //std::cout<<"params["<<n_corBC_l+i<<"]: "<<params[n_corBC_l+i]<<std::endl;
-//    block_name = this->names_corBC_r[i];
-//    this->coronary_params[0] = this->Ra_r_base[i]*params[n_corBC_l+i]*this->R_scaling; //Ra
-//    this->coronary_params[1] = this->Ram_r_base[i]*params[n_corBC_l+i]*this->R_scaling; //Ram
-//    this->coronary_params[2] = this->Rv_r_base[i]*params[n_corBC_l+i]*this->R_scaling; //Rv
-//    this->coronary_params[3] = this->Ca_r_base[i]; //Ca
-//    this->coronary_params[4] = this->Cim_r_base[i]; //Cim
-//    this->coronary_params[5] = this->imr_base[i]; //imr
-//    this->interface.update_block_params(block_name, this->coronary_params);
-//    R_total_inv += 1.0/(this->coronary_params[0] + this->coronary_params[1] + this->coronary_params[2]);
-//  }
-//  //std::cout<<"[solveCoronaryLPN] Total assigned coronary resistance = "<<(1.0/R_total_inv)<<std::endl;
-//  
-//  // Set up solution and time vectors, and run simulation
-//  std::vector<double> solutions(interface.system_size_*interface.num_output_steps_);
-//  std::vector<double> times(interface.num_output_steps_);
-//  int error_code = 0;
-//  interface.update_state(init_state_y, init_state_ydot);
-//  this->interface.run_simulation(0.0, times, solutions, error_code);
-//  //std::cout << "[solveCoronaryLPN] error_code: " << error_code << std::endl;
-
-//  // Parse the solution vector
-//  int state, step;
-//  double t[interface.num_output_steps_];
-//  for (step = 0; step < totOutputSteps; step++) {
-//    t[step] = times[step];
-//    //std::cout<<"times: "<<times[step]<<std::endl;
-//  }
-//  int sol_idx;
-//  for (state = 0; state < totalStates; state++) {
-//    for (step = 0; step < totOutputSteps; step++) {
-//      sol_idx = step*totalStates + state;
-//      outVals[state][step] = solutions[sol_idx];
-//    }
-//  }
-//  //std::cout << "[solveCoronaryLPN] after parsing solution" << std::endl;
-
-//  double mean_branch_flow;
-//  double total_flow = 0.0;
-//  for(int i = 0; i < n_corBC_l; i++){    
-//    mean_branch_flow = 0.0;
-//    for (int t = totOutputSteps - totalStepsOnSingleCycle - 1; t < totOutputSteps; t++) {
-//      mean_branch_flow += outVals[this->Q_lca_ids[i]][t];
-//    }
-//    mean_branch_flow = mean_branch_flow/(double)(totalStepsOnSingleCycle - 1);
-//    results.push_back(mean_branch_flow);
-//    total_flow += mean_branch_flow;
-//  }
-//  for(int i = 0; i < n_corBC_r; i++){    
-//    mean_branch_flow = 0.0;
-//    for (int t = totOutputSteps - totalStepsOnSingleCycle - 1; t < totOutputSteps; t++) {
-//      mean_branch_flow += outVals[this->Q_rca_ids[i]][t];
-//    }
-//    mean_branch_flow = mean_branch_flow/(double)(totalStepsOnSingleCycle - 1);
-//    results.push_back(mean_branch_flow);
-//    total_flow += mean_branch_flow;
-//  }
-//  //std::cout<<"Total coronary flow = "<<total_flow<<std::endl;
-//  
-//  for(int i = 0; i < results.size(); i++) {
-//    results[i] = results[i]/total_flow;
-//  }
-
-////if(error_code != 0) {
-////  for(int loopA=0;loopA<totalStates;loopA++){
-////    delete [] outVals[loopA];
-////  }
-////  delete [] outVals;
-////  return 1;
-////}
-
-//  // FREE MEMORY
-////  for(int loopA=0;loopA<totalStates;loopA++){
-////    delete [] outVals[loopA];
-////  }
-////delete [] outVals;
-
-//  //std::cout << "[solveCoronaryLPN] END " << std::endl;
-//  return error_code;
-//}
 
 // =========================
 // EVAL MODEL ERROR FUNCTION
 // =========================
-//double svZeroD_distalResistance::evalModelError(std::vector<double> paramsVals, std::vector<double>& outputs, std::vector<int>& errorCode) {
 double svZeroD_distalResistance::evalModelError(std::vector<double>& results) {
   //std::cout << "[evalModelError] START " << std::endl;
 
   int totalParams = getParameterTotal();
   int resultTotal   = getResultTotal();
-  
-//std::vector<double> results;
-
-//// Solve coronary model
-//int error = 0;
-//try{
-//  error = solveCoronaryLPN(paramsVals,results);
-//}catch(...){
-//  error = 1;
-//}
-//errorCode.push_back(error);
- 
-  //std::cout << "[evalModelError] 2 " << std::endl;
   
   double loss = 0.0;
   double sq_pct_error = 0.0, pct_error = 0.0;

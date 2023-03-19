@@ -43,6 +43,7 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     // GET THE PARAMETER RANGES FOR THE LPN MODELS
     virtual void getParameterLimits(stdVec& limits);
 
+    // GET THE DEFAULT PARAMETER RANGES FOR THE LPN MODELS (NOT USED CURRENTLY)
     virtual void getDefaultParameterLimits(stdVec& limits);
 
     virtual void getPriorMapping(int priorModelType,int* prPtr);

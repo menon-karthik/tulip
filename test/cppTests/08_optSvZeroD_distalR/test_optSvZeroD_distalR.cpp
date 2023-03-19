@@ -1,34 +1,11 @@
-// TEST CASE 8 - Tune outlet/distal reistrances of svZeroD model using Nelder Mead
+// TEST CASE 8 - Tune outlet/distal resistances of svZeroD model using Nelder Mead
 // Karthik Menon, Mar 2023
 
-# include <stdlib.h>
-# include <stdio.h>
-# include <iostream>
-# include <fstream>
-# include <math.h>
-# include <string>
-# include <vector>
-
-# include "uqTypes.h"
-# include "uqConstants.h"
-
-# include "cmException.h"
-# include "cmUtils.h"
-
-# include "daData_multiple_Table.h"
-
 # include "acActionOPT_NM.h"
-
 #include "cmLPN_svZeroD.h"
 #include "svZeroD_distalResistance.h"
 
 using namespace std;
-
-//const int modelPA = 0;
-//const int modelPD = 1;
-
-//const int keyColumn = 2;
-//const int timeStampColumn = 1;
 
 // =============
 // MAIN FUNCTION
@@ -61,54 +38,39 @@ int main(int argc, char* argv[]){
     }
   }
   
-  //try{
+  // Create new LPN model
+  // svZeroDPlus interface library
+  auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
+  // Type of svZeroD model
+  svZeroDModel* zeroDmodel = new svZeroD_distalResistance(targets_file, perfusion_volumes_file);
+  cmLPN_svZeroD* lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib, true);
 
-    // DATASET
-    //daData* data = new daData_Scalar_MultiplePatients();
-    //data->readFromFile(currPatientFile);
+  // Total Number of iterations
+  int totIterations = 50;
+  // Convergence Tolerance
+  double convTol = 1.0e-1;
+  // Check Convergence every convUpdateIt iterations
+  int convUpdateIt = 10;
+  // Maximum Iterations
+  int maxOptIt = 200;
+  // Coefficient for Step increments
+  double stepCoefficient = 0.1;    
+  // File with initial starting point
+  bool useStartingParameterFromFile = false;
+  string startParameterFile("");
+  bool startFromCentre = false;
 
-//  // LPN MODEL
-//  cmLPN_svZeroD_distalR* lpnModel;
-//  //std::string model_path = "svzerod_tuning.json";
-//  lpnModel = new cmLPN_svZeroD_distalR(model_path,targets_file,perfusion_volumes_file); 
+  // INIT ACTION
+  acAction* nm = new acActionOPT_NM(convTol, 
+                                    convUpdateIt,
+                                    maxOptIt,
+                                    stepCoefficient);
+  
+  // SET THE MODEL
+  nm->setModel(lpnModel);
 
-    // ASSIGN DATASET
-    //lpnModel->setData(data,2);
-    //lpnModel->readTargetsFromFile(currPatientFile);
-
-    // Create new LPN model
-    // svZeroDPlus interface library
-    auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
-    // Type of svZeroD model
-    svZeroDModel* zeroDmodel = new svZeroD_distalResistance(targets_file, perfusion_volumes_file);
-    cmLPN_svZeroD* lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib, true);
-
-    // Total Number of iterations
-    int totIterations = 50;
-    // Convergence Tolerance
-    double convTol = 1.0e-1;
-    // Check Convergence every convUpdateIt iterations
-    int convUpdateIt = 10;
-    // Maximum Iterations
-    int maxOptIt = 200;
-    // Coefficient for Step increments
-    double stepCoefficient = 0.1;    
-    // File with initial starting point
-    bool useStartingParameterFromFile = false;
-    string startParameterFile("");
-    bool startFromCentre = false;
-
-    // INIT ACTION
-    acAction* nm = new acActionOPT_NM(convTol, 
-                                      convUpdateIt,
-                                      maxOptIt,
-                                      stepCoefficient);
-    
-    // SET THE MODEL
-    nm->setModel(lpnModel);
-
-    // SET INITIAL GUESS
-    ((acActionOPT_NM*)nm)->setInitialParamGuess(useStartingParameterFromFile,
+  // SET INITIAL GUESS
+  ((acActionOPT_NM*)nm)->setInitialParamGuess(useStartingParameterFromFile,
                                                 startFromCentre,
                                                 startParameterFile);        
 
@@ -146,11 +108,7 @@ int main(int argc, char* argv[]){
   double RScaling = 0.0;
   int dummy  = 0;
   std::string specifier = "RScaling";
-  //f = fopen(fileName.c_str(), "w");
   f = fopen("optParams.txt", "a");
-  //double test = lpnModel->getRScaling;
-  //lpnModel->getRScaling();
-//fprintf(f,"%f\n",lpnModel->getRScaling());
   zeroDmodel->getSpecifiedParameter(specifier,RScaling,dummy);
   fprintf(f,"%f\n",RScaling);
   fclose(f);

@@ -1,24 +1,8 @@
 // TEST CASE 7 - Tune parameters of svZeroD coronary closed-loop model using Nelder Mead
 // Karthik Menon, Jan 2023
 
-# include <stdlib.h>
-# include <stdio.h>
-# include <iostream>
-# include <fstream>
-# include <math.h>
-# include <string>
-# include <vector>
-
-# include "uqTypes.h"
-# include "uqConstants.h"
-
-# include "cmException.h"
-# include "cmUtils.h"
-
 # include "daData_multiple_Table.h"
-
 # include "acActionOPT_NM.h"
-
 #include "cmLPN_svZeroD.h"
 #include "svZeroD_ClosedLoopCoronary.h"
 
