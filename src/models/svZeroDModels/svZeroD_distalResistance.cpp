@@ -3,7 +3,10 @@
 using namespace std;
 
 svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std::string perfusion_volumes_file) {
+  // Read target flows
   this->readTargetsFromFile(target_file);
+
+  // Read perfusion_volumes.dat if provided
   if (perfusion_volumes_file != "None") {
     std::cout<<"Using perfusion data"<<std::endl;
     this->use_perfusion = true;
@@ -179,8 +182,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
     } 
   }
 
-  // Read targets and discard targets without perfusion data if required
-  //this->readTargetsFromFile(target_file);
+  // Discard targets without perfusion data if required
   if (this->use_perfusion) {
     std::vector<double> all_targets = this->target_flows;
     std::vector<std::string> all_outlet_names = this->outlet_names;
@@ -204,6 +206,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
     std::cout << "Error: Number of target flows does not match number of saved flow state IDs" << std::endl;
     throw std::runtime_error("Error: Number of target flows does not match number of saved flow state IDs");
   }
+
   // Rearrange targets to match the order of names in Q_lca/rca_ids
   //Add target_flows and outlet_names and Q_lca/rca_ids_names and R_total_inv_base to header file
   int idx;
@@ -508,13 +511,11 @@ double svZeroD_distalResistance::evalModelError(std::vector<double>& results) {
 
   int totalParams = getParameterTotal();
   int resultTotal   = getResultTotal();
-  
+
+  // Compute mean squared percentage error and mean percentage error of flow fractions
   double loss = 0.0;
   double sq_pct_error = 0.0, pct_error = 0.0;
   for(int i=0; i < resultTotal; i++){
-    //std::cout<<results[i]<<std::endl;
-    //loss += (results[i] - this->target_flows[i])*(results[i] - this->target_flows[i])/(this->target_flows[i]*this->target_flows[i]);
-    //sq_pct_error = (results[i] - this->target_flows[i])*(results[i] - this->target_flows[i])/(this->target_flows[i]*this->target_flows[i]);
     sq_pct_error = (results[i] - this->target_flow_fracs[i])*(results[i] - this->target_flow_fracs[i])/(this->target_flow_fracs[i]*this->target_flow_fracs[i]);
     loss += sq_pct_error;
     pct_error += sqrt(sq_pct_error);
@@ -547,8 +548,14 @@ void svZeroD_distalResistance::getPriorMapping(int priorModelType,int* prPtr) {
   std::runtime_error("ERROR: svZeroD_distalResistance::getPriorMapping not implemented.");
 }
 
+// ====================
+// GET NUMBER OF AUXILIARY STATES
+// ====================
 int svZeroD_distalResistance::getAuxStateTotal(){
-  return 50;
+  std::cout<<"ERROR: svZeroD_distalResistance::getAuxStateTotal not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_distalResistance::getAuxStateTotal not implemented.");
+  return 0;
 }
 
 // =========================

@@ -77,6 +77,7 @@ class cmLPN_svZeroD: public cmModel {
     svZeroDModel* zeroDmodel;
     std::vector<double> init_state_y, init_state_ydot;
     bool custom_error_eval= false;
+    stdVec results;
 };
 
 #endif // CMLPNSVZEROD_H

@@ -8,7 +8,6 @@ using namespace std;
 cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib, bool custom_error_eval){
   
   // Load shared library and get interface functions.
-  //auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface_library.so");
   this->interface.load_library(interface_lib);
   this->interface.initialize(model_path);
   auto nUnknowns = this->interface.system_size_;
@@ -25,6 +24,10 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::s
 
   // Does this model use a custom error evaluation?
   this->custom_error_eval = custom_error_eval;
+
+  // Create results/outputs vector
+  this->results.clear();
+  this->results.resize(getResultTotal());
 }
 
 // ========================
@@ -119,20 +122,22 @@ void cmLPN_svZeroD::printResults(const int totalResults, const stdVec results) {
 int cmLPN_svZeroD::solveLPN(const stdVec& params, stdVec& results){
 
   int totalStates = getStateTotal();
-  int totalAuxStates = getAuxStateTotal();
   int totOutputSteps = interface.num_output_steps_;
   
   // Initialize the outputs
   stdMat auxOutVals;
   stdMat outVals;
   outVals.resize(totalStates);
-  auxOutVals.resize(totalAuxStates);
   for(int loopA=0;loopA<totalStates;loopA++){
     outVals[loopA].resize(totOutputSteps);
   }
-  for(int loopA=0;loopA<totalAuxStates;loopA++){
-    auxOutVals[loopA].resize(totOutputSteps);
-  }
+ 
+  // NOTE: Aux states currently not used. Uncomment below if required.
+  //int totalAuxStates = getAuxStateTotal();
+  //auxOutVals.resize(totalAuxStates);
+  //for(int loopA=0;loopA<totalAuxStates;loopA++){
+  //  auxOutVals[loopA].resize(totOutputSteps);
+  //}
  
   // Update the model parameters based on input params argument
   this->zeroDmodel->setModelParams(interface, params);
@@ -180,14 +185,10 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
   int totalParams = getParameterTotal();
   int resultTotal = getResultTotal();
   
-  //TODO: Does this need to be done every time this fn is called?
-  outputs.clear();
-  outputs.resize(resultTotal);
-
   // Solve coronary model
   int error = 0;
   try{
-    error = solveLPN(inputs,outputs);
+    error = solveLPN(inputs,this->results);
   }catch(...){
     error = 1;
   }
@@ -197,15 +198,10 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
 
   if (this->custom_error_eval) {
 
-    model_error = this->zeroDmodel->evalModelError(outputs);
+    // Custom error metric for some models 
+    model_error = this->zeroDmodel->evalModelError(this->results);
 
   } else {
-
-  ////TODO: Is this needed?
-  //stdVec computedValues;
-  //for(int i = 0; i < resultTotal; i++) {
-  //   computedValues.push_back(outputs[i]);
-  //}
 
     // Keys/names for each target quantity
     vector<string> keys;
@@ -223,13 +219,14 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
     if(data != NULL){
 
       // Print Info
-      data->printAndCompare(keys,outputs,weights);
+      data->printAndCompare(keys,this->results,weights);
       
       // Evaluate Log Likelihood
-      model_error = data->evalLogLikelihood(keys,outputs,stdFactors,weights);
+      model_error = data->evalLogLikelihood(keys,this->results,stdFactors,weights);
     }
   }
 
+  outputs = this->results;
   return model_error;
 }
 
