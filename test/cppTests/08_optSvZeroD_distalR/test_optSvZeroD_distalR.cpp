@@ -98,11 +98,6 @@ int main(int argc, char* argv[]){
     return 0;
   }
 
-  // COMPLETED
-  std::ofstream fin_file("NM_fin.txt");
-  fin_file << "COMPLETE" << std::endl;
-  fin_file.close();
-
   // Write RScaling parameter to end of optParams.txt
   FILE *f;
   double RScaling = 0.0;
@@ -112,6 +107,11 @@ int main(int argc, char* argv[]){
   zeroDmodel->getSpecifiedParameter(specifier,RScaling,dummy);
   fprintf(f,"%f\n",RScaling);
   fclose(f);
+
+  // COMPLETED
+  std::ofstream fin_file("NM_fin.txt");
+  fin_file << "COMPLETE" << std::endl;
+  fin_file.close();
 
   printf("\n");
   printf("COMPLETED!\n");
