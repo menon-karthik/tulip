@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
     exit(1);
   }else{
     try{
-      // Get Model ID and Patient Number
+      // Get svZeroD model json file and perfusion volumes file (if provided)
       model_path = string(argv[1]);
       targets_file = string(argv[2]);
       if(argc == 4) {
