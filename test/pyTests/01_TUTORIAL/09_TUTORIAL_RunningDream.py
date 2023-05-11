@@ -9,32 +9,56 @@ import tulipCM as cm
 import tulipDA as da
 # Import Action Library
 import tulipAC as ac
-# Import Mat File From MATLAB
-import scipy.io
+# Other libraries
 import numpy as np
 from mpi4py import MPI
+import matplotlib.pyplot as plt
 
-# Available Models
-ipGOH  = 0
-ipSHRA = 1
-ipFR   = 2
+# Perform data preparation
+def prepare_data():
 
-# MAIN FUNCTION
-def main():
+  # Get Parameter Set From Optimization
+  inputs     = uq.stdVec()
+  outputs    = uq.stdVec()
+  errorCodes = uq.stdIntVec()
+
+  # Solve Model
+  model = cm.cmTutorial()
+  model.getDefaultParams(inputs)
   
-  # MPI Init
-  rank = comm.Get_rank()
-  size = comm.Get_size()
-
   # Dataset
   useSingleColumn = False
   columnID = 0  
-  data = da.daData_Scalar_MultiplePatients(useSingleColumn,columnID);
-  data.readFromFile('../datasets/tutorial.csv');
+  data = da.daData_multiple_Table(useSingleColumn,columnID)
+  data.readFromFile('tutorial.csv')
+  model.setData(data);
 
+  # Evaluate model  
+  ll = model.evalModelError(inputs,outputs,errorCodes)
+
+  # Print results and LL
+  print()
+  print('Outputs: ',np.array(outputs))
+  print('LL: ',ll)
+
+# MAIN FUNCTION
+def main_dream():
+
+  # Init MPI
+  comm = MPI.COMM_WORLD
+  rank = comm.Get_rank()
+  size = comm.Get_size()
+  
+  # Dataset
+  useSingleColumn = False
+  columnID = 0  
+  data = da.daData_multiple_Table(useSingleColumn,columnID)
+  data.readFromFile('tutorial.csv')
+
+  # Assign model
   model = cm.cmTutorial()
 
-  # ASSIGN DATASET
+  # Assign dataset
   model.setData(data);
 
   # Set DREAM Parameters
@@ -63,20 +87,20 @@ def main():
   priorModelType = 0
 
   # Initialize DREAM Action
-  dream = ac.acActionDREAM(totChains,
-                           totGenerations,
-                           totalCR,
-                           totCrossoverPairs,
-                           dreamChainFileName,
-                           dreamGRFileName,
-                           dreamGRThreshold,
-                           dreamJumpStep,
-                           dreamGRPrintStep,
-                           dreamRestartReadFileName,
-                           dreamRestartWriteFileName,
-                           usePriorFromFile,
-                           priorFileName,
-                           priorModelType)
+  dream = ac.acActionDREAMmpi(totChains,
+                              totGenerations,
+                              totalCR,
+                              totCrossoverPairs,
+                              dreamChainFileName,
+                              dreamGRFileName,
+                              dreamGRThreshold,
+                              dreamJumpStep,
+                              dreamGRPrintStep,
+                              dreamRestartReadFileName,
+                              dreamRestartWriteFileName,
+                              usePriorFromFile,
+                              priorFileName,
+                              priorModelType)
 
   # Set Model
   dream.setModel(model)
@@ -90,18 +114,34 @@ def main():
   # Post Process the Results
   if(rank == 0):
     debugMode = False
-    burnInPercent = 0.1
+    burnInPercent = 50.0 # half of the samples discarded
     dream.postProcess(debugMode,burnInPercent);
+
+def post_process():
+  params = np.loadtxt('paramTraces.txt',skiprows=1)[:,2:]
+  plt.figure(figsize=(10,3))
+  plt.subplot(1,3,1)
+  plt.hist(params[:,0],bins='auto',alpha=0.5)
+  plt.axvline(x = 1, color = 'r')
+  plt.subplot(1,3,2)
+  plt.hist(params[:,1],bins='auto',alpha=0.5)
+  plt.axvline(x = 5, color = 'r')
+  plt.subplot(1,3,3)
+  plt.hist(params[:,2],bins='auto',alpha=0.5)
+  plt.axvline(x = 60, color = 'r')
+  plt.tight_layout()
+  plt.show()
 
 # ====
 # MAIN
 # ====
 if __name__ == "__main__":
 
-  # Init MPI
-  comm = MPI.COMM_WORLD
-  rank = comm.Get_rank()
-  size = comm.Get_size()
+  # Perform data preparation
+  # prepare_data()
 
-  # Run Main Function
-  main()
+  # run dream function
+  main_dream()
+
+  # post_process
+  # post_process()
