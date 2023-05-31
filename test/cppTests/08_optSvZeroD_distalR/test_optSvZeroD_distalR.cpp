@@ -109,7 +109,7 @@ int main(int argc, char* argv[]){
   fclose(f);
 
   // COMPLETED
-  std::ofstream fin_file("NM_fin.txt");
+  std::ofstream fin_file("NM_fin_distalR.txt");
   fin_file << "COMPLETE" << std::endl;
   fin_file.close();
 

@@ -105,7 +105,7 @@ int main(int argc, char* argv[]){
   }
 
   // COMPLETED
-  std::ofstream fin_file("NM_fin.txt");
+  std::ofstream fin_file("NM_fin_closedloop.txt");
   fin_file << "COMPLETE" << std::endl;
   fin_file.close();
 
