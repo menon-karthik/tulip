@@ -36,7 +36,7 @@ void cmTutorial::getDefaultParameterLimits(stdVec& limits){
   limits.resize(6);
   // Starting Position [m]
   limits[0] = 0.0;
-  limits[1] = 1.0;
+  limits[1] = 2.0;
   // Initial Velocity [m/s]
   limits[2] = 0.0;
   limits[3] = 10.0;
