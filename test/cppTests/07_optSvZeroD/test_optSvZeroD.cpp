@@ -35,7 +35,6 @@ int main(int argc, char* argv[]){
     
   // Create new data object
   int keyColumn = 0;
-  int timeStampColumn = 0;
   int columnID = 1; // N-1 after column with keys
   bool useSingleColumn = true;
   string currPatientFile("coronary.csv");
@@ -51,7 +50,6 @@ int main(int argc, char* argv[]){
   lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib);
 
   // Assign Dataset to model
-  int currPatient = 0;
   lpnModel->setData(data);
 
   // Set Optimizer Parameters

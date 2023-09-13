@@ -1,0 +1,2 @@
+ADD_EXECUTABLE(estimateDREAM_svZeroD ${CMAKE_SOURCE_DIR}/test/cppTests/10_estimateDREAM_svZeroD/test_estimateDREAM_svZeroD.cpp)
+TARGET_LINK_LIBRARIES(estimateDREAM_svZeroD tulip armadillo)
