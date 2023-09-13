@@ -507,7 +507,6 @@ void svZeroD_distalResistance::postProcess(LPNSolverInterface& interface, const 
 // EVAL MODEL ERROR FUNCTION
 // =========================
 double svZeroD_distalResistance::evalModelError(std::vector<double>& results) {
-  //std::cout << "[evalModelError] START " << std::endl;
 
   int totalParams = getParameterTotal();
   int resultTotal   = getResultTotal();
@@ -526,7 +525,6 @@ double svZeroD_distalResistance::evalModelError(std::vector<double>& results) {
   std::cout<<"[evalModelError] Mean pct error: "<<pct_error<<std::endl;
 
 
-  //std::cout << "[evalModelError] END " << std::endl;
   return loss;
 }
 

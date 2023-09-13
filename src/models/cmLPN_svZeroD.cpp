@@ -201,7 +201,7 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
     // Custom error metric for some models 
     model_error = this->zeroDmodel->evalModelError(this->results);
 
-  } else {
+  } else { // Otherwise error is in terms of log likelihood
 
     // Keys/names for each target quantity
     vector<string> keys;

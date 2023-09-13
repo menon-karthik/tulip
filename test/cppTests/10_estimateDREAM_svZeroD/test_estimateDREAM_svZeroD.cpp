@@ -41,7 +41,7 @@ int main(int argc, char* argv[]){
   lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib);
 
   // Assign dataset
-  model->setData(data);
+  lpnModel->setData(data);
 
   // DREAM Parameters
   int totChains = num_procs;
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]){
                       priorModelType);
 
   // Set model
-  dream.setModel(model);
+  dream.setModel(lpnModel);
 
 
   // Run MCMC simulation
