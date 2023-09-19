@@ -18,6 +18,7 @@
 # include "cmException.h"
 # include "uqConstants.h"
 # include "LPNSolverInterface.h"
+# include "daData.h"
 
 using namespace std;
 
@@ -81,6 +82,9 @@ class svZeroDModel {
 
     // CUSTOM ERROR EVALUATION FOR SPECIFIC MODELS
     virtual double evalModelError(std::vector<double>& results) = 0;
+    
+    // CUSTOM DATA OBJECT FOR SPECIFIC MODELS
+    virtual daData* createCustomData() = 0;
 };
 
 #endif // SVZERODMODEL_H

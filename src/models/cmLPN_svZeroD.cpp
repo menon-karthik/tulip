@@ -5,7 +5,7 @@ using namespace std;
 // ========================
 // CONSTRUCTOR
 // ========================
-cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib, bool custom_error_eval){
+cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib, bool custom_error_eval, bool use_custom_data){
   
   // Load shared library and get interface functions.
   this->interface.load_library(interface_lib);
@@ -25,9 +25,18 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::s
   // Does this model use a custom error evaluation?
   this->custom_error_eval = custom_error_eval;
 
+  // If data object is not read from a file and needs to be specially created 
+  if (use_custom_data) {
+    daData* custom_data = this->zeroDmodel->createCustomData();
+    this->setData(custom_data);
+  }
+
   // Create results/outputs vector
   this->results.clear();
   this->results.resize(getResultTotal());
+
+  // Write a file with all the parameter names
+  this->writeParamNames();
 }
 
 // ========================
@@ -182,7 +191,6 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
 
   int model = 0;
 
-  int totalParams = getParameterTotal();
   int resultTotal = getResultTotal();
   
   // Solve coronary model
@@ -251,6 +259,21 @@ void writeAllDataFile(int totalSteps,int totalStates,int totAuxStates,const stdM
     }
     fprintf(outFile,"\n");
   }
+  // CLOSE THE FILE
+  fclose(outFile);
+}
+
+// ==================
+// SAVE ALL PARAM NAMES
+// ==================
+void cmLPN_svZeroD::writeParamNames() {
+  FILE* outFile;
+  outFile = fopen("paramNames.txt","w");
+  for(int loopA=0; loopA < this->getParameterTotal(); loopA++) {
+    auto param_name = getParamName(loopA);
+    std::cout<<param_name<<std::endl;
+    fprintf(outFile,"%s \n",param_name.c_str());
+    }
   // CLOSE THE FILE
   fclose(outFile);
 }

@@ -28,7 +28,7 @@ class cmLPN_svZeroD: public cmModel {
   public:
 
     // DEFAULT CONSTRUCTOR
-    cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib, bool custom_error_eval = false);
+    cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::string interface_lib, bool custom_error_eval = false, bool use_custom_data = false);
     
     // DESTRUCTOR
     virtual ~cmLPN_svZeroD();
@@ -70,6 +70,9 @@ class cmLPN_svZeroD: public cmModel {
     virtual double evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode);
     
     virtual void getPriorMapping(int priorModelType,int* prPtr);
+
+    // WRITE A FILE WITH PARAMETER NAMES
+    virtual void writeParamNames();
 
   protected:
 

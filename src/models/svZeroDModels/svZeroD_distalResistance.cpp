@@ -208,7 +208,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   }
 
   // Rearrange targets to match the order of names in Q_lca/rca_ids
-  //Add target_flows and outlet_names and Q_lca/rca_ids_names and R_total_inv_base to header file
+  // Add target_flows and outlet_names and Q_lca/rca_ids_names and R_total_inv_base to header file
   int idx;
   std::vector<double> targets_copy = this->target_flows;
   for (int i = 0; i < this->Q_lca_ids.size(); i++) {
@@ -233,11 +233,19 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
       throw std::runtime_error("Error: Could not find "+this->Q_rca_ids_names[i]+" in outlet_names.");
     }
   }
-
-  // Save target flow fractions
+  
+  // Save target flow fractions, result keys, weights and standard deviation
+  double perfusion_std = 5.0;
   std::cout<<"Total target flow = "<<this->total_target_flow<<std::endl;
   for (int i = 0; i < this->target_flows.size(); i++) {
+    // Flow fractions
     this->target_flow_fracs.push_back(this->target_flows[i]/this->total_target_flow);
+    // Result names/keys
+    this->result_keys.push_back(this->getResultName(i));
+    // Result weights
+    this->result_weights.push_back(1.0);
+    // Standard deviations of target flows
+    this->data_std.push_back(perfusion_std);
   }
 }
 
@@ -323,10 +331,12 @@ int svZeroD_distalResistance::getResultTotal(){
 string svZeroD_distalResistance::getParamName(int index) {
   if (index < this->n_corBC_l) {
     return this->Q_lca_ids_names[index];
-  } else if ((index >= this->n_corBC_l) && (index < this->n_corBC_r)) {
+  } else if ((index >= this->n_corBC_l) && (index < (this->n_corBC_l+this->n_corBC_r))) {
     return this->Q_rca_ids_names[index-this->n_corBC_l];
   } else {
-    throw std::runtime_error("ERROR: Invalid index in svZeroD_distalResistance::getParamName(index)");
+    const std::string err_msg = "ERROR in svZeroD_distalResistance::getParamName: Invalid index: "
+            +std::to_string(index)+" ; Max index: "+std::to_string(this->n_corBC_l+this->n_corBC_r);
+    throw std::runtime_error(err_msg);
   }
 }
 
@@ -336,10 +346,12 @@ string svZeroD_distalResistance::getParamName(int index) {
 string svZeroD_distalResistance::getResultName(int index) {
   if (index < this->n_corBC_l) {
     return this->Q_lca_ids_names[index];
-  } else if ((index >= this->n_corBC_l) && (index < this->n_corBC_r)) {
+  } else if ((index >= this->n_corBC_l) && (index < (this->n_corBC_l+this->n_corBC_r))) {
     return this->Q_rca_ids_names[index-this->n_corBC_l];
   } else {
-    throw std::runtime_error("ERROR: Invalid index in svZeroD_distalResistance::getResultName(index)");
+    const std::string err_msg = "ERROR in svZeroD_distalResistance::getResultName: Invalid index: "
+            +std::to_string(index)+" ; Max index: "+std::to_string(this->n_corBC_l+this->n_corBC_r);
+    throw std::runtime_error(err_msg);
   }
 }
 
@@ -508,7 +520,6 @@ void svZeroD_distalResistance::postProcess(LPNSolverInterface& interface, const 
 // =========================
 double svZeroD_distalResistance::evalModelError(std::vector<double>& results) {
 
-  int totalParams = getParameterTotal();
   int resultTotal   = getResultTotal();
 
   // Compute mean squared percentage error and mean percentage error of flow fractions
@@ -560,25 +571,34 @@ int svZeroD_distalResistance::getAuxStateTotal(){
 // KEY/NAME FOR EACH TARGET QUANTITY
 // =========================
 void svZeroD_distalResistance::getResultKeys(vector<string>& keys) {
-  std::cout<<"ERROR: svZeroD_distalResistance::getResultKeys not implemented."<<std::endl;
-  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
-  std::runtime_error("ERROR: svZeroD_distalResistance::getResultKeys not implemented.");
+  keys = this->result_keys;
 }
 
 // =========================
 // STANDARD DEVIATION OF EACH TARGET MEASUREMENT
 // =========================
 void svZeroD_distalResistance::getDataStd(stdVec& stdFactors) {
-  std::cout<<"ERROR: svZeroD_distalResistance::getDataStd not implemented."<<std::endl;
-  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
-  std::runtime_error("ERROR: svZeroD_distalResistance::getDataStd not implemented.");
+  stdFactors = this->data_std;
 }
 
 // =========================
 // INVERSE WEIGHT OF EACH TARGET QUANTITY IN LOG LIKELIHOOD
 // =========================
 void svZeroD_distalResistance::getResultWeights(stdVec& weights) {
-  std::cout<<"ERROR: svZeroD_distalResistance::getResultWeights not implemented."<<std::endl;
-  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
-  std::runtime_error("ERROR: svZeroD_distalResistance::getResultWeights not implemented.");
+  weights = this->result_weights;
+}
+
+// =========================
+// CUSTOM DATA OBJECT AFTER SCALING TARGET FLOWS 
+// AND REMOVING BRANCHES WITHOUT PERFUSION DATA
+// =========================
+daData* svZeroD_distalResistance::createCustomData() {
+  bool useSingleColumn = true;
+  int columnID = 0; // column N-1 after the column with keys (not relevant here if not reading file)
+  daData* custom_data = new daData_multiple_Table(useSingleColumn,columnID);
+  for (int i = 0; i < this->getResultTotal(); i++) {
+    std::cout<<"[createCustomData] key: "<<this->result_keys[i]<<" ; Flow frac: "<<this->target_flow_fracs[i]<<std::endl;
+    custom_data->addKeyValue(this->result_keys[i], this->target_flow_fracs[i]);
+  }
+  return custom_data;
 }

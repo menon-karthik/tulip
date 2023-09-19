@@ -3,10 +3,9 @@
 // Karthik Menon, 2023
 // =========================
 
-# include "daData_multiple_Table.h"
 # include "acActionDREAMmpi.h"
 # include "cmLPN_svZeroD.h"
-# include "svZeroD_ClosedLoopCoronary.h"
+# include "svZeroD_distalResistance.h"
 
 using namespace std;
 
@@ -19,29 +18,37 @@ int main(int argc, char* argv[]){
   MPI_Comm_size(MPI_COMM_WORLD,&num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD,&id);
 
-  if(argc != 3){
-    printf("Usage: test_estimateDREAM_svZeroD <model_json_file> <target_file> \n");
+  std::string model_path;
+  std::string targets_file;
+  std::string perfusion_volumes_file;
+  if (argc < 3 || argc > 4) {
+    printf("Usage: test_estimateDREAM_distalR <model_json_file> <target_flows> (optional: perfusion_volumes) \n");
     printf("Terminated!\n");
     exit(1);
+  } else {
+    try {
+      // Get svZeroD model json file and perfusion volumes file (if provided)
+      model_path = string(argv[1]);
+      targets_file = string(argv[2]);
+      if(argc == 4) {
+        perfusion_volumes_file = string(argv[3]);
+      } else {
+        perfusion_volumes_file = "None";
+      }
+    } catch(exception &e) {
+      // ERROR: TERMINATED!
+      printf("Invalid Input Arguments\n");
+      printf("TERMINATED!\n");
+      return 0;
+    }
   }
 
-  // Dataset
-  std::string target_file;
-  target_file = string(argv[2]);
-  bool useSingleColumn = true;
-  int columnID = 1;
-  daData* data = new daData_multiple_Table(useSingleColumn,columnID);
-  data->readFromFile(target_file);
-
-  // Assign model
-  std::string model_path = string(argv[1]);
+  // Create new LPN model
+  // svZeroDPlus interface library
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
-  svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
-  cmLPN_svZeroD* lpnModel;
-  lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib);
-
-  // Assign dataset
-  lpnModel->setData(data);
+  // Type of svZeroD model
+  svZeroDModel* zeroDmodel = new svZeroD_distalResistance(targets_file, perfusion_volumes_file);
+  cmLPN_svZeroD* lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib, false, true);
 
   // DREAM Parameters
   int totChains = num_procs;

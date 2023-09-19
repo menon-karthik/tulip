@@ -69,6 +69,9 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     // CUSTOM ERROR EVALUATION FOR SPECIFIC MODELS
     virtual double evalModelError(std::vector<double>& results);
 
+    // CUSTOM DATA OBJECT FOR SPECIFIC MODELS
+    virtual daData* createCustomData();
+
   protected:
 
     int num_blocks;

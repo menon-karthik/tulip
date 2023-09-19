@@ -1120,3 +1120,12 @@ double svZeroD_ClosedLoopCoronary::evalModelError(std::vector<double>& results) 
   std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::evalModelError not implemented.");
   return 0.0;
 }
+//// ====================
+//// CUSTOM DATA
+//// ====================
+daData* svZeroD_ClosedLoopCoronary::createCustomData() {
+  std::cout<<"ERROR: svZeroD_ClosedLoopCoronary::createCustomData not implemented."<<std::endl;
+  std::cout<<"Execution should be terminated but might not if this is in a try-catch block."<<std::endl;
+  std::runtime_error("ERROR: svZeroD_ClosedLoopCoronary::createCustomData not implemented.");
+  return NULL;
+}

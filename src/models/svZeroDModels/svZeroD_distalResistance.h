@@ -2,6 +2,7 @@
 #define SVZERODDISTALRESISTANCE
 
 # include "svZeroDModel.h"
+# include "daData_multiple_Table.h"
 
 using namespace std;
 
@@ -48,6 +49,9 @@ class svZeroD_distalResistance: public svZeroDModel {
 
     // CUSTOM ERROR EVALUATION FOR SPECIFIC MODELS
     virtual double evalModelError(std::vector<double>& results);
+
+    // CUSTOM DATA OBJECT FOR SPECIFIC MODELS
+    virtual daData* createCustomData();
 
     // PRINT OUT RESULTS
     void printResults(int totalResults, double *Xn);
@@ -118,6 +122,10 @@ class svZeroD_distalResistance: public svZeroDModel {
     std::vector<double> Ca_r_base;
     std::vector<double> iml_base;
     std::vector<double> imr_base;
+
+    std::vector<double> result_weights;
+    std::vector<std::string> result_keys;
+    std::vector<double> data_std;
 };
 
 #endif // SVZERODDISTALRESISTANCE

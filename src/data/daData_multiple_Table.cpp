@@ -211,10 +211,10 @@ double daData_multiple_Table::evalLogLikelihood(const stdStringVec& keys,const s
   return result;
 }
 
-void daData_multiple_Table::printAndCompare(const stdStringVec& keys,const stdVec& values,const stdVec& weigths){
+void daData_multiple_Table::printAndCompare(const stdStringVec& keys,const stdVec& values,const stdVec& weights){
   
   // Check The Size of keys and values
-  if((keys.size() != values.size())||(keys.size() != weigths.size())){
+  if((keys.size() != values.size())||(keys.size() != weights.size())){
     throw daException("Error in printAndCompare size of keys and values are not consistent.\n");
   }
 
@@ -256,7 +256,7 @@ void daData_multiple_Table::printAndCompare(const stdStringVec& keys,const stdVe
         if(measuredString.compare("none") != 0){        
           try{
             measured = atof(measuredString.c_str());
-            weight = weigths[loopA];
+            weight = weights[loopA];
             fprintf(fp,"%15s %15.3f %15.3f %15.3f\n",keys[loopA].c_str(),measured,computed,weight);
           }catch(...){
           }
