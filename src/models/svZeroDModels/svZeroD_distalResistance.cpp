@@ -235,7 +235,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   }
   
   // Save target flow fractions, result keys, weights and standard deviation
-  double perfusion_std = 5.0;
+  double perfusion_std = 10.0;
   std::cout<<"Total target flow = "<<this->total_target_flow<<std::endl;
   for (int i = 0; i < this->target_flows.size(); i++) {
     // Flow fractions
@@ -245,7 +245,8 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
     // Result weights
     this->result_weights.push_back(1.0);
     // Standard deviations of target flows
-    this->data_std.push_back(perfusion_std);
+    //this->data_std.push_back(perfusion_std);
+    this->data_std.push_back(this->target_flow_fracs[i]*perfusion_std/100.0);
   }
 }
 
