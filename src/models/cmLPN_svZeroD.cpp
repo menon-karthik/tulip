@@ -271,9 +271,8 @@ void cmLPN_svZeroD::writeParamNames() {
   outFile = fopen("paramNames.txt","w");
   for(int loopA=0; loopA < this->getParameterTotal(); loopA++) {
     auto param_name = getParamName(loopA);
-    std::cout<<param_name<<std::endl;
     fprintf(outFile,"%s \n",param_name.c_str());
-    }
+  }
   // CLOSE THE FILE
   fclose(outFile);
 }
