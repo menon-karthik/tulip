@@ -866,7 +866,7 @@ int findNodeMap(int nodeIdx, int dims, int totalNodesRed, double* nodesRed,
 void generateNodesWeightMat(int dims, int maxOrder, double* resNodes,stdMat &resWeights){
   
   // Generate the nodes at the maximum Order
-  int totalNodes = sparse_grid_cfn_size (dims,maxOrder);
+  int totalNodes = sparse_grid_cfn_size (dims,maxOrder); // kmenon: this is already computed in generateSparseGrid
   double* maxNodes = new double[dims*totalNodes];
   double* maxWeights = new double[totalNodes];
   sparse_grid_cc (dims,maxOrder,totalNodes,maxWeights,maxNodes);
