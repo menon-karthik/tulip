@@ -162,6 +162,7 @@ void extractGSICoefficients(int basis_num,int res_num,int par_num,
     for(int loopB=1;loopB<basis_num;loopB++){
       currVariance = currVariance + sigmaCoeffs[loopA][loopB]*sigmaCoeffs[loopA][loopB];
     }
+    std::cout<<"[extractGSICoefficients]: Variance for result "<<loopA<<" = "<<currVariance<<std::endl;
    
     // Clear Temporary Arrays
     tempDirTable.clear();
@@ -176,10 +177,12 @@ void extractGSICoefficients(int basis_num,int res_num,int par_num,
         // Direct Coefficient
         if(hasOnlyIndex(loopB,loopC,par_num,mi)){
           currFirstOrderCoeffDir = currFirstOrderCoeffDir + sigmaCoeffs[loopA][loopC]*sigmaCoeffs[loopA][loopC];
+          //std::cout<<"[extractGSICoefficients]: Direct coeff - Result: "<<loopA<<" ; parameter: "<<loopB<<" ; coeff = "<<sigmaCoeffs[loopA][loopC]<<std::endl;
         }
         // Total Coefficent
         if(mi->getMultiIndexAt(loopC,loopB) != 0){
           currFirstOrderCoeffTot = currFirstOrderCoeffTot + sigmaCoeffs[loopA][loopC]*sigmaCoeffs[loopA][loopC];
+          //std::cout<<"[extractGSICoefficients]: Total coeff - Result: "<<loopA<<" ; parameter: "<<loopB<<" ; coeff = "<<sigmaCoeffs[loopA][loopC]<<std::endl;
         }
       }
       // Store Table Value
@@ -362,6 +365,7 @@ int acActionGSI::go(){
 
     // Write Sample Point if debug
     if(writeDebugData){
+      printf("Evaluation %d out of %d\n",loopA,samples->getTotSamples());
       printf("CURRENT PARAMETER SAMPLE\n");
       for(int loopC=0;loopC<par_num;loopC++){
         printf("%d %f\n",loopC,currGridSample[loopC]);
