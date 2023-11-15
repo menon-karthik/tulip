@@ -248,7 +248,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
     }
   }
   if ((Q_aorta_id < 0) || (P_aorta_id < 0) || (Q_LV_id < 0) || (V_LV_id < 0) || (Q_LA_id < 0) || (Q_RV_id < 0) || (P_pul_id < 0) || (P_RV_id < 0) || (P_RA_id < 0)) {
-    std::cout << "[svZeroD_ClosedLoopCoronary_GSI] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
+    //std::cout << "[svZeroD_ClosedLoopCoronary_GSI] Variable IDs: " << Q_aorta_id << ", " << P_aorta_id << ", " << Q_LV_id << ", " << V_LV_id << ", " << Q_LA_id << ", " << Q_RV_id << ", " << P_pul_id << ", " << P_RV_id << ", " << P_RA_id << std::endl;
     throw std::runtime_error("Error: Did not find all solution IDs for variables.");
   }
 
@@ -258,7 +258,9 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
 // ========================
 int svZeroD_ClosedLoopCoronary_GSI::getParameterTotal(){
   //return 38;
-  return 37;
+  //return 37;
+  //return 36;
+  return 35;
 }
 
 // ===================================
@@ -339,66 +341,126 @@ string svZeroD_ClosedLoopCoronary_GSI::getParamName(int index){
     case 17: {
 	    result = "Cpa";
       break; }
-//  case 18: {
-//          result = "R_inlet";
-//    break; }
+  //case 18: {
+  //        result = "R_inlet";
+  //  break; }
     case 18: {
-	    result = "Kxp_ra";
+            result = "Kxp_ra";
       break; }
     case 19: {
-	    result = "Kxv_ra";
+            result = "Kxv_ra";
       break; }
     case 20: {
-	    result = "Emax_ra";
+            result = "Emax_ra";
       break; }
     case 21: {
-	    result = "Vaso_ra";
+            result = "Vaso_ra";
       break; }
     case 22: {
-	    result = "Kxp_la";
+            result = "Kxp_la";
       break; }
     case 23: {
-	    result = "Kxv_la";
+            result = "Kxv_la";
       break; }
     case 24: {
-	    result = "Emax_la";
+            result = "Emax_la";
       break; }
     case 25: {
-	    result = "Vaso_la";
+            result = "Vaso_la";
       break; }
     case 26: {
-	    result = "Ram_cor";
+            result = "Ram_cor";
       break; }
     case 27: {
-	    result = "Rv_cor";
+            result = "Rv_cor";
       break; }
     case 28: {
             result = "Cam_l";
       break; }
     case 29: {
-	    result = "Ca_l";
+            result = "Ca_l";
       break; }
     case 30: {
-	    result = "Cam_r";
+            result = "Cam_r";
       break; }
     case 31: {
-	    result = "Ca_r";
+            result = "Ca_r";
       break; }
     case 32: {
-	    result = "Rrcr";
+            result = "Rrcr";
       break; }
     case 33: {
-	    result = "Crcr";
+            result = "Crcr";
       break; }
+  //case 34: {
+  //        result = "R_prox_factor";
+  //  break; }
     case 34: {
-            result = "R_prox_factor";
+            result = "imr";
       break; }
-    case 35: {
-	    result = "imr";
-      break; }
-    case 36: {
-            result = "init_volume_scaling";
-      break; }
+  //case 36: {
+  //        result = "init_volume_scaling";
+  //  break; }
+//  case 18: {
+//          result = "R_inlet";
+//    break; }
+//  case 19: {
+//          result = "Kxp_ra";
+//    break; }
+//  case 20: {
+//          result = "Kxv_ra";
+//    break; }
+//  case 21: {
+//          result = "Emax_ra";
+//    break; }
+//  case 22: {
+//          result = "Vaso_ra";
+//    break; }
+//  case 23: {
+//          result = "Kxp_la";
+//    break; }
+//  case 24: {
+//          result = "Kxv_la";
+//    break; }
+//  case 25: {
+//          result = "Emax_la";
+//    break; }
+//  case 26: {
+//          result = "Vaso_la";
+//    break; }
+//  case 27: {
+//          result = "Ram_cor";
+//    break; }
+//  case 28: {
+//          result = "Rv_cor";
+//    break; }
+//  case 29: {
+//          result = "Cam_l";
+//    break; }
+//  case 30: {
+//          result = "Ca_l";
+//    break; }
+//  case 31: {
+//          result = "Cam_r";
+//    break; }
+//  case 32: {
+//          result = "Ca_r";
+//    break; }
+//  case 33: {
+//          result = "Rrcr";
+//    break; }
+//  case 34: {
+//          result = "Crcr";
+//    break; }
+//  case 35: {
+//          result = "R_prox_factor";
+//    break; }
+//  case 36: {
+//          result = "imr";
+//    break; }
+//  case 37: {
+//          result = "init_volume_scaling";
+//    break; }
   }
   return result;
 }
@@ -532,7 +594,7 @@ void svZeroD_ClosedLoopCoronary_GSI::getDefaultParams(stdVec& zp){
       zp[15] = 100.0; // Rpd
       zp[16] = 1.0;   // Cp
       zp[17] = 0.9;   // Cpa
-//    zp[18] = 15.0; // R_inlet
+      //zp[18] = 15.0; // R_inlet
 
       zp[18] = 4.0;   // Kxp_ra
       zp[19] = 0.005; // Kxv_ra
@@ -552,9 +614,32 @@ void svZeroD_ClosedLoopCoronary_GSI::getDefaultParams(stdVec& zp){
       zp[31] = 1.0;  // Ca_r
       zp[32] = 1.00;  // Rrcr
       zp[33] = 1.0;  // Crcr
-      zp[34] = 0.11;  // Rprox_factor
-      zp[35] = 0.75;  // imr
-      zp[36] = 1.0; // init_volume_scaling
+      //zp[34] = 0.11;  // Rprox_factor
+      zp[34] = 0.75;  // imr
+      //zp[36] = 1.0; // init_volume_scaling
+//    zp[18] = 15.0; // R_inlet
+
+//    zp[19] = 4.0;   // Kxp_ra
+//    zp[20] = 0.005; // Kxv_ra
+//    zp[21] = 0.2;   // Emax_ra
+//    zp[22] = 0.0;   // Vaso_ra
+
+//    zp[23] = 8.0;   // Kxp_la
+//    zp[24] = 0.008;// Kxv_la
+//    zp[25] = 0.3;   // Emax_la
+//    zp[26] = 0.0;   // Vaso_la
+
+//    zp[27] = 1.0;  // Ram_cor
+//    zp[28] = 1.0;   // Rv_cor
+//    zp[29] = 0.25;   // Cam_l
+//    zp[30] = 1.0;   // Ca_l
+//    zp[31] = 0.25;  // Cam_r
+//    zp[32] = 1.0;  // Ca_r
+//    zp[33] = 1.00;  // Rrcr
+//    zp[34] = 1.0;  // Crcr
+//    zp[35] = 0.11;  // Rprox_factor
+//    zp[36] = 0.75;  // imr
+//    zp[37] = 1.0; // init_volume_scaling
 }
 
 // ====================
@@ -585,7 +670,7 @@ void svZeroD_ClosedLoopCoronary_GSI::getParameterLimits(stdVec& limits){
   limits[30]=0.5000;  limits[31]=1.5; // Rpd
   limits[32]=0.900;   limits[33]=1.1;   //Cp
   limits[34]=0.08;    limits[35]=1.0;   //Cpa
-//limits[36]=0.0;     limits[37]=0.0; // R_inlet
+  //limits[36]=0.0;     limits[37]=0.0; // R_inlet
   //limits[36]=0.001;   limits[37]=10.00; //Kxp_ra
   limits[36]=1.0;   limits[37]=10.00; //Kxp_ra
   limits[38]=0.003;   limits[39]=0.005; //Kxv_ra
@@ -614,11 +699,61 @@ void svZeroD_ClosedLoopCoronary_GSI::getParameterLimits(stdVec& limits){
   //limits[66]=0.0100;  limits[67]=1.1;  //Crcr
   limits[66]=0.1;  limits[67]=2.0;  //Crcr
   //limits[68]=0.1;     limits[69]=0.2;   // Rprox_factor
-  limits[68]=0.1;     limits[69]=0.2;   // Rprox_factor
   //limits[70]=0.2000;  limits[71]=1.000; // imr
-  limits[70]=0.2000;  limits[71]=1.000; // imr
+  limits[68]=0.2000;  limits[69]=1.000; // imr
   //limits[72]=0.3;     limits[73]=1.5;   // init_volume_scaling
-  limits[72]=0.1;     limits[73]=1.5;   // init_volume_scaling
+  //limits[72]=0.1;     limits[73]=1.5;   // init_volume_scaling
+//limits[0]=0.4000;   limits[1]=0.4500; // Tsa
+//limits[2]=8.0000;   limits[3]=9.000; // tpwave
+//limits[4]=1.0000;   limits[5]=3.00; // Erv
+//limits[6]=1.5000;   limits[7]=5.00; // Elv
+//limits[8]=0.2000;   limits[9]=1.00; // iml
+//limits[10]=0.1;     limits[11]=0.5;   // Lrv_a
+//limits[12]=0.5;     limits[13]=1.5; // Rrv_a
+////limits[14]=0.001;   limits[15]=0.5;  // Lra_v
+//limits[14]=0.01;   limits[15]=0.5;  // Lra_v
+//limits[16]=5.0;     limits[17]=12.0; // Rra_v
+////limits[18]=0.001;   limits[19]=0.5;  // Lla_v
+//limits[18]=0.01;   limits[19]=0.5;  // Lla_v
+//limits[20]=5.0;     limits[21]=12.0; // Rla_v
+//limits[22]=0.5;     limits[23]=1.5; // Rlv_ao
+//limits[24]=0.1;     limits[25]=0.5;   // Llv_a
+//limits[26]=-10.0;   limits[27]=10.0; // Vrv_u
+//limits[28]=-10.0;   limits[29]=10.0; // Vlv_u
+//limits[30]=0.5000;  limits[31]=1.5; // Rpd
+//limits[32]=0.900;   limits[33]=1.1;   //Cp
+//limits[34]=0.08;    limits[35]=1.0;   //Cpa
+//limits[36]=0.0;     limits[37]=1.0; // R_inlet
+////limits[38]=0.001;   limits[39]=10.00; //Kxp_ra
+//limits[38]=1.0;   limits[39]=10.00; //Kxp_ra
+//limits[40]=0.003;   limits[41]=0.005; //Kxv_ra
+//limits[42]=0.2;     limits[43]=0.3;  //Emax_ra
+//limits[44]=-5.00;   limits[45]=5.00; //Vaso_ra
+////limits[46]=0.0001;  limits[47]=10.00; //Kxp_la
+//limits[46]=1.0;  limits[47]=10.00; //Kxp_la
+//limits[48]=0.0075;  limits[49]=0.0085; //Kxv_la
+//limits[50]=0.29;    limits[51]=0.310; //Emax_la
+//limits[52]=-5.00;   limits[53]=10.00; //Vaso_la
+////limits[54]=0.0100;  limits[55]=10.0;  //Ram_cor
+//limits[54]=0.100;  limits[55]=2.0;  //Ram_cor
+////limits[56]=0.0001;  limits[57]=10.0;  //Rv_cor
+//limits[56]=0.5;  limits[57]=10.0;  //Rv_cor
+////limits[58]=0.0001;  limits[59]=10.0;  //Cam_l
+//limits[58]=0.5;  limits[59]=10.0;  //Cam_l
+////limits[60]=0.0001;  limits[61]=10.0;  //Ca_l
+//limits[60]=0.5;  limits[61]=10.0;  //Ca_l
+////limits[62]=0.0001;  limits[63]=10.0;  //Cam_r
+//limits[62]=0.05;  limits[63]=10.0;  //Cam_r
+////limits[64]=0.0001;  limits[65]=10.0;  //Ca_r
+//limits[64]=0.5;  limits[65]=10.0;  //Ca_r
+////limits[66]=0.1000;  limits[67]=10.0;  //Rrcr
+//limits[66]=0.5;  limits[67]=10.0;  //Rrcr
+////limits[68]=0.0100;  limits[69]=1.1;  //Crcr
+//limits[68]=0.100;  limits[69]=2.0;  //Crcr
+//limits[70]=0.1;     limits[71]=0.2;   // Rprox_factor
+//limits[72]=0.2000;  limits[73]=1.000; // imr
+////limits[74]=0.3;     limits[75]=1.5;   // init_volume_scaling
+//limits[74]=0.1;     limits[75]=1.5;   // init_volume_scaling
 }
 
 // ====================
@@ -648,31 +783,45 @@ void svZeroD_ClosedLoopCoronary_GSI::setModelParams(LPNSolverInterface& interfac
   // Update the model parameters 
   for (int i = 0; i < this->n_corBC_l; i++) {
     block_name = this->names_corBC_l[i];
-    this->coronary_params[0] = this->Ra_l_base[i]*params[27]; //Ra
-    this->coronary_params[1] = this->Ram_l_base[i]*params[27]; //Ram
-    this->coronary_params[2] = this->Rv_l_base[i]*params[28]; //Rv
-    this->coronary_params[3] = this->Ca_l_base[i]*params[30]; //Ca
-    this->coronary_params[4] = this->Cim_l_base[i]*params[29]; //Cim
+//  this->coronary_params[0] = this->Ra_l_base[i]*params[27]; //Ra
+//  this->coronary_params[1] = this->Ram_l_base[i]*params[27]; //Ram
+//  this->coronary_params[2] = this->Rv_l_base[i]*params[28]; //Rv
+//  this->coronary_params[3] = this->Ca_l_base[i]*params[30]; //Ca
+//  this->coronary_params[4] = this->Cim_l_base[i]*params[29]; //Cim
+    this->coronary_params[0] = this->Ra_l_base[i]*params[26]; //Ra
+    this->coronary_params[1] = this->Ram_l_base[i]*params[26]; //Ram
+    this->coronary_params[2] = this->Rv_l_base[i]*params[27]; //Rv
+    this->coronary_params[3] = this->Ca_l_base[i]*params[29]; //Ca
+    this->coronary_params[4] = this->Cim_l_base[i]*params[28]; //Cim
     this->coronary_params[5] = params[4]; //iml
     interface.update_block_params(block_name, this->coronary_params);
   }
   
   for (int i = 0; i < this->n_corBC_r; i++) {
     block_name = this->names_corBC_r[i];
-    this->coronary_params[0] = this->Ra_r_base[i]*params[27]; //Ra
-    this->coronary_params[1] = this->Ram_r_base[i]*params[27]; //Ram
-    this->coronary_params[2] = this->Rv_r_base[i]*params[28]; //Rv
-    this->coronary_params[3] = this->Ca_r_base[i]*params[32]; //Ca
-    this->coronary_params[4] = this->Cim_r_base[i]*params[31]; //Cim
-    this->coronary_params[5] = params[36]; //imr
+//  this->coronary_params[0] = this->Ra_r_base[i]*params[27]; //Ra
+//  this->coronary_params[1] = this->Ram_r_base[i]*params[27]; //Ram
+//  this->coronary_params[2] = this->Rv_r_base[i]*params[28]; //Rv
+//  this->coronary_params[3] = this->Ca_r_base[i]*params[32]; //Ca
+//  this->coronary_params[4] = this->Cim_r_base[i]*params[31]; //Cim
+//  this->coronary_params[5] = params[36]; //imr
+    this->coronary_params[0] = this->Ra_r_base[i]*params[26]; //Ra
+    this->coronary_params[1] = this->Ram_r_base[i]*params[26]; //Ram
+    this->coronary_params[2] = this->Rv_r_base[i]*params[27]; //Rv
+    this->coronary_params[3] = this->Ca_r_base[i]*params[31]; //Ca
+    this->coronary_params[4] = this->Cim_r_base[i]*params[30]; //Cim
+    this->coronary_params[5] = params[34]; //imr
     interface.update_block_params(block_name, this->coronary_params);
   }
   
   for (int i = 0; i < this->n_RCR; i++) {
     block_name = "BC_RCR" + to_string(i+1);
-    this->rcr_params[0] = this->Rp_rcr_base[i]*params[33]; //Rp
-    this->rcr_params[1] = this->C_rcr_base[i]*params[34]; //C
-    this->rcr_params[2] = this->Rd_rcr_base[i]*params[33]; //Rd
+//  this->rcr_params[0] = this->Rp_rcr_base[i]*params[33]; //Rp
+//  this->rcr_params[1] = this->C_rcr_base[i]*params[34]; //C
+//  this->rcr_params[2] = this->Rd_rcr_base[i]*params[33]; //Rd
+    this->rcr_params[0] = this->Rp_rcr_base[i]*params[32]; //Rp
+    this->rcr_params[1] = this->C_rcr_base[i]*params[33]; //C
+    this->rcr_params[2] = this->Rd_rcr_base[i]*params[32]; //Rd
     interface.update_block_params(block_name, this->rcr_params);
   }
   
@@ -681,7 +830,8 @@ void svZeroD_ClosedLoopCoronary_GSI::setModelParams(LPNSolverInterface& interfac
   this->heart_params[2]  = params[2]; //Erv_s
   this->heart_params[3]  = params[3]; //Elv_s
   this->heart_params[4]  = params[4]; //iml
-  this->heart_params[5]  = params[36]; //imr
+  //this->heart_params[5]  = params[36]; //imr
+  this->heart_params[5]  = params[34]; //imr
   this->heart_params[6]  = params[7]/pConv; //Lra_v
   this->heart_params[7]  = params[8]/pConv; //Rra_v
   this->heart_params[8]  = params[5]/pConv; //Lrv_a
@@ -701,14 +851,22 @@ void svZeroD_ClosedLoopCoronary_GSI::setModelParams(LPNSolverInterface& interfac
 //this->heart_params[16] = this->Rpd_base; //Rpd
   this->heart_params[17] = params[16]; //Cp
   this->heart_params[18] = params[17]; //Cpa
-  this->heart_params[19] = params[19]; //Kxp_ra
-  this->heart_params[20] = params[20]; //Kxv_ra
-  this->heart_params[21] = params[23]; //Kxp_la
-  this->heart_params[22] = params[24]; //Kxv_la
-  this->heart_params[23] = params[21]; //Emax_ra
-  this->heart_params[24] = params[25]; //Emax_la
-  this->heart_params[25] = params[22]; //Vaso_ra
-  this->heart_params[26] = params[26]; //Vaso_la
+//this->heart_params[19] = params[19]; //Kxp_ra
+//this->heart_params[20] = params[20]; //Kxv_ra
+//this->heart_params[21] = params[23]; //Kxp_la
+//this->heart_params[22] = params[24]; //Kxv_la
+//this->heart_params[23] = params[21]; //Emax_ra
+//this->heart_params[24] = params[25]; //Emax_la
+//this->heart_params[25] = params[22]; //Vaso_ra
+//this->heart_params[26] = params[26]; //Vaso_la
+  this->heart_params[19] = params[18]; //Kxp_ra
+  this->heart_params[20] = params[19]; //Kxv_ra
+  this->heart_params[21] = params[22]; //Kxp_la
+  this->heart_params[22] = params[23]; //Kxv_la
+  this->heart_params[23] = params[20]; //Emax_ra
+  this->heart_params[24] = params[24]; //Emax_la
+  this->heart_params[25] = params[21]; //Vaso_ra
+  this->heart_params[26] = params[25]; //Vaso_la
   interface.update_block_params("CLH", this->heart_params);
 }
 

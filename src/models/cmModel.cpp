@@ -45,10 +45,8 @@ void cmModel::freezeModelParameters(const stdIntVec& localParamIDX,const stdVec&
 }
 
 void cmModel::getParameterLimits(stdVec& limits){
-  //std::cout<<"KMENON limits0"<<std::endl;
   if(userLimits.size() == 0){
     // Get Default Parameters
-  //std::cout<<"KMENON limits1"<<std::endl;
     getDefaultParameterLimits(limits);
   }else{
     // Get User-defined limits

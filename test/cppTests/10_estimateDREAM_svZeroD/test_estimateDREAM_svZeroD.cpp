@@ -6,7 +6,7 @@
 # include "daData_multiple_Table.h"
 # include "acActionDREAMmpi.h"
 # include "cmLPN_svZeroD.h"
-# include "svZeroD_ClosedLoopCoronary.h"
+# include "svZeroD_ClosedLoopCoronary_GSI.h"
 
 using namespace std;
 
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
   // Assign model
   std::string model_path = string(argv[1]);
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
-  svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
+  svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary_GSI();
   cmLPN_svZeroD* lpnModel;
   lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib);
 
@@ -46,6 +46,7 @@ int main(int argc, char* argv[]){
   // DREAM Parameters
   int totChains = num_procs;
   int totGenerations = 10000;
+  //int totGenerations = 20;
   int totalCR = 3;
   int totCrossoverPairs = 5;
   double dreamGRThreshold = 1.2;
