@@ -19,10 +19,9 @@ int main(int argc, char* argv[]){
   MPI_Comm_size(MPI_COMM_WORLD,&num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD,&id);
 
-  if(argc != 3){
-    printf("Usage: test_estimateDREAM_svZeroD <model_json_file> <target_file> \n");
-    printf("Terminated!\n");
-    exit(1);
+  if(argc != 3 && argc != 4){
+    printf("Error! Terminated!\n");
+    throw std::runtime_error("Usage: test_estimateDREAM_svZeroD <model_json_file> <target_file> (optional: <frozen_parameters_file>)");
   }
 
   // Dataset
@@ -42,6 +41,16 @@ int main(int argc, char* argv[]){
 
   // Assign dataset
   lpnModel->setData(data);
+
+  // Frozen parameters
+  stdIntVec frozen_param_idxs;
+  stdVec frozen_param_values;
+  if(argc == 4){
+    // Read list and values of frozen parameters
+    cmUtils::getFrozenParametersFromCSVFile(argv[3], frozen_param_idxs, frozen_param_values);
+    // Set the model frozen parameters
+    lpnModel->freezeModelParameters(frozen_param_idxs, frozen_param_values);
+  }
 
   // DREAM Parameters
   int totChains = num_procs;
