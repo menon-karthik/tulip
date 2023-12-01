@@ -1516,8 +1516,10 @@ void acActionDREAM::gr_compute (int chain_num, int gen_index, int gen_num, doubl
   double var;
   double w_var;
 
-  ind0 = ( ( gen_index + 1 ) / 2 ) - 1;
-  rnd0 = ( double ) ( ind0 + 1 );
+  //ind0 = ( ( gen_index + 1 ) / 2 ) - 1;
+  //rnd0 = ( double ) ( ind0 + 1 );
+  ind0 = ( ( gen_index + 1 ) / 2 );
+  rnd0 = ( double ) ( ind0 );
 
   mean_chain = new double[chain_num];
 
