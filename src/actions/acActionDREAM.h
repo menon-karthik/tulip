@@ -90,7 +90,7 @@ class acActionDREAM: public acAction{
                          int prior_num, int* prPtr, 
                          const stdVec& prAv, const stdVec& prSd);
     void chain_outliers (int chain_num, int gen_index, int gen_num, int par_num, double fit[], double z[]);
-    void chain_write (string chain_filename, int chain_num, double fit[], int gen_num, int par_num, double z[]);
+    void chain_write (string chain_filename, int chain_num, double fit[], int gen_num, int par_num, double z[], int res_num = 0, double outputs[] = NULL );
     void cr_prob_update(double cr_dis[], int cr_num, double cr_prob[], int cr_ups[]);
     double* diff_compute (int chain_num, int gen_index, int gen_num, 
                           int jump_dim[], int jump_num, int pair_num, int par_num, int r[], double z[]);
@@ -108,7 +108,7 @@ class acActionDREAM: public acAction{
                         double &gr_threshold, int &jumpstep, double limits[], int par_num, 
                         int &printstep, string *restart_read_filename, string *restart_write_filename);
     double* prior_sample ( int par_num, int prior_num, int* prPtr, const stdVec& prAv, const stdVec& prSd);
-    double sample_likelihood (int par_num, double zp[]);
+    double sample_likelihood (int par_num, double zp[], stdVec& outputs);
     void writeStatisticsToLatexTable(int par_num,stdMat& modelStats);
 
     // To be removed !!!

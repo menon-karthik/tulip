@@ -52,6 +52,7 @@ void acActionDREAMseq::chain_init (int chain_num, double fit[], int gen_num, int
   int c;
   int p;
   double *zp;
+  stdVec outputs;
 
   for ( c = 0; c < chain_num; c++ ){
     zp = prior_sample ( par_num ,prior_num, prPtr, prAv, prSd );
@@ -60,7 +61,7 @@ void acActionDREAMseq::chain_init (int chain_num, double fit[], int gen_num, int
       z[p+c*par_num+0*par_num*chain_num] = zp[p];
     }
 
-    fit[c+0*chain_num] = sample_likelihood ( par_num, zp );
+    fit[c+0*chain_num] = sample_likelihood ( par_num, zp, outputs );
 
     delete [] zp;
   }
@@ -395,6 +396,7 @@ void acActionDREAMseq::dream_algm_seq(int chain_num, int cr_num, double fit[], i
   double *zp_old;
   double zp_old_fit;
   double zp_ratio;
+  stdVec outputs;
 
   zp_old = new double[par_num];
   zp_count = 0;
@@ -446,7 +448,7 @@ void acActionDREAMseq::dream_algm_seq(int chain_num, int cr_num, double fit[], i
       zp_count = zp_count + 1;
 
       //  Compute the log likelihood function for ZP.
-      zp_fit = sample_likelihood ( par_num, zp );
+      zp_fit = sample_likelihood ( par_num, zp, outputs );
 
       for ( i = 0; i < par_num; i++ ){
         zp_old[i] = z[i+chain_index*par_num+(gen_index-1)*par_num*chain_num];

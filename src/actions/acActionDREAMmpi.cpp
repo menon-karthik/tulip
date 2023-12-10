@@ -263,7 +263,7 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
                                        double jumprate_table[], int jumpstep, double limits[], int pair_num, 
                                        int par_num, int printstep, double z[], 
                                        int prior_num, int* prPtr, vector<double> prAv, vector<double> prSd,
-                                       double iniMean[], double iniStd[])
+                                       double iniMean[], double iniStd[], int res_num, double outputs[])
     
 //
 //  Purpose:
@@ -403,15 +403,15 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
 
 /**************************************************************************************************************************/
 
-	zp_count = 0;
-	zp_accept = 0;
-	cr = new double[cr_num];
-	cr_dis = new double[cr_num];
-	cr_prob = new double[cr_num];
-	cr_ups = new int[cr_num];
-	double AllLHs[num_procs];
-	double AllLHs_tmp[num_procs];
-	// Stored
+    zp_count = 0;
+    zp_accept = 0;
+    cr = new double[cr_num];
+    cr_dis = new double[cr_num];
+    cr_prob = new double[cr_num];
+    cr_ups = new int[cr_num];
+    double AllLHs[num_procs];
+    double AllLHs_tmp[num_procs];
+    // Stored
     double storedMean[par_num];
     double storedStd[par_num];
     // Current 
@@ -420,6 +420,12 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
     // Test
     double testMean[par_num];
     double testStd[par_num];
+    
+    stdVec outputs_sample;
+    double outputs_subproc[num_procs*res_num];
+    double outputs_allprocs[num_procs*res_num];
+    double received_outputs[res_num];
+    //double outputs[res_num*par_num*gen_num];
 
     for(int loopA=0;loopA<par_num;loopA++){
       storedMean[loopA] = iniMean[loopA];
@@ -428,25 +434,25 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
 //
 //  Initialize the CR values
 //
-	cr_init(cr, cr_dis, cr_num, cr_prob, cr_ups);
+    cr_init(cr, cr_dis, cr_num, cr_prob, cr_ups);
 
     //  Initialize temporary storage for parameter candidates
-	double z_temp[num_procs*par_num];
-	double z_temp_aux[num_procs*par_num];
-	double zp_old[par_num];
-	double fit_old;
+    double z_temp[num_procs*par_num];
+    double z_temp_aux[num_procs*par_num];
+    double zp_old[par_num];
+    double fit_old;
 
     // Start main loop over all generations
-	for( gen_index = 1; gen_index < gen_num; gen_index++) {
+    for( gen_index = 1; gen_index < gen_num; gen_index++) {
     	  
-    // This is the "Prepare, Sample, and Send" loop that generates samples and sends them to Worker processes
-	  // Send Samples to the sub-processed in this Node
-	  //for( proc_index = 1; proc_index < num_procs; proc_index++) {
-	  // Loop on all the chain numbers for this sub group
-	  for(proc_index=1;proc_index<size_sm;proc_index++){
+      // This is the "Prepare, Sample, and Send" loop that generates samples and sends them to Worker processes
+      // Send Samples to the sub-processed in this Node
+      //for( proc_index = 1; proc_index < num_procs; proc_index++) {
+      // Loop on all the chain numbers for this sub group
+      for(proc_index=1;proc_index<size_sm;proc_index++){
 
-	  	// Careful: The proc_index should depend on the node!!!
-	  	currIndex = localGroupNumbers[id]*size_sm + proc_index;
+        // Careful: The proc_index should depend on the node!!!
+        currIndex = localGroupNumbers[id]*size_sm + proc_index;
 
         cr_index = cr_index_choose(cr_num, cr_prob);
         // Sample candidate for all processors with id > 0
@@ -471,6 +477,14 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
         AllLHs_tmp[proc_index] = received_LH;
       }
 
+      // Receive results from sub-processes
+      for( proc_index = 1; proc_index < size_sm; proc_index++) {
+        MPI_Recv(received_outputs,res_num,MPI_DOUBLE,proc_index,7,comm_sm,&info);
+        for ( i = 0; i < res_num; i++) {
+          outputs_subproc[proc_index*res_num + i] = received_outputs[i];
+        }
+      }
+
       // Continue to process Sample for primary node processor
       cr_index = cr_index_choose(cr_num, cr_prob);
 
@@ -485,8 +499,11 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
       }
 
       //  Compute the LH Function for the parameter set on this node
-      zp_fit = sample_likelihood(par_num, zp);
+      zp_fit = sample_likelihood(par_num, zp, outputs_sample);
       AllLHs_tmp[0] = zp_fit;
+      for ( i = 0; i < res_num; i++) {
+        outputs_subproc[i] = outputs_sample[i];
+      }
       
       // Gather From Other Nodes if multiple nodes are present
       if(totGroups > 1){
@@ -494,12 +511,17 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
         MPI_Allgather(AllLHs_tmp,size_sm,MPI_DOUBLE,AllLHs,size_sm,MPI_DOUBLE,mainProcessComm);
         // Sync z_temp
         MPI_Allgather(z_temp_aux,size_sm*par_num,MPI_DOUBLE,z_temp,size_sm*par_num,MPI_DOUBLE,mainProcessComm);
+        // Sync outputs
+        MPI_Allgather(outputs_subproc,size_sm*res_num,MPI_DOUBLE,outputs_allprocs,size_sm*res_num,MPI_DOUBLE,mainProcessComm);
       }else{
       	for(int loopA=0;loopA<size_sm;loopA++){
           AllLHs[loopA] = AllLHs_tmp[loopA];
       	}
       	for(int loopA=0;loopA<size_sm*par_num;loopA++){
           z_temp[loopA] = z_temp_aux[loopA];
+      	}
+      	for(int loopA=0;loopA<size_sm*res_num;loopA++){
+          outputs_allprocs[loopA] = outputs_subproc[loopA];
       	}      	
       }
       
@@ -530,11 +552,17 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
           for(i=0;i<par_num;i++){
             z[i+proc_index*par_num+gen_index*par_num*num_procs] = zp[i];
           }
+          for(i=0;i<res_num;i++){
+            outputs[i+proc_index*res_num+gen_index*res_num*num_procs] = outputs_allprocs[proc_index*res_num+i];
+          }
           zp_accept++;
           fit[proc_index+gen_index*num_procs] = received_LH;
         }else{
           for(i=0;i<par_num;i++){
             z[i+proc_index*par_num+gen_index*par_num*num_procs] = zp_old[i];
+          }
+          for(i=0;i<res_num;i++){
+            outputs[i+proc_index*res_num+gen_index*res_num*num_procs] = outputs[i+proc_index*res_num+(gen_index-1)*res_num*num_procs];
           }
           fit[proc_index+gen_index*num_procs] = fit_old;
         }
@@ -542,13 +570,13 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
       delete [] zp;
 
       //  Compute the standard deviations once for all chains
-      std_compute (chain_num,gen_index,gen_num,par_num,z,storedMean,storedStd, currentMean, currentStd);
+//    std_compute (chain_num,gen_index,gen_num,par_num,z,storedMean,storedStd, currentMean, currentStd);
 
-      // Update stored statistics for this parameter
-      for(i=0;i<par_num;i++){
-        storedMean[i] = currentMean[i];
-        storedStd[i] = currentStd[i];
-      }
+//    // Update stored statistics for this parameter
+//    for(i=0;i<par_num;i++){
+//      storedMean[i] = currentMean[i];
+//      storedStd[i] = currentStd[i];
+//    }
 
       //  Update the CR distance
       //  Process results from all chains
@@ -589,7 +617,7 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
       if(id == 0){
         printf("PROGRESS: (%d / %d)\n", gen_index, gen_num);
       }
-    }
+    } // end gen_index for loop
 
     //  Compute the acceptance rate.
     zp_accept_rate = ( double ) ( zp_accept ) / ( double ) ( zp_count );
@@ -630,7 +658,7 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
     //  Write each chain to a separate file.
     if(id == 0){
       if(!chain_filename.empty()){
-        chain_write ( chain_filename, chain_num, fit, gen_num, par_num, z );
+        chain_write ( chain_filename, chain_num, fit, gen_num, par_num, z, res_num, outputs );
       }	  
     }
 
@@ -642,10 +670,16 @@ void acActionDREAMmpi::dream_algm_mpi (int rank_sm, int id, int num_procs, int s
       fflush(stdout);
       double local_params[par_num];
       double local_LH;
+      stdVec local_outputs;
+      double outputs_send[res_num];
       for(int i = 1; i < gen_num; i++) {
         MPI_Recv(local_params,par_num,MPI_DOUBLE,0,5,comm_sm,&info);
-        local_LH = sample_likelihood(par_num, local_params);
+        local_LH = sample_likelihood(par_num, local_params, local_outputs);
         MPI_Send(&local_LH,1,MPI_DOUBLE,0,6,comm_sm);
+        for ( int j = 0; j < res_num; j++) {
+          outputs_send[j] = local_outputs[j];
+        }
+        MPI_Send(outputs_send,res_num,MPI_DOUBLE,0,7,comm_sm);
       }
     }
   
@@ -907,7 +941,8 @@ void acActionDREAMmpi::input_print ( string chain_filename, int chain_num, int c
 
 void acActionDREAMmpi::chain_init ( int chain_num, double fit[], int gen_num, int par_num, 
   double z[], int prior_num, int* prPtr, vector<double> prAv, vector<double> prSd, int globRank,
-  MPI_Comm comm_sm, MPI_Comm mainProcessComm, int size_sm, int totGroups, int rank_sm)
+  MPI_Comm comm_sm, MPI_Comm mainProcessComm, int size_sm, int totGroups, int rank_sm, 
+  int res_num, double outputs[])
 //
 //  Parameters:
 //
@@ -933,41 +968,55 @@ void acActionDREAMmpi::chain_init ( int chain_num, double fit[], int gen_num, in
   // Temp Quantities on Nodes
   double* z_node = NULL;
   double* fit_node = NULL;
+  double* outputs_node = NULL;
+  stdVec outputs_sample;
+  double outputs_sample_dbl[res_num];
+
   if(rank_sm == 0){
     z_node = new double[size_sm*par_num];
     fit_node = new double[size_sm];
+    outputs_node = new double[size_sm*res_num];
   }
 
   zp = prior_sample ( par_num ,prior_num, prPtr, prAv, prSd );
-  tempFit[0] = sample_likelihood ( par_num, zp );
+  tempFit[0] = sample_likelihood ( par_num, zp, outputs_sample );
+  for (int i = 0; i < res_num; i++) {
+    outputs_sample_dbl[i] = outputs_sample[i];
+  }
 
   // Sync Vector z and fit
   // Remember: z[p+c*par_num+0*par_num*chain_num] = zp[p];
   // Pass to Main Node Processor
   MPI_Gather(zp,par_num,MPI_DOUBLE,z_node,par_num,MPI_DOUBLE,0,comm_sm);
   MPI_Gather(tempFit,1,MPI_DOUBLE,fit_node,1,MPI_DOUBLE,0,comm_sm);
+  MPI_Gather(outputs_sample_dbl,res_num,MPI_DOUBLE,outputs_node,res_num,MPI_DOUBLE,0,comm_sm);
 
   // Communicate between nodes only if there are more than one group
   if(totGroups > 1){
-  	if(rank_sm == 0){
+    if(rank_sm == 0){
       MPI_Allgather(z_node,size_sm*par_num,MPI_DOUBLE,z,size_sm*par_num,MPI_DOUBLE,mainProcessComm);
       MPI_Allgather(fit_node,size_sm,MPI_DOUBLE,fit,size_sm,MPI_DOUBLE,mainProcessComm);
-  	}    
-  }else{
+      MPI_Allgather(outputs_node,size_sm*res_num,MPI_DOUBLE,outputs,size_sm*res_num,MPI_DOUBLE,mainProcessComm);
+    }    
+  } else {
     if(rank_sm == 0){
-  	  for(int loopA=0;loopA<size_sm*par_num;loopA++){
+      for(int loopA=0;loopA<size_sm*par_num;loopA++){
         z[loopA] = z_node[loopA];
-  	  } 
-  	  for(int loopA=0;loopA<size_sm;loopA++){
+      } 
+      for(int loopA=0;loopA<size_sm;loopA++){
         fit[loopA] = fit_node[loopA];
-  	  } 
-  	}
+      } 
+      for(int loopA=0;loopA<size_sm*res_num;loopA++){
+        outputs[loopA] = outputs_node[loopA];
+      } 
+    }
   }
   // Deallocate
   free(zp);
   if(rank_sm == 0){
     delete [] z_node;
     delete [] fit_node;
+    delete [] outputs_node;
   }  
   return;
 }
@@ -999,6 +1048,7 @@ int acActionDREAMmpi::go(){
   int* prPtr = NULL;
   vector<double> prAv;
   vector<double> prSd;
+  double *outputs = NULL;
 
   int globRank;
   MPI_Comm_rank(MPI_COMM_WORLD,&globRank);
@@ -1169,6 +1219,7 @@ int acActionDREAMmpi::go(){
 //  Allocate and zero out memory.
 //
   gr_num = gen_num / printstep;
+  int res_num = model->getResultTotal();
 
   // Only the main processes (1 for node) stores the iteration quantities
   if(rank_sm == 0){
@@ -1177,6 +1228,8 @@ int acActionDREAMmpi::go(){
     fit = r8mat_zero_new   ( chain_num, gen_num );
     gr  = r8mat_zero_new   ( par_num, gr_num );
     z   = r8block_zero_new ( par_num, chain_num, gen_num );
+    outputs   = r8block_zero_new ( res_num, chain_num, gen_num );
+    //outputs = new [res_num*par_num*gen_num];
   }
 //
 //  Set the jump rate table.
@@ -1209,7 +1262,8 @@ int acActionDREAMmpi::go(){
     }
     chain_init ( chain_num, fit, gen_num, par_num, z,
                  prior_num, prPtr, prAv, prSd, globRank, 
-                 comm_sm, mainProcessComm, size_sm, totGroups, rank_sm );
+                 comm_sm, mainProcessComm, size_sm, totGroups, rank_sm, 
+                 res_num, outputs );
   }else{
     if(globRank == 0){
       cout << "READING RESTARTS?\n";
@@ -1241,7 +1295,7 @@ int acActionDREAMmpi::go(){
   dream_algm_mpi (rank_sm, id, num_procs, size_sm, localGroupNumbers, comm_sm, info, totGroups, mainProcessComm,
                   chain_num, cr_num, fit, gen_num, gr, gr_conv, gr_count, 
                   gr_num, gr_threshold, jumprate_table, jumpstep, limits, pair_num, 
-                  par_num, printstep, z ,prior_num, prPtr, prAv, prSd, iniMean, iniStd);
+                  par_num, printstep, z ,prior_num, prPtr, prAv, prSd, iniMean, iniStd, res_num, outputs);
 //
 // Free Groups and Communicators
 //
@@ -1260,6 +1314,7 @@ int acActionDREAMmpi::go(){
   delete [] z;
   // Free Prior Params
   delete [] prPtr;
+  delete [] outputs;
 //
 //  Terminate.
 //

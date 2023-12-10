@@ -1115,7 +1115,8 @@ void acActionDREAM::chain_outliers (int chain_num, int gen_index, int gen_num,
 }
 
 void acActionDREAM::chain_write (string chain_filename, int chain_num, double fit[], 
-                                 int gen_num, int par_num, double z[] )
+                                 int gen_num, int par_num, double z[], int res_num, 
+                                 double outputs[] )
 //
 //  Purpose:
 //
@@ -1192,6 +1193,9 @@ void acActionDREAM::chain_write (string chain_filename, int chain_num, double fi
             << "  " << fit[j+k*chain_num];
       for (i = 0; i < par_num; i++){
         chain << "  " << z[i+j*par_num+k*par_num*chain_num];
+      }
+      for (i = 0; i < res_num; i++){
+        chain << "  " << outputs[i+j*res_num+k*res_num*chain_num];
       }
       chain << "\n";
     }
@@ -2016,7 +2020,7 @@ double* acActionDREAM::prior_sample ( int par_num, int prior_num, int* prPtr, co
   return zp;
 }
 
-double acActionDREAM::sample_likelihood (int par_num, double zp[])
+double acActionDREAM::sample_likelihood (int par_num, double zp[], stdVec& outputs)
 //
 //  Purpose:
 //
@@ -2059,7 +2063,7 @@ double acActionDREAM::sample_likelihood (int par_num, double zp[])
   for(int loopA=0;loopA<par_num;loopA++){
     inputs.push_back(zp[loopA]);
   }
-  stdVec outputs;
+  //stdVec outputs;
   stdIntVec errors;
   double value = 0.0;
   int error = 0;
