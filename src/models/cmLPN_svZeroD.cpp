@@ -35,8 +35,8 @@ cmLPN_svZeroD::cmLPN_svZeroD(std::string model_path, svZeroDModel* model, std::s
   this->results.clear();
   this->results.resize(getResultTotal());
 
-  // Write a file with all the parameter names
-  this->writeParamNames();
+  // Write a file with all the parameters and results names
+  this->writeParamAndResultNames();
 }
 
 // ========================
@@ -272,6 +272,40 @@ void cmLPN_svZeroD::writeParamNames() {
   for(int loopA=0; loopA < this->getParameterTotal(); loopA++) {
     auto param_name = getParamName(loopA);
     fprintf(outFile,"%s \n",param_name.c_str());
+  }
+  // CLOSE THE FILE
+  fclose(outFile);
+}
+
+// ==================
+// SAVE ALL RESULT NAMES
+// ==================
+void cmLPN_svZeroD::writeResultNames() {
+  FILE* outFile;
+  outFile = fopen("resultNames.txt","w");
+  for(int loopA=0; loopA < this->getResultTotal(); loopA++) {
+    auto result_name = getResultName(loopA);
+    fprintf(outFile,"%s \n",result_name.c_str());
+  }
+  // CLOSE THE FILE
+  fclose(outFile);
+}
+
+// ==================
+// SAVE ALL PARAM AND RESULT NAMES
+// ==================
+void cmLPN_svZeroD::writeParamAndResultNames() {
+  FILE* outFile;
+  outFile = fopen("paramAndResultNames.txt","w");
+  fprintf(outFile,"---Parameters \n");
+  for(int loopA=0; loopA < this->getParameterTotal(); loopA++) {
+    auto param_name = getParamName(loopA);
+    fprintf(outFile,"%s \n",param_name.c_str());
+  }
+  fprintf(outFile,"---Results \n");
+  for(int loopA=0; loopA < this->getResultTotal(); loopA++) {
+    auto result_name = getResultName(loopA);
+    fprintf(outFile,"%s \n",result_name.c_str());
   }
   // CLOSE THE FILE
   fclose(outFile);

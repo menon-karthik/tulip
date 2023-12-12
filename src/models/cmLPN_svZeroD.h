@@ -74,6 +74,12 @@ class cmLPN_svZeroD: public cmModel {
     // WRITE A FILE WITH PARAMETER NAMES
     virtual void writeParamNames();
 
+    // WRITE A FILE WITH RESULT NAMES
+    virtual void writeResultNames();
+
+    // WRITE A FILE WITH RESULT NAMES
+    virtual void writeParamAndResultNames();
+
   protected:
 
     LPNSolverInterface interface;
