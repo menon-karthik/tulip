@@ -26,27 +26,27 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
     if (block_name.substr(0,6) == "BC_lca") { // Left coronary BC block
       this->n_corBC_l++;
       this->names_corBC_l.push_back(block_name);
-      std::cout<<"n_corBC_l: "<<block_name<<std::endl;
+      //std::cout<<"n_corBC_l: "<<block_name<<std::endl;
     
     } else if (block_name.substr(0,3) == "lca") { // Left coronary 3D segmented outlet
       // Search for string "cco" in block name
       std::size_t search_cco = block_name.find("cco",3);
       if (search_cco == std::string::npos) { // Does the block correspond to a non-CCO vessel?
         this->n_cor3d_l++;
-        std::cout<<"n_cor3d_l: "<<block_name<<std::endl;
+        //std::cout<<"n_cor3d_l: "<<block_name<<std::endl;
       } //search_cco
 
     } else if (block_name.substr(0,6) == "BC_rca") { // Right coronary BC block
       this->n_corBC_r++;
       this->names_corBC_r.push_back(block_name);
-      std::cout<<"n_corBC_r: "<<block_name<<std::endl;
+      //std::cout<<"n_corBC_r: "<<block_name<<std::endl;
     
     } else if (block_name.substr(0,3) == "rca") { // Right coronary 3D segmented outlet
       // Search for string "cco" in block name
       std::size_t search_cco = block_name.find("cco",3);
       if (search_cco == std::string::npos) { // Does the block correspond to a non-CCO vessel?
         this->n_cor3d_r++;
-        std::cout<<"n_cor3d_r: "<<block_name<<std::endl;
+        //std::cout<<"n_cor3d_r: "<<block_name<<std::endl;
       } //search_cco
     
     } else if (block_name.substr(0,6) == "BC_RCR") {
@@ -87,6 +87,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
   this->Rv_l_base.reserve(this->n_corBC_l);
   this->Ca_l_base.reserve(this->n_corBC_l);
   this->Cim_l_base.reserve(this->n_corBC_l);
+  double R_min_lca = 1E10;
   for (int i = 0; i < this->n_corBC_l; i++) {
     block_name = this->names_corBC_l[i];
     interface.read_block_params(block_name, this->coronary_params);
@@ -95,6 +96,10 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
     this->Rv_l_base[i] = this->coronary_params[2];
     this->Ca_l_base[i] = this->coronary_params[3];
     this->Cim_l_base[i] = this->coronary_params[4];
+    if (this->Ra_l_base[i] < R_min_lca) {
+      R_min_lca = this->Ra_l_base[i];
+      this->lca_main_id = i;
+    }
   }
   
   // Read right coronary parameters
@@ -103,6 +108,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
   this->Rv_r_base.reserve(this->n_corBC_r);
   this->Ca_r_base.reserve(this->n_corBC_r);
   this->Cim_r_base.reserve(this->n_corBC_r);
+  double R_min_rca = 1E10;
   for (int i = 0; i < this->n_corBC_r; i++) {
     block_name = this->names_corBC_r[i];
     interface.read_block_params(block_name, this->coronary_params);
@@ -111,6 +117,10 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
     this->Rv_r_base[i] = this->coronary_params[2];
     this->Ca_r_base[i] = this->coronary_params[3];
     this->Cim_r_base[i] = this->coronary_params[4];
+    if (this->Ra_r_base[i] < R_min_rca) {
+      R_min_rca = this->Ra_r_base[i];
+      this->rca_main_id = i;
+    }
   }
   
   // Read RCR parameters
@@ -910,10 +920,10 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
   int totalStepsOnSingleCycle = interface.pts_per_cycle_;
   int numCycles = interface.num_cycles_;
   int totOutputSteps = interface.num_output_steps_;
-//// IDs of main lca/rca
-//int lca_main_id = 0;
-//int rca_main_id = 0;
-//double max_flow = 0.0;
+  // IDs of main lca/rca
+  //int lca_main_id_loc = 0;
+  //int rca_main_id_loc = 0;
+  //double max_flow = 0.0;
     
   // SUM RCR FLUX
   double temp = 0.0;
@@ -931,12 +941,12 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
     Q_lcor = Q_lcor + temp;
 //  if (std::fabs(temp) > max_flow) { //TODO
 //    max_flow = std::fabs(temp);
-//    lca_main_id = loopA;
+//    lca_main_id_loc = loopA;
 //  }
   }
 
   // INTEGRATE MAIN FLOW
-  double lmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_lca_ids[lca_main_id]]);
+  double lmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_lca_ids[this->lca_main_id]]);
 
   // SUM RIGHT CORONARY FLUX
   double Q_rcor = 0.0;
@@ -946,12 +956,12 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
     Q_rcor = Q_rcor + temp;
 //  if (std::fabs(temp) > max_flow) { // TODO
 //    max_flow = std::fabs(temp);
-//    rca_main_id = loopA;
+//    rca_main_id_loc = loopA;
 //  }
   }
 
   // SUM RIGHT CORONARY FLUX
-  double rmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rca_ids[rca_main_id]]);
+  double rmain_flow = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rca_ids[this->rca_main_id]]);
 
   // FIND THE END OF SYSTOLE
   double small_number = 1e-4;
