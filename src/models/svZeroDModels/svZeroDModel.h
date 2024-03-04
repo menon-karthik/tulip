@@ -45,6 +45,9 @@ class svZeroDModel {
     // GET TOTAL NUMBER OF RESULTS
     virtual int getResultTotal() = 0;
 
+    // IS THIS MODEL SCALED?
+    virtual bool isScaled() = 0;
+
     // GET THE PARAMETER NAMES
     virtual string getParamName(int index) = 0;
 
@@ -55,7 +58,7 @@ class svZeroDModel {
     virtual void getDefaultParams(stdVec& zp) = 0;
 
     // GET THE PARAMETER RANGES FOR THE LPN MODELS
-    virtual void getParameterLimits(stdVec& limits) = 0;
+    virtual void getParameterLimits(stdVec& limits, bool reverse_scaling = false) = 0;
 
     // GET THE DEFAULT PARAMETER RANGES FOR THE LPN MODELS (NOT USED CURRENTLY)
     virtual void getDefaultParameterLimits(stdVec& limits) = 0;
@@ -63,7 +66,7 @@ class svZeroDModel {
     virtual void getPriorMapping(int priorModelType,int* prPtr) = 0;
         
     // UPDATE ZEROD MODEL PARAMETERS
-    virtual void setModelParams(LPNSolverInterface& interface, const stdVec& params) = 0;
+    virtual void setModelParams(LPNSolverInterface& interface, stdVec params) = 0;
 
     // POSTPROCESS ZEROD SIMULATION
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results) = 0;

@@ -2,7 +2,8 @@
 
 using namespace std;
 
-svZeroD_ClosedLoopCoronary_GSI::svZeroD_ClosedLoopCoronary_GSI(){
+svZeroD_ClosedLoopCoronary_GSI::svZeroD_ClosedLoopCoronary_GSI(bool scaled){
+  this->scaled = scaled;
 }
 
 void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
@@ -253,6 +254,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
   }
 
 }
+
 // ========================
 // GET NUMBER OF PARAMETERS
 // ========================
@@ -279,6 +281,13 @@ int svZeroD_ClosedLoopCoronary_GSI::getAuxStateTotal(){
 // ===========================
 int svZeroD_ClosedLoopCoronary_GSI::getResultTotal(){
   return 29;  
+}
+
+// ===================================
+// IS THIS MODEL SCALED?
+// ===================================
+bool svZeroD_ClosedLoopCoronary_GSI::isScaled(){
+  return this->scaled; 
 }
 
 // ==================
@@ -645,120 +654,129 @@ void svZeroD_ClosedLoopCoronary_GSI::getDefaultParams(stdVec& zp){
 // ====================
 // GET PARAMETER RANGES
 // ====================
-void svZeroD_ClosedLoopCoronary_GSI::getParameterLimits(stdVec& limits){
+void svZeroD_ClosedLoopCoronary_GSI::getParameterLimits(stdVec& limits, bool reverse_scaling){
 
   limits.resize(2*getParameterTotal());
 
-  // Constrained ranges
-  limits[0]=0.39;   limits[1]=0.43; // Tsa
-  limits[2]=8.43;   limits[3]=9.31; // tpwave
-  limits[4]=0.95;   limits[5]=3.33; // Erv
-  limits[6]=1.14;   limits[7]=6.30; // Elv
-  limits[8]=0.30;   limits[9]=0.88; // iml
-  limits[10]=0.19;     limits[11]=0.7;   // Lrv_a
-  limits[12]=0.87;     limits[13]=1.83; // Rrv_a
-  //limits[14]=0.001;   limits[15]=0.5;  // Lra_v
-  limits[14]=0.01;   limits[15]=0.84;  // Lra_v
-  limits[16]=7.77;     limits[17]=13.14; // Rra_v
-  //limits[18]=0.001;   limits[19]=0.5;  // Lla_v
-  //limits[18]=0.06;   limits[19]=0.8;  // Lla_v
-  limits[18]=0.2;   limits[19]=1.2;  // Lla_v
-  limits[20]=4.78;     limits[21]=12.0; // Rla_v
-  limits[22]=0.69;     limits[23]=1.63; // Rlv_ao
-  limits[24]=0.1;     limits[25]=0.72;   // Llv_a
-  limits[26]=-10.0;   limits[27]=10.0; // Vrv_u
+  if (this->scaled && !reverse_scaling) {
+    for (int i = 0; i < getParameterTotal(); i++) {
+      limits[2*i] = 0.0;
+      limits[2*i+1] = 1.0;
+    }
+  } else {
+    // Constrained ranges
+    limits[0]=0.39;   limits[1]=0.43; // Tsa
+    limits[2]=8.43;   limits[3]=9.31; // tpwave
+    limits[4]=0.95;   limits[5]=3.33; // Erv
+    //limits[6]=1.14;   limits[7]=6.30; // Elv
+    limits[6]=1.14;   limits[7]=5.1; // Elv
+    limits[8]=0.30;   limits[9]=0.88; // iml
+    limits[10]=0.19;     limits[11]=0.7;   // Lrv_a
+    limits[12]=0.87;     limits[13]=1.83; // Rrv_a
+    //limits[14]=0.001;   limits[15]=0.5;  // Lra_v
+    limits[14]=0.01;   limits[15]=0.84;  // Lra_v
+    limits[16]=7.77;     limits[17]=13.14; // Rra_v
+    //limits[18]=0.001;   limits[19]=0.5;  // Lla_v
+    //limits[18]=0.06;   limits[19]=0.8;  // Lla_v
+    limits[18]=0.2;   limits[19]=1.2;  // Lla_v
+    limits[20]=4.78;     limits[21]=12.0; // Rla_v
+    limits[22]=0.69;     limits[23]=1.63; // Rlv_ao
+    limits[24]=0.1;     limits[25]=0.72;   // Llv_a
+    limits[26]=-10.0;   limits[27]=10.0; // Vrv_u
+    //limits[28]=-10.0;   limits[29]=10.0; // Vlv_u
+    limits[28]=-20.0;   limits[29]=5.0; // Vlv_u
+    limits[30]=0.69;  limits[31]=1.80; // Rpd
+    limits[32]=1.0;   limits[33]=1.15;   //Cp
+    //limits[34]=0.05;    limits[35]=1.32;   //Cpa
+    limits[34]=0.33;    limits[35]=1.32;   //Cpa
+    //limits[36]=0.0;     limits[37]=0.0; // R_inlet
+    //limits[36]=0.001;   limits[37]=10.00; //Kxp_ra
+    limits[36]=1.0;   limits[37]=10.00; //Kxp_ra
+    limits[38]=0.003;   limits[39]=0.0051; //Kxv_ra
+    //limits[40]=0.16;     limits[41]=0.39;  //Emax_ra
+    limits[40]=0.25;     limits[41]=0.50;  //Emax_ra
+    limits[42]=-5.00;   limits[43]=5.00; //Vaso_ra
+    //limits[44]=0.0001;  limits[45]=10.00; //Kxp_la
+    //limits[44]=2.29;  limits[45]=12.73; //Kxp_la
+    limits[44]=0.29;  limits[45]=10.73; //Kxp_la
+    limits[46]=0.0078;  limits[47]=0.0085; //Kxv_la
+    limits[48]=0.29;    limits[49]=0.32; //Emax_la
+    limits[50]=-1.69;   limits[51]=15.81; //Vaso_la
+    //limits[52]=0.0100;  limits[53]=10.0;  //Ram_cor
+    limits[52]=0.1;  limits[53]=1.5;  //Ram_cor
+    //limits[54]=0.0001;  limits[55]=10.0;  //Rv_cor
+    limits[54]=0.5;  limits[55]=10.0;  //Rv_cor
+    //limits[56]=0.0001;  limits[57]=10.0;  //Cam_l
+    //limits[56]=1.0;  limits[57]=10.0;  //Cam_l
+    //limits[56]=4.76;  limits[57]=12.96;  //Cam_l
+    limits[56]=9.76;  limits[57]=17.96;  //Cam_l
+    //limits[58]=0.0001;  limits[59]=10.0;  //Ca_l
+    limits[58]=1.84;  limits[59]=13.94;  //Ca_l
+    //limits[60]=0.0001;  limits[61]=10.0;  //Cam_r
+    limits[60]=0.05;  limits[61]=15.28;  //Cam_r
+    //limits[62]=0.0001;  limits[63]=10.0;  //Ca_r
+    limits[62]=0.46;  limits[63]=14.36;  //Ca_r
+    //limits[64]=0.1000;  limits[65]=10.0;  //Rrcr
+    limits[64]=0.55;  limits[65]=1.69;  //Rrcr
+    //limits[66]=0.0100;  limits[67]=1.1;  //Crcr
+    limits[66]=0.1;  limits[67]=2.0;  //Crcr
+    //limits[68]=0.1;     limits[69]=0.2;   // Rprox_factor
+    //limits[70]=0.2000;  limits[71]=1.000; // imr
+    limits[68]=0.2000;  limits[69]=1.28; // imr
+    //limits[72]=0.3;     limits[73]=1.5;   // init_volume_scaling
+    //limits[72]=0.1;     limits[73]=1.5;   // init_volume_scaling
+  //limits[0]=0.4000;   limits[1]=0.4500; // Tsa
+  //limits[2]=8.0000;   limits[3]=9.000; // tpwave
+  //limits[4]=1.0000;   limits[5]=3.00; // Erv
+  //limits[6]=1.5000;   limits[7]=5.00; // Elv
+  //limits[8]=0.2000;   limits[9]=1.00; // iml
+  //limits[10]=0.1;     limits[11]=0.5;   // Lrv_a
+  //limits[12]=0.5;     limits[13]=1.5; // Rrv_a
+  ////limits[14]=0.001;   limits[15]=0.5;  // Lra_v
+  //limits[14]=0.01;   limits[15]=0.5;  // Lra_v
+  //limits[16]=5.0;     limits[17]=12.0; // Rra_v
+  ////limits[18]=0.001;   limits[19]=0.5;  // Lla_v
+  //limits[18]=0.01;   limits[19]=0.5;  // Lla_v
+  //limits[20]=5.0;     limits[21]=12.0; // Rla_v
+  //limits[22]=0.5;     limits[23]=1.5; // Rlv_ao
+  //limits[24]=0.1;     limits[25]=0.5;   // Llv_a
+  //limits[26]=-10.0;   limits[27]=10.0; // Vrv_u
   //limits[28]=-10.0;   limits[29]=10.0; // Vlv_u
-  limits[28]=-20.0;   limits[29]=5.0; // Vlv_u
-  limits[30]=0.69;  limits[31]=1.80; // Rpd
-  limits[32]=1.0;   limits[33]=1.15;   //Cp
-  limits[34]=0.05;    limits[35]=1.32;   //Cpa
-  //limits[36]=0.0;     limits[37]=0.0; // R_inlet
-  //limits[36]=0.001;   limits[37]=10.00; //Kxp_ra
-  limits[36]=1.0;   limits[37]=10.00; //Kxp_ra
-  limits[38]=0.003;   limits[39]=0.0051; //Kxv_ra
-  //limits[40]=0.16;     limits[41]=0.39;  //Emax_ra
-  limits[40]=0.25;     limits[41]=0.50;  //Emax_ra
-  limits[42]=-5.00;   limits[43]=5.00; //Vaso_ra
-  //limits[44]=0.0001;  limits[45]=10.00; //Kxp_la
-  //limits[44]=2.29;  limits[45]=12.73; //Kxp_la
-  limits[44]=0.29;  limits[45]=10.73; //Kxp_la
-  limits[46]=0.0078;  limits[47]=0.0085; //Kxv_la
-  limits[48]=0.29;    limits[49]=0.32; //Emax_la
-  limits[50]=-1.69;   limits[51]=15.81; //Vaso_la
-  //limits[52]=0.0100;  limits[53]=10.0;  //Ram_cor
-  limits[52]=0.1;  limits[53]=1.5;  //Ram_cor
-  //limits[54]=0.0001;  limits[55]=10.0;  //Rv_cor
-  limits[54]=0.5;  limits[55]=10.0;  //Rv_cor
-  //limits[56]=0.0001;  limits[57]=10.0;  //Cam_l
-  //limits[56]=1.0;  limits[57]=10.0;  //Cam_l
-  //limits[56]=4.76;  limits[57]=12.96;  //Cam_l
-  limits[56]=9.76;  limits[57]=17.96;  //Cam_l
-  //limits[58]=0.0001;  limits[59]=10.0;  //Ca_l
-  limits[58]=1.84;  limits[59]=13.94;  //Ca_l
-  //limits[60]=0.0001;  limits[61]=10.0;  //Cam_r
-  limits[60]=0.05;  limits[61]=15.28;  //Cam_r
-  //limits[62]=0.0001;  limits[63]=10.0;  //Ca_r
-  limits[62]=0.46;  limits[63]=14.36;  //Ca_r
-  //limits[64]=0.1000;  limits[65]=10.0;  //Rrcr
-  limits[64]=0.55;  limits[65]=1.69;  //Rrcr
-  //limits[66]=0.0100;  limits[67]=1.1;  //Crcr
-  limits[66]=0.1;  limits[67]=2.0;  //Crcr
-  //limits[68]=0.1;     limits[69]=0.2;   // Rprox_factor
-  //limits[70]=0.2000;  limits[71]=1.000; // imr
-  limits[68]=0.2000;  limits[69]=1.28; // imr
-  //limits[72]=0.3;     limits[73]=1.5;   // init_volume_scaling
-  //limits[72]=0.1;     limits[73]=1.5;   // init_volume_scaling
-//limits[0]=0.4000;   limits[1]=0.4500; // Tsa
-//limits[2]=8.0000;   limits[3]=9.000; // tpwave
-//limits[4]=1.0000;   limits[5]=3.00; // Erv
-//limits[6]=1.5000;   limits[7]=5.00; // Elv
-//limits[8]=0.2000;   limits[9]=1.00; // iml
-//limits[10]=0.1;     limits[11]=0.5;   // Lrv_a
-//limits[12]=0.5;     limits[13]=1.5; // Rrv_a
-////limits[14]=0.001;   limits[15]=0.5;  // Lra_v
-//limits[14]=0.01;   limits[15]=0.5;  // Lra_v
-//limits[16]=5.0;     limits[17]=12.0; // Rra_v
-////limits[18]=0.001;   limits[19]=0.5;  // Lla_v
-//limits[18]=0.01;   limits[19]=0.5;  // Lla_v
-//limits[20]=5.0;     limits[21]=12.0; // Rla_v
-//limits[22]=0.5;     limits[23]=1.5; // Rlv_ao
-//limits[24]=0.1;     limits[25]=0.5;   // Llv_a
-//limits[26]=-10.0;   limits[27]=10.0; // Vrv_u
-//limits[28]=-10.0;   limits[29]=10.0; // Vlv_u
-//limits[30]=0.5000;  limits[31]=1.5; // Rpd
-//limits[32]=0.900;   limits[33]=1.1;   //Cp
-//limits[34]=0.08;    limits[35]=1.0;   //Cpa
-//limits[36]=0.0;     limits[37]=1.0; // R_inlet
-////limits[38]=0.001;   limits[39]=10.00; //Kxp_ra
-//limits[38]=1.0;   limits[39]=10.00; //Kxp_ra
-//limits[40]=0.003;   limits[41]=0.005; //Kxv_ra
-//limits[42]=0.2;     limits[43]=0.3;  //Emax_ra
-//limits[44]=-5.00;   limits[45]=5.00; //Vaso_ra
-////limits[46]=0.0001;  limits[47]=10.00; //Kxp_la
-//limits[46]=1.0;  limits[47]=10.00; //Kxp_la
-//limits[48]=0.0075;  limits[49]=0.0085; //Kxv_la
-//limits[50]=0.29;    limits[51]=0.310; //Emax_la
-//limits[52]=-5.00;   limits[53]=10.00; //Vaso_la
-////limits[54]=0.0100;  limits[55]=10.0;  //Ram_cor
-//limits[54]=0.100;  limits[55]=2.0;  //Ram_cor
-////limits[56]=0.0001;  limits[57]=10.0;  //Rv_cor
-//limits[56]=0.5;  limits[57]=10.0;  //Rv_cor
-////limits[58]=0.0001;  limits[59]=10.0;  //Cam_l
-//limits[58]=0.5;  limits[59]=10.0;  //Cam_l
-////limits[60]=0.0001;  limits[61]=10.0;  //Ca_l
-//limits[60]=0.5;  limits[61]=10.0;  //Ca_l
-////limits[62]=0.0001;  limits[63]=10.0;  //Cam_r
-//limits[62]=0.05;  limits[63]=10.0;  //Cam_r
-////limits[64]=0.0001;  limits[65]=10.0;  //Ca_r
-//limits[64]=0.5;  limits[65]=10.0;  //Ca_r
-////limits[66]=0.1000;  limits[67]=10.0;  //Rrcr
-//limits[66]=0.5;  limits[67]=10.0;  //Rrcr
-////limits[68]=0.0100;  limits[69]=1.1;  //Crcr
-//limits[68]=0.100;  limits[69]=2.0;  //Crcr
-//limits[70]=0.1;     limits[71]=0.2;   // Rprox_factor
-//limits[72]=0.2000;  limits[73]=1.000; // imr
-////limits[74]=0.3;     limits[75]=1.5;   // init_volume_scaling
-//limits[74]=0.1;     limits[75]=1.5;   // init_volume_scaling
+  //limits[30]=0.5000;  limits[31]=1.5; // Rpd
+  //limits[32]=0.900;   limits[33]=1.1;   //Cp
+  //limits[34]=0.08;    limits[35]=1.0;   //Cpa
+  //limits[36]=0.0;     limits[37]=1.0; // R_inlet
+  ////limits[38]=0.001;   limits[39]=10.00; //Kxp_ra
+  //limits[38]=1.0;   limits[39]=10.00; //Kxp_ra
+  //limits[40]=0.003;   limits[41]=0.005; //Kxv_ra
+  //limits[42]=0.2;     limits[43]=0.3;  //Emax_ra
+  //limits[44]=-5.00;   limits[45]=5.00; //Vaso_ra
+  ////limits[46]=0.0001;  limits[47]=10.00; //Kxp_la
+  //limits[46]=1.0;  limits[47]=10.00; //Kxp_la
+  //limits[48]=0.0075;  limits[49]=0.0085; //Kxv_la
+  //limits[50]=0.29;    limits[51]=0.310; //Emax_la
+  //limits[52]=-5.00;   limits[53]=10.00; //Vaso_la
+  ////limits[54]=0.0100;  limits[55]=10.0;  //Ram_cor
+  //limits[54]=0.100;  limits[55]=2.0;  //Ram_cor
+  ////limits[56]=0.0001;  limits[57]=10.0;  //Rv_cor
+  //limits[56]=0.5;  limits[57]=10.0;  //Rv_cor
+  ////limits[58]=0.0001;  limits[59]=10.0;  //Cam_l
+  //limits[58]=0.5;  limits[59]=10.0;  //Cam_l
+  ////limits[60]=0.0001;  limits[61]=10.0;  //Ca_l
+  //limits[60]=0.5;  limits[61]=10.0;  //Ca_l
+  ////limits[62]=0.0001;  limits[63]=10.0;  //Cam_r
+  //limits[62]=0.05;  limits[63]=10.0;  //Cam_r
+  ////limits[64]=0.0001;  limits[65]=10.0;  //Ca_r
+  //limits[64]=0.5;  limits[65]=10.0;  //Ca_r
+  ////limits[66]=0.1000;  limits[67]=10.0;  //Rrcr
+  //limits[66]=0.5;  limits[67]=10.0;  //Rrcr
+  ////limits[68]=0.0100;  limits[69]=1.1;  //Crcr
+  //limits[68]=0.100;  limits[69]=2.0;  //Crcr
+  //limits[70]=0.1;     limits[71]=0.2;   // Rprox_factor
+  //limits[72]=0.2000;  limits[73]=1.000; // imr
+  ////limits[74]=0.3;     limits[75]=1.5;   // init_volume_scaling
+  //limits[74]=0.1;     limits[75]=1.5;   // init_volume_scaling
+  }
 }
 
 // ====================
@@ -782,8 +800,17 @@ void svZeroD_ClosedLoopCoronary_GSI::getPriorMapping(int priorModelType,int* prP
 // ==========================================
 // UPDATE PARAMETERS OF THE ZEROD MODEL
 // ==========================================
-void svZeroD_ClosedLoopCoronary_GSI::setModelParams(LPNSolverInterface& interface, const stdVec& params) {
+void svZeroD_ClosedLoopCoronary_GSI::setModelParams(LPNSolverInterface& interface, stdVec params) {
   std::string block_name;
+
+  if (this->scaled) {
+    // Un-scale parameters before passing to model
+    stdVec limits;
+    this->getParameterLimits(limits, true);
+    for (int i  = 0; i < this->getParameterTotal(); i++) {
+      params[i] = params[i]*(limits[2*i+1]-limits[2*i]) + limits[2*i];
+    }
+  }
   
   // Update the model parameters 
   for (int i = 0; i < this->n_corBC_l; i++) {
@@ -883,10 +910,10 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
   int totalStepsOnSingleCycle = interface.pts_per_cycle_;
   int numCycles = interface.num_cycles_;
   int totOutputSteps = interface.num_output_steps_;
-  // IDs of main lca/rca
-  int lca_main_id = 0;
-  int rca_main_id = 0;
-  double max_flow = 0.0;
+//// IDs of main lca/rca
+//int lca_main_id = 0;
+//int rca_main_id = 0;
+//double max_flow = 0.0;
     
   // SUM RCR FLUX
   double temp = 0.0;
@@ -957,6 +984,12 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
         mit_open = count;
         break;
      }
+  }
+
+  if (systole_start >= systole_end) {
+    std::cout<<"WARNING: systole_start >= systole_end"<<std::endl;
+    std::cout<<"systole_start: "<<systole_start<<std::endl;
+    std::cout<<"systole_end: "<<systole_end<<std::endl;
   }
 
   // COUNT PERCENTAGE OF
@@ -1068,6 +1101,22 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
   double r_cor_tot_ratio = r_cor_qtot_d/r_cor_qtot_s;
   double l_cor_max_ratio = l_cor_qmax_d/l_cor_qmax_s;
   double l_cor_tot_ratio = l_cor_qtot_d/l_cor_qtot_s;
+  
+//if(r_cor_max_ratio < 0 || l_cor_max_ratio < 0 || r_cor_tot_ratio < 0 || l_cor_tot_ratio < 0) {
+//    r_cor_max_ratio = 9001.0;
+//}
+  if(r_cor_max_ratio < 0) {
+      r_cor_max_ratio = 9001.0;
+  }
+  if(r_cor_tot_ratio < 0) {
+      r_cor_tot_ratio = 9001.0;
+  }
+  if(l_cor_max_ratio < 0) {
+      l_cor_max_ratio = 9001.0;
+  }
+  if(l_cor_tot_ratio < 0) {
+      l_cor_tot_ratio = 9001.0;
+  }
 
   // CALCULATE 1/3 FF AND 1/2 FF
   double r_third_FF, r_half_FF, l_third_FF, l_half_FF;
@@ -1127,9 +1176,6 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
   double Qla_ratio = cmUtils::getMax(mit_open-1,mit_half,outVals[Q_LA_id])/cmUtils::getMax(mit_half-1,totOutputSteps,outVals[Q_LA_id]);
   double Pra_mean = cmUtils::getMean(totOutputSteps - totalStepsOnSingleCycle - 1, totOutputSteps, outVals[P_RA_id]);
   double LR_split = (Q_lcor/(Q_lcor + Q_rcor))*100;
-  if(r_cor_max_ratio < 0 || l_cor_max_ratio < 0 || r_cor_tot_ratio < 0 || l_cor_tot_ratio < 0) {
-      r_cor_max_ratio = 9001.0;
-  }
 
   // COMPUTE CONVERGENCE QUANTITIES (for past 2 cycles)
   double Qinlet1 = cmUtils::trapz(totOutputSteps - 2*totalStepsOnSingleCycle - 1, totOutputSteps - totalStepsOnSingleCycle,t,outVals[Q_aorta_id]);

@@ -625,7 +625,7 @@ void svZeroD_ClosedLoopCoronary::getPriorMapping(int priorModelType,int* prPtr) 
 // ==========================================
 // UPDATE PARAMETERS OF THE ZEROD MODEL
 // ==========================================
-void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, const stdVec& params) {
+void svZeroD_ClosedLoopCoronary::setModelParams(LPNSolverInterface& interface, stdVec params) {
   std::string block_name;
   
   // Update the model parameters 

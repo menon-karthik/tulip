@@ -15,7 +15,7 @@ class svZeroD_distalResistance: public svZeroDModel {
   public:
     
     //DEFAULT CONSTRUCTOR
-    svZeroD_distalResistance(std::string input_target_file, std::string input_perufusion_volumes_file);
+    svZeroD_distalResistance(std::string input_target_file, std::string input_perufusion_volumes_file, bool scaled = false);
 
     // SET UP MODEL PARAMETERS
     virtual void setupModel(LPNSolverInterface& interface);
@@ -29,6 +29,9 @@ class svZeroD_distalResistance: public svZeroDModel {
     // GET TOTAL NUMBER OF RESULTS
     virtual int getResultTotal();
 
+    // IS THIS MODEL SCALED?
+    virtual bool isScaled();
+
     // GET THE PARAMETER NAMES
     virtual string getParamName(int index);
 
@@ -36,13 +39,14 @@ class svZeroD_distalResistance: public svZeroDModel {
     virtual string getResultName(int index);
 
     // GET THE PARAMETER RANGES FOR THE LPN MODELS
-    virtual void getParameterLimits(stdVec& limits);
+    //virtual void getParameterLimits(stdVec& limits);
+    virtual void getParameterLimits(stdVec& limits, bool reverse_scaling = false);
 
     // GET PARAMETER SETS FOR THE LPN MODELS     
     virtual void getDefaultParams(stdVec& zp);
 
     // UPDATE ZEROD MODEL PARAMETERS
-    virtual void setModelParams(LPNSolverInterface& interface, const stdVec& params);
+    virtual void setModelParams(LPNSolverInterface& interface, stdVec params);
 
     // POSTPROCESS ZEROD SIMULATION
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
@@ -126,6 +130,7 @@ class svZeroD_distalResistance: public svZeroDModel {
     std::vector<double> result_weights;
     std::vector<std::string> result_keys;
     std::vector<double> data_std;
+    bool scaled;
 };
 
 #endif // SVZERODDISTALRESISTANCE

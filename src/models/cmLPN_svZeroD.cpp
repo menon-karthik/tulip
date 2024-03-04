@@ -96,15 +96,27 @@ void cmLPN_svZeroD::getDefaultParams(stdVec& zp){
 // ====================
 void cmLPN_svZeroD::getParameterLimits(stdVec& limits){
   this->zeroDmodel->getParameterLimits(limits);
-
-  // Change the limits bases on the Fixed Parameter List
+  
+  // Change the limits for fixed/frozen parameters
   int currParam = 0;
-  for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
-    currParam = frozenParamIDX[loopA];
-    // Assign the new lower and upper bounds to the center
-    limits[currParam*2]     = frozenParamVAL[loopA];
-    limits[currParam*2 + 1] = frozenParamVAL[loopA];
-  }  
+  if (this->zeroDmodel->isScaled()) {
+    stdVec limits_unscaled;
+    this->zeroDmodel->getParameterLimits(limits_unscaled, true);
+    for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
+      currParam = frozenParamIDX[loopA];
+      double scaled_param_val = (frozenParamVAL[loopA]-limits_unscaled[currParam*2])/(limits_unscaled[currParam*2+1]-limits_unscaled[currParam*2]);
+      // Assign the new lower and upper bounds
+      limits[currParam*2]     = scaled_param_val;
+      limits[currParam*2 + 1] = scaled_param_val;
+    }
+  } else {
+    for(size_t loopA=0;loopA<frozenParamIDX.size();loopA++){
+      currParam = frozenParamIDX[loopA];
+      // Assign the new lower and upper bounds
+      limits[currParam*2]     = frozenParamVAL[loopA];
+      limits[currParam*2 + 1] = frozenParamVAL[loopA];
+    }
+  }
 }
 
 // ====================
@@ -189,9 +201,9 @@ int cmLPN_svZeroD::solveLPN(const stdVec& params, stdVec& results){
 // =========================
 double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdIntVec& errorCode) {
 
-  int model = 0;
+  //int model = 0;
 
-  int resultTotal = getResultTotal();
+  //int resultTotal = getResultTotal();
   
   // Solve coronary model
   int error = 0;

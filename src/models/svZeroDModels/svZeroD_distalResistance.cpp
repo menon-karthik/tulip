@@ -2,7 +2,7 @@
 
 using namespace std;
 
-svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std::string perfusion_volumes_file) {
+svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std::string perfusion_volumes_file, bool scaled) {
   // Read target flows
   this->readTargetsFromFile(target_file);
 
@@ -12,6 +12,7 @@ svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std:
     this->use_perfusion = true;
     this->readPerfusionFile(perfusion_volumes_file);
   }
+  this->scaled = scaled;
 }
 
 // ==========================
@@ -326,6 +327,13 @@ int svZeroD_distalResistance::getResultTotal(){
   return (this->n_corBC_l+this->n_corBC_r);  
 }
 
+// ===================================
+// IS THIS MODEL SCALED?
+// ===================================
+bool svZeroD_distalResistance::isScaled(){
+  return this->scaled; 
+}
+
 // ==================
 // GET PARAMETER NAME
 // ==================
@@ -383,7 +391,7 @@ void svZeroD_distalResistance::getDefaultParams(stdVec& default_params){
 // ====================
 // GET PARAMETER RANGES
 // ====================
-void svZeroD_distalResistance::getParameterLimits(stdVec& limits){
+void svZeroD_distalResistance::getParameterLimits(stdVec& limits, bool reverse_scaling){
 
   limits.resize(2*getParameterTotal());
   for (int i = 0; i < getParameterTotal(); i++) {
@@ -432,7 +440,7 @@ void svZeroD_distalResistance::printResults(int totalResults, double* Xn) {
 // ==========================================
 // UPDATE PARAMETERS OF THE ZEROD MODEL
 // ==========================================
-void svZeroD_distalResistance::setModelParams(LPNSolverInterface& interface, const stdVec& params) {
+void svZeroD_distalResistance::setModelParams(LPNSolverInterface& interface, stdVec params) {
 
   // Scale each resistance so the total coronary resistance remains the same
   double R_total_inv = 0.0;

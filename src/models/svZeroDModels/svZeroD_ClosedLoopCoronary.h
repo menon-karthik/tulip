@@ -49,7 +49,7 @@ class svZeroD_ClosedLoopCoronary: public svZeroDModel {
     virtual void getPriorMapping(int priorModelType,int* prPtr);
 
     // UPDATE ZEROD MODEL PARAMETERS
-    virtual void setModelParams(LPNSolverInterface& interface, const stdVec& params);
+    virtual void setModelParams(LPNSolverInterface& interface, stdVec params);
 
     // POSTPROCESS ZEROD SIMULATION
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);

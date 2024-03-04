@@ -14,7 +14,7 @@ class svZeroD_ClosedLoopCoronary_GSI: public svZeroDModel {
   public:
 	
     // DEFAULT CONSTRUCTOR
-    svZeroD_ClosedLoopCoronary_GSI();
+    svZeroD_ClosedLoopCoronary_GSI(bool scaled = false);
 
     // SET UP MODEL PARAMETERS
     virtual void setupModel(LPNSolverInterface& interface);
@@ -31,6 +31,9 @@ class svZeroD_ClosedLoopCoronary_GSI: public svZeroDModel {
     // GET TOTAL NUMBER OF RESULTS
     virtual int getResultTotal();
 
+    // IS THIS MODEL SCALED?
+    virtual bool isScaled();
+
     // GET THE PARAMETER NAMES
     virtual string getParamName(int index);
 
@@ -41,7 +44,7 @@ class svZeroD_ClosedLoopCoronary_GSI: public svZeroDModel {
     virtual void getDefaultParams(stdVec& zp);
 
     // GET THE PARAMETER RANGES FOR THE LPN MODELS
-    virtual void getParameterLimits(stdVec& limits);
+    virtual void getParameterLimits(stdVec& limits, bool reverse_scaling = false);
 
     // GET THE DEFAULT PARAMETER RANGES FOR THE LPN MODELS (NOT USED CURRENTLY)
     virtual void getDefaultParameterLimits(stdVec& limits);
@@ -49,7 +52,7 @@ class svZeroD_ClosedLoopCoronary_GSI: public svZeroDModel {
     virtual void getPriorMapping(int priorModelType,int* prPtr);
 
     // UPDATE ZEROD MODEL PARAMETERS
-    virtual void setModelParams(LPNSolverInterface& interface, const stdVec& params);
+    virtual void setModelParams(LPNSolverInterface& interface, stdVec params);
 
     // POSTPROCESS ZEROD SIMULATION
     virtual void postProcess(LPNSolverInterface& interface, const stdVec& t, const stdMat& outVals,const stdMat& auxOutVals, stdVec& results);
@@ -123,6 +126,8 @@ class svZeroD_ClosedLoopCoronary_GSI: public svZeroDModel {
     double targetEDV;
     double targetPaoMin;
     double targetPaoMax;
+    bool scaled = false;
+    int lca_main_id, rca_main_id;
 };
 
 #endif // SVZERODCLOSEDLOOPCORONARY_GSI_H
