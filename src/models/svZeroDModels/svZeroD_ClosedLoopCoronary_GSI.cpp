@@ -680,7 +680,8 @@ void svZeroD_ClosedLoopCoronary_GSI::getParameterLimits(stdVec& limits, bool rev
     limits[4]=0.95;   limits[5]=3.33; // Erv
     //limits[6]=1.14;   limits[7]=6.30; // Elv
     limits[6]=1.14;   limits[7]=5.1; // Elv
-    limits[8]=0.30;   limits[9]=0.88; // iml
+    //limits[8]=0.30;   limits[9]=0.88; // iml
+    limits[8]=0.30;   limits[9]=0.83; // iml
     limits[10]=0.19;     limits[11]=0.7;   // Lrv_a
     limits[12]=0.87;     limits[13]=1.83; // Rrv_a
     //limits[14]=0.001;   limits[15]=0.5;  // Lra_v
@@ -935,7 +936,6 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
 
   // SUM LEFT CORONARY FLUX
   double Q_lcor = 0.0;
-  max_flow = 0.0;
   for(int loopA=0;loopA<n_cor3d_l;loopA++){    
     temp = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_lca_ids[loopA]]);
     Q_lcor = Q_lcor + temp;
@@ -950,7 +950,7 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
 
   // SUM RIGHT CORONARY FLUX
   double Q_rcor = 0.0;
-  max_flow = 0.0;
+  //max_flow = 0.0;
   for(int loopA=0;loopA<n_cor3d_r;loopA++){    
     temp = cmUtils::trapz(totOutputSteps-totalStepsOnSingleCycle-1,totOutputSteps,t,outVals[this->Q_rca_ids[loopA]]);
     Q_rcor = Q_rcor + temp;
