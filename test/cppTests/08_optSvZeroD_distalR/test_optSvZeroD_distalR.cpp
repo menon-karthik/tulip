@@ -101,10 +101,11 @@ int main(int argc, char* argv[]){
   // Write RScaling parameter to end of optParams.txt
   FILE *f;
   double RScaling = 0.0;
-  int dummy  = 0;
+  int dummy = 0;
+  std::Vector<double> dummy_vec;
   std::string specifier = "RScaling";
   f = fopen("optParams.txt", "a");
-  zeroDmodel->getSpecifiedParameter(specifier,RScaling,dummy);
+  zeroDmodel->getSpecifiedParameter(specifier,RScaling,dummy,dummy_vec);
   fprintf(f,"%f\n",RScaling);
   fclose(f);
 

@@ -75,6 +75,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   fclose(fp);
 
   this->coronary_params.resize(6);
+  //this->coronary_params.resize(5);
   this->R_total_inv_base = 0.0;
   // Initialize parameter vectors and read baseline block params
   // Baseline parameters (named *_base) are set in the svZeroD config file
@@ -367,9 +368,11 @@ string svZeroD_distalResistance::getResultName(int index) {
 // ====================
 // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
 // ====================
-void svZeroD_distalResistance::getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param) {
+void svZeroD_distalResistance::getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param, stdVec& return_vector) {
   if (specifier == "RScaling") {
     return_db_param = this->R_scaling;
+  } else if (specifier == "RScaling_history")
+    return_vector = this->R_scaling_history;
   } else {
     throw std::runtime_error("ERROR: Invalid specifier in svZeroD_distalResistance::getSpecifiedParameter.");
   }
@@ -456,6 +459,7 @@ void svZeroD_distalResistance::setModelParams(LPNSolverInterface& interface, std
   this->R_scaling = R_total_inv/this->R_total_inv_base;
   //std::cout<<"[solveCoronaryLPN] R scaling: "<<R_scaling<<std::endl;
 
+  this->R_scaling_history.push_back(this->R_scaling);
   std::string block_name;
   
   R_total_inv = 0.0;

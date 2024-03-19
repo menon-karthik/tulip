@@ -84,7 +84,7 @@ class svZeroD_distalResistance: public svZeroDModel {
     virtual void getResultWeights(stdVec& weights);
 
     // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
-    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param);
+    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param, stdVec& return_vector);
 
   protected:
 
@@ -126,6 +126,7 @@ class svZeroD_distalResistance: public svZeroDModel {
     std::vector<double> Ca_r_base;
     std::vector<double> iml_base;
     std::vector<double> imr_base;
+    std::vector<double> R_scaling_history;
 
     std::vector<double> result_weights;
     std::vector<std::string> result_keys;
