@@ -107,7 +107,7 @@ int main(int argc, char* argv[]){
   // Postprocess results
   if(id == 0){
     bool debugMode = false;
-    double burnInPercent = 10.0; // half of the samples discarded
+    double burnInPercent = 10.0; // samples discarded
     dream.postProcess(debugMode,burnInPercent);
   }
 

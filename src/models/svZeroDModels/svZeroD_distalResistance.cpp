@@ -2,7 +2,7 @@
 
 using namespace std;
 
-svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std::string perfusion_volumes_file, bool scaled) {
+svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std::string perfusion_volumes_file, std::string covariance_file, bool scaled) {
   // Read target flows
   this->readTargetsFromFile(target_file);
 
@@ -11,6 +11,11 @@ svZeroD_distalResistance::svZeroD_distalResistance(std::string target_file, std:
     std::cout<<"Using perfusion data"<<std::endl;
     this->use_perfusion = true;
     this->readPerfusionFile(perfusion_volumes_file);
+  }
+
+  if (covariance_file != "None") {
+    this->useCovariance = true;
+    this->readCovarianceFile(covariance_file);
   }
   this->scaled = scaled;
 }
@@ -98,6 +103,27 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
     this->iml_base[i] = this->coronary_params[5];
     this->R_total_inv_base += 1.0/(this->Ra_l_base[i]+this->Ram_l_base[i]+this->Rv_l_base[i]);
   }
+
+////TODO:TEST
+//double temp;
+//temp = this->Ra_l_base[0];
+//this->Ra_l_base[0] = this->Ra_l_base[2];
+//this->Ra_l_base[2] = temp;
+//temp = this->Ram_l_base[0];
+//this->Ram_l_base[0] = this->Ram_l_base[2];
+//this->Ram_l_base[2] = temp;
+//temp = this->Rv_l_base[0];
+//this->Rv_l_base[0] = this->Rv_l_base[2];
+//this->Rv_l_base[2] = temp;
+//temp = this->Ra_l_base[3];
+//this->Ra_l_base[3] = this->Ra_l_base[4];
+//this->Ra_l_base[4] = temp;
+//temp = this->Ram_l_base[3];
+//this->Ram_l_base[3] = this->Ram_l_base[4];
+//this->Ram_l_base[4] = temp;
+//temp = this->Rv_l_base[3];
+//this->Rv_l_base[3] = this->Rv_l_base[4];
+//this->Rv_l_base[4] = temp;
   
   // Read right coronary parameters
   this->Ra_r_base.reserve(this->n_corBC_r);
@@ -213,6 +239,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
   // Add target_flows and outlet_names and Q_lca/rca_ids_names and R_total_inv_base to header file
   int idx;
   std::vector<double> targets_copy = this->target_flows;
+  std::vector<std::vector<double>> cov_inv_copy = this->cov_inv;
   for (int i = 0; i < this->Q_lca_ids.size(); i++) {
     std::cout<<"Branch name: "<<this->Q_lca_ids_names[i]<<std::endl;
     auto itr = find(this->outlet_names.begin(), this->outlet_names.end(), this->Q_lca_ids_names[i]);
@@ -220,6 +247,7 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
       idx = std::distance(this->outlet_names.begin(), itr);
       std::cout<<"Found in targets at idx: "<<idx<<std::endl;
       this->target_flows[i] = targets_copy[idx];
+      std::cout<<"Rearrange: "<<i<<" "<<idx<<std::endl;
     } else {
       throw std::runtime_error("Error: Could not find "+this->Q_lca_ids_names[i]+" in outlet_names.");
     }
@@ -231,13 +259,14 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
       idx = std::distance(this->outlet_names.begin(), itr);
       std::cout<<"Found in targets at idx: "<<idx<<std::endl;
       this->target_flows[this->Q_lca_ids.size()+i] = targets_copy[idx];
+      std::cout<<"Rearrange: "<<this->Q_lca_ids.size()+i<<" "<<idx<<std::endl;
     } else {
       throw std::runtime_error("Error: Could not find "+this->Q_rca_ids_names[i]+" in outlet_names.");
     }
   }
   
   // Save target flow fractions, result keys, weights and standard deviation
-  double perfusion_std = 10.0;
+  double perfusion_std = 20.0;
   std::cout<<"Total target flow = "<<this->total_target_flow<<std::endl;
   for (int i = 0; i < this->target_flows.size(); i++) {
     // Flow fractions
@@ -246,9 +275,11 @@ void svZeroD_distalResistance::setupModel(LPNSolverInterface& interface){
     this->result_keys.push_back(this->getResultName(i));
     // Result weights
     this->result_weights.push_back(1.0);
-    // Standard deviations of target flows
-    //this->data_std.push_back(perfusion_std);
-    this->data_std.push_back(this->target_flow_fracs[i]*perfusion_std/100.0);
+    if (!this->useCovariance){
+      // Standard deviations of target flows
+      this->data_std.push_back(this->target_flow_fracs[i]*perfusion_std/100.0);
+      std::cout<<"Std: "<<i<<" "<<this->target_flow_fracs[i]*perfusion_std/100.0<<std::endl;
+    }
   }
 }
 
@@ -300,6 +331,50 @@ void svZeroD_distalResistance::readPerfusionFile(string perfusionFileName)
     if (line_ct > 0) { //skip header
       cmUtils::schSplit(buffer,tokens," ");
       this->perfusion_data.insert({tokens[0].c_str(),atof(tokens[1].c_str())});
+    }
+    line_ct++;
+  }
+  
+  read_file.close();
+}
+
+// ==========================
+// READ COVARIANCE DATA FROM FILE
+// ==========================
+void svZeroD_distalResistance::readCovarianceFile(string covarianceFileName)
+{
+  std::ifstream read_file;
+  read_file.open(covarianceFileName.c_str());
+  
+  std::string buffer;
+  std::vector<std::string> tokens;
+  if(!read_file.is_open())
+    throw cmException("ERROR: Cannot open covariance file");
+  if(read_file.eof())
+    throw cmException("ERROR: No covariance data found!");
+ 
+  int dim;
+  int line_ct = 0;
+  int dim_ct = 0;
+  while(std::getline(read_file,buffer))
+  {
+    if (line_ct == 0) {
+      cmUtils::schSplit(buffer,tokens," ");
+      dim = atoi(tokens[0].c_str());
+      this->cov_inv.resize(dim);
+      std::cout<<"dim="<<dim<<std::endl;
+    } else if (line_ct == 1) {
+      cmUtils::schSplit(buffer,tokens," ");
+      this->cov_det = atof(tokens[0].c_str());
+      std::cout<<"det="<<this->cov_det<<std::endl;
+    } else if (line_ct > 1) { //skip header
+      cmUtils::schSplit(buffer,tokens," ");
+      this->cov_inv[dim_ct].resize(dim);
+      for (int j=0; j<dim; j++) {
+        this->cov_inv[dim_ct][j] = atof(tokens[j].c_str());
+        std::cout<<dim_ct<<" "<<j<<" "<<this->cov_inv[dim_ct][j]<<std::endl;
+      }
+      dim_ct++;
     }
     line_ct++;
   }
@@ -368,10 +443,10 @@ string svZeroD_distalResistance::getResultName(int index) {
 // ====================
 // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
 // ====================
-void svZeroD_distalResistance::getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param, stdVec& return_vector) {
+void svZeroD_distalResistance::getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param, std::vector<double>& return_vector) {
   if (specifier == "RScaling") {
     return_db_param = this->R_scaling;
-  } else if (specifier == "RScaling_history")
+  } else if (specifier == "RScaling_history") {
     return_vector = this->R_scaling_history;
   } else {
     throw std::runtime_error("ERROR: Invalid specifier in svZeroD_distalResistance::getSpecifiedParameter.");
@@ -400,6 +475,10 @@ void svZeroD_distalResistance::getParameterLimits(stdVec& limits, bool reverse_s
   for (int i = 0; i < getParameterTotal(); i++) {
     limits[2*i] = 0.5;
     limits[2*i+1] = 2.0;
+    //limits[2*i] = 0.25;
+    //limits[2*i+1] = 4.0;
+    //limits[2*i] = 0.1;
+    //limits[2*i+1] = 1.9;
   }
 
 //int currParam = 0;
@@ -612,6 +691,9 @@ daData* svZeroD_distalResistance::createCustomData() {
   for (int i = 0; i < this->getResultTotal(); i++) {
     std::cout<<"[createCustomData] key: "<<this->result_keys[i]<<" ; Flow frac: "<<this->target_flow_fracs[i]<<std::endl;
     custom_data->addKeyValue(this->result_keys[i], this->target_flow_fracs[i]);
+  }
+  if (this->useCovariance == true) {
+    custom_data->addCovariance(this->cov_inv, this->cov_det);
   }
   return custom_data;
 }
