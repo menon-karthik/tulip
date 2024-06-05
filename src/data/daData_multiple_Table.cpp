@@ -211,6 +211,31 @@ double daData_multiple_Table::evalLogLikelihood(const stdStringVec& keys,const s
   return result;
 }
 
+//Compute log likelihood with non-diagonal covariance matrix
+double daData_multiple_Table::evalLogLikelihood_cov(const stdVec& computed) {
+
+  // NOTE: Assumes order of values in compiuted is same as order of keys (this function does not refer to (key, value) dict for simplicity) 
+  // NOTE: Also assumes that this->measured has been set in daData::addKeyValue
+
+  // Check The Size of keys and values
+  if(this->measured.size() != computed.size()){
+    throw daException("ERROR: Invalid values in daData_multiple_Table::evalLogLikelihood_cov.\n");
+  }
+  
+  double sum = 0.0;
+  // L = -0.5*N*log(2\pi) - 0.5*log(|\Sigma|) - 0.5*(Y-Y')^T*\Sigma^-1*(Y-Y')
+  double log_likelihood = 0.5*log(this->cov_det); // Negative log likelihood
+  for (int i=0; i<computed.size(); i++) {
+    sum = 0.0;
+    for (int j=0; j<computed.size(); j++) {
+      sum += this->cov_inv[i][j]*(computed[j]-this->measured[j]); // Each row of \Sigma^-1*(Y-Y')
+    }
+    log_likelihood += 0.5*(computed[i]-this->measured[i])*sum + 0.5*log(2.0*M_PI);
+  }
+  return log_likelihood;
+}
+
+
 void daData_multiple_Table::printAndCompare(const stdStringVec& keys,const stdVec& values,const stdVec& weights){
   
   // Check The Size of keys and values

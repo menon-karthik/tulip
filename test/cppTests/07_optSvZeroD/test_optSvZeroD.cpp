@@ -4,7 +4,8 @@
 # include "daData_multiple_Table.h"
 # include "acActionOPT_NM.h"
 # include "cmLPN_svZeroD.h"
-# include "svZeroD_ClosedLoopCoronary.h"
+//# include "svZeroD_ClosedLoopCoronary.h"
+# include "svZeroD_ClosedLoopCoronary_GSI.h"
 
 
 using namespace std;
@@ -45,7 +46,8 @@ int main(int argc, char* argv[]){
   // svZeroDPlus interface library
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
   // Type of svZeroD model
-  svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
+  //svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
+  svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary_GSI();
   cmLPN_svZeroD* lpnModel;
   lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib);
 

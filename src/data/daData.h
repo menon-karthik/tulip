@@ -23,6 +23,9 @@ class daData{
     */
     dataMap dict;
     doubleMap userStdDict;
+    std::vector<double> measured; //Stores measurements
+    std::vector<std::vector<double>> cov_inv;
+    double cov_det;
 
   public:
   	//! Empty data constructor
@@ -276,6 +279,9 @@ class daData{
     double evalLikelihood(const stdStringVec& keys,const stdVec& avValues,const stdVec& stdFactors,const stdVec& weights);
 
     void printUserSTDs();
+
+    void addCovariance(std::vector<std::vector<double>> covariance_mat_inv, double determinant);
+    virtual double evalLogLikelihood_cov(const stdVec& computed) = 0;
 
 };
 

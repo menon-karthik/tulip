@@ -25,7 +25,7 @@ int main(int argc, char* argv[]){
   std::string targets_file = "target_flows.dat";
   std::string perfusion_volumes_file = "perfusion_volumes.dat";
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
-  svZeroDModel* zeroDmodel = new svZeroD_distalResistance(targets_file, perfusion_volumes_file);
+  svZeroDModel* zeroDmodel = new svZeroD_distalResistance(targets_file, perfusion_volumes_file, "None");
   //svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary_GSI();
   //svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
   cmLPN_svZeroD* lpnModel;

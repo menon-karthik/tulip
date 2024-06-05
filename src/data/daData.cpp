@@ -36,6 +36,7 @@ void daData::addKeyValue(string key,double value){
   stdStringVec valuesAsString;
   valuesAsString.push_back(valueAsString);
   dict[key] = valuesAsString;
+  this->measured.push_back(value);
 }
 
 void daData::removeKeyValue(string key){
@@ -44,6 +45,19 @@ void daData::removeKeyValue(string key){
   if(it != dict.end()){
     // Remove the element pointed by iterator
     dict.erase(it);
+  }
+}
+
+void daData::addCovariance(std::vector<std::vector<double>> covariance_mat_inv, double determinant) {
+  this->cov_det = determinant;
+  int dim;
+  dim = covariance_mat_inv.size();
+  this->cov_inv.resize(dim);
+  for (int i=0; i<dim; i++) {
+    this->cov_inv[i].resize(dim);
+    for (int j=0; j<dim; j++) {
+      this->cov_inv[i][j] = covariance_mat_inv[i][j];
+    }
   }
 }
 

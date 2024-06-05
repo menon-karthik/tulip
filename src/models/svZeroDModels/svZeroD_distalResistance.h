@@ -15,7 +15,7 @@ class svZeroD_distalResistance: public svZeroDModel {
   public:
     
     //DEFAULT CONSTRUCTOR
-    svZeroD_distalResistance(std::string input_target_file, std::string input_perufusion_volumes_file, bool scaled = false);
+    svZeroD_distalResistance(std::string input_target_file, std::string input_perufusion_volumes_file, std::string input_covariance_file, bool scaled = false);
 
     // SET UP MODEL PARAMETERS
     virtual void setupModel(LPNSolverInterface& interface);
@@ -84,7 +84,10 @@ class svZeroD_distalResistance: public svZeroDModel {
     virtual void getResultWeights(stdVec& weights);
 
     // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
-    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param, stdVec& return_vector);
+    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param, std::vector<double>& return_vector);
+
+    // READ COVARIANCE DATA FROM A FILE
+    void readCovarianceFile(string covarianceFileName);
 
   protected:
 
@@ -132,6 +135,10 @@ class svZeroD_distalResistance: public svZeroDModel {
     std::vector<std::string> result_keys;
     std::vector<double> data_std;
     bool scaled;
+
+    double cov_det;
+    std::vector<std::vector<double>> cov_inv;
+    bool useCovariance = false;
 };
 
 #endif // SVZERODDISTALRESISTANCE

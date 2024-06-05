@@ -67,7 +67,7 @@ class svZeroD_ClosedLoopCoronary_GSI: public svZeroDModel {
     virtual void getResultWeights(stdVec& weights);
     
     // RETURN PARAMETER SPECIFIED BY STRING SPECIFIER
-    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param);
+    virtual void getSpecifiedParameter(string& specifier, double& return_db_param, int& return_int_param, std::vector<double>& return_vector);
 
     // CUSTOM ERROR EVALUATION FOR SPECIFIC MODELS
     virtual double evalModelError(std::vector<double>& results);
@@ -116,6 +116,8 @@ class svZeroD_ClosedLoopCoronary_GSI: public svZeroDModel {
     std::vector<double> Rp_rcr_base;
     std::vector<double> Rd_rcr_base;
     std::vector<double> C_rcr_base;
+    std::vector<double> iml_base;
+    std::vector<double> imr_base;
     double Rrv_base;
     double Rlv_base;
     double Rpd_base;

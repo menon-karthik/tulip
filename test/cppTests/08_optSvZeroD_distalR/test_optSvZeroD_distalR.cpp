@@ -42,7 +42,7 @@ int main(int argc, char* argv[]){
   // svZeroDPlus interface library
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
   // Type of svZeroD model
-  svZeroDModel* zeroDmodel = new svZeroD_distalResistance(targets_file, perfusion_volumes_file);
+  svZeroDModel* zeroDmodel = new svZeroD_distalResistance(targets_file, perfusion_volumes_file, "None");
   cmLPN_svZeroD* lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib, true);
 
   // Total Number of iterations
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]){
   FILE *f;
   double RScaling = 0.0;
   int dummy = 0;
-  std::Vector<double> dummy_vec;
+  std::vector<double> dummy_vec;
   std::string specifier = "RScaling";
   f = fopen("optParams.txt", "a");
   zeroDmodel->getSpecifiedParameter(specifier,RScaling,dummy,dummy_vec);

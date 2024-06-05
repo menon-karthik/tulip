@@ -21,8 +21,9 @@ int main(int argc, char* argv[]){
   // Assign model
   std::string model_path = string(argv[1]);
   auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
-  svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary_GSI();
-  //svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary();
+  //auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-sbi/src/interface/libsvzero_interface.so");
+  svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary_GSI(true);
+  //svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary_GSI();
   cmLPN_svZeroD* lpnModel;
   lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib);
 
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]){
     distributionsFileName = string(argv[2]);
   }
   // Order of PCE
-  int maxOrder = 4;
+  int maxOrder = 2;
   // Method to compute PCE coeffs: algUseRegression or algUseQuadrature
   int coeffAlg = algUseQuadrature;
   // Write debug data?

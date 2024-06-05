@@ -44,6 +44,7 @@ class daData_multiple_Table: public daData{
 
     void assignFromLabelsAndMat(const stdStringVec& labels,const stdMat& values, bool useMean);
     void overwriteStandardDeviations(const stdStringVec& labels,const stdVec& stds);
+    virtual double evalLogLikelihood_cov(const stdVec& computed);
     
 };
 
