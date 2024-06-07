@@ -242,9 +242,9 @@ double cmLPN_svZeroD::evalModelError(const stdVec& inputs, stdVec& outputs, stdI
       data->printAndCompare(keys,this->results,weights);
       
       // Evaluate Log Likelihood
-      //model_error = data->evalLogLikelihood(keys,this->results,stdFactors,weights);
+      model_error = data->evalLogLikelihood(keys,this->results,stdFactors,weights);
       // TODO: Add condition to trigger case with non-diagonal covariance
-      model_error = data->evalLogLikelihood_cov(this->results);
+      //model_error = data->evalLogLikelihood_cov(this->results);
     }
   }
 

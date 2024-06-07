@@ -34,7 +34,7 @@ int main(int argc, char* argv[]){
 
   // Assign model
   std::string model_path = string(argv[1]);
-  auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release-master/src/interface/libsvzero_interface_library.so");
+  auto interface_lib = std::string("/home/users/kmenon13/svZeroDPlus/Release/src/interface/libsvzero_interface.so");
   svZeroDModel* zeroDmodel = new svZeroD_ClosedLoopCoronary_GSI();
   cmLPN_svZeroD* lpnModel;
   lpnModel = new cmLPN_svZeroD(model_path, zeroDmodel, interface_lib);

@@ -74,8 +74,8 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
   }
         
   // Initialize parameter vectors and read baseline block params
-  this->coronary_params.resize(6);
-  //this->coronary_params.resize(5);
+  //this->coronary_params.resize(6);
+  this->coronary_params.resize(5);
   this->rcr_params.resize(3);
   this->heart_params.resize(27);
   this->vessel_params.resize(4);
@@ -88,7 +88,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
   this->Rv_l_base.reserve(this->n_corBC_l);
   this->Ca_l_base.reserve(this->n_corBC_l);
   this->Cim_l_base.reserve(this->n_corBC_l);
-  this->iml_base.reserve(this->n_corBC_l);
+  //this->iml_base.reserve(this->n_corBC_l);
   double R_min_lca = 1E10;
   for (int i = 0; i < this->n_corBC_l; i++) {
     block_name = this->names_corBC_l[i];
@@ -98,7 +98,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
     this->Rv_l_base[i] = this->coronary_params[2];
     this->Ca_l_base[i] = this->coronary_params[3];
     this->Cim_l_base[i] = this->coronary_params[4];
-    this->iml_base[i] = this->coronary_params[5];
+    //this->iml_base[i] = this->coronary_params[5];
     if (this->Ra_l_base[i] < R_min_lca) {
       R_min_lca = this->Ra_l_base[i];
       this->lca_main_id = i;
@@ -111,7 +111,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
   this->Rv_r_base.reserve(this->n_corBC_r);
   this->Ca_r_base.reserve(this->n_corBC_r);
   this->Cim_r_base.reserve(this->n_corBC_r);
-  this->imr_base.reserve(this->n_corBC_r);
+  //this->imr_base.reserve(this->n_corBC_r);
   double R_min_rca = 1E10;
   for (int i = 0; i < this->n_corBC_r; i++) {
     block_name = this->names_corBC_r[i];
@@ -121,7 +121,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setupModel(LPNSolverInterface& interface){
     this->Rv_r_base[i] = this->coronary_params[2];
     this->Ca_r_base[i] = this->coronary_params[3];
     this->Cim_r_base[i] = this->coronary_params[4];
-    this->imr_base[i] = this->coronary_params[5];
+    //this->imr_base[i] = this->coronary_params[5];
     if (this->Ra_r_base[i] < R_min_rca) {
       R_min_rca = this->Ra_r_base[i];
       this->rca_main_id = i;
@@ -841,7 +841,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setModelParams(LPNSolverInterface& interfac
     this->coronary_params[2] = this->Rv_l_base[i]*params[27]; //Rv
     this->coronary_params[3] = this->Ca_l_base[i]*params[29]; //Ca
     this->coronary_params[4] = this->Cim_l_base[i]*params[28]; //Cim
-    this->coronary_params[5] = params[4]; //iml
+    //this->coronary_params[5] = params[4]; //iml
     interface.update_block_params(block_name, this->coronary_params);
   }
   
@@ -858,7 +858,7 @@ void svZeroD_ClosedLoopCoronary_GSI::setModelParams(LPNSolverInterface& interfac
     this->coronary_params[2] = this->Rv_r_base[i]*params[27]; //Rv
     this->coronary_params[3] = this->Ca_r_base[i]*params[31]; //Ca
     this->coronary_params[4] = this->Cim_r_base[i]*params[30]; //Cim
-    this->coronary_params[5] = params[34]; //imr
+    //this->coronary_params[5] = params[34]; //imr
     interface.update_block_params(block_name, this->coronary_params);
   }
   
@@ -1234,9 +1234,9 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
   results[28] = r_grad_ok;
 
   // Check for nans
-  std::cout<<"RESULTS:"<<std::endl;
+  //std::cout<<"\nRESULTS:"<<std::endl;
   for (int i = 0; i < this->getResultTotal(); i++) {
-    std::cout<<i<<" "<<results[i]<<std::endl;
+    //std::cout<<i<<" "<<results[i]<<std::endl;
     if (isnan(results[i]) || isinf(results[i])) {
       const std::string error_msg = "ERROR: nan/inf in result "+this->getResultName(i)+" with index "+std::to_string(i);
       std::cout<<error_msg<<std::endl;
@@ -1244,7 +1244,6 @@ void svZeroD_ClosedLoopCoronary_GSI::postProcess(LPNSolverInterface& interface, 
       //throw std::runtime_error(error_msg);
     }
   }
-  std::cout<<std::endl;
 
 }
 
